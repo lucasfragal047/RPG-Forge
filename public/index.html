@@ -5,225 +5,45 @@
 <title>RPG Forge — Mesa Virtual</title>
 <style>
 :root{color-scheme:dark;--bg:#101216;--panel:#171a20;--panel2:#1d2129;--line:#303641;--text:#eef1f5;--muted:#9ca5b3;--accent:#d6a85d;--good:#6dcc9b;--danger:#df7474}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,Segoe UI,sans-serif;overflow:hidden}.app{height:100vh;display:grid;grid-template-rows:58px 1fr;background:var(--bg)}header{display:flex;align-items:center;gap:18px;padding:0 18px;border-bottom:1px solid var(--line);background:#12151a}.logo{font-weight:800;letter-spacing:.4px}.logo span{color:var(--accent)}.session{color:var(--muted);font-size:12px}.spacer{flex:1}.pill,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:8px 11px}.btn{cursor:pointer}.btn:hover{border-color:#555e6d}.main{min-height:0;display:grid;grid-template-columns:250px 1fr 285px}.side{background:var(--panel);border-right:1px solid var(--line);overflow:auto}.right{border-left:1px solid var(--line);border-right:0}.section{padding:15px;border-bottom:1px solid var(--line)}h3{margin:0 0 11px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}.toolgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.tool{padding:9px;border:1px solid var(--line);border-radius:8px;background:#191d24;cursor:pointer}.tool.active{border-color:var(--accent);color:var(--accent)}.tokenItem{display:flex;align-items:center;gap:8px;padding:8px;border-radius:7px;cursor:pointer}.tokenItem:hover{background:#20252e}.dot{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;border:2px solid #fff}.player{background:#5774d9}.npc{background:#b25d65}.monster{background:#7a9a55}.canvasWrap{position:relative;overflow:hidden;background:#0c0f13}.toolbar{position:absolute;z-index:5;top:12px;left:12px;right:12px;display:flex;gap:7px;align-items:center}.toolbar .btn{background:#171b22dd;backdrop-filter:blur(5px)}.mapToolsWrap{position:relative;z-index:10;display:flex;align-items:flex-start}.mapToolsToggle{width:40px;height:40px;padding:0;font-size:18px}.mapToolsPanel{display:none;position:absolute;left:47px;top:0;gap:7px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:10px;background:#12151add;backdrop-filter:blur(7px);box-shadow:0 8px 24px #0008;white-space:nowrap}.mapToolsWrap.open .mapToolsPanel{display:flex}#map{position:absolute;inset:0;cursor:grab;transform-origin:0 0}.grid{position:absolute;width:2400px;height:1600px;left:-400px;top:-300px;background-color:#15191e;background-image:linear-gradient(#30353d 1px,transparent 1px),linear-gradient(90deg,#30353d 1px,transparent 1px);background-size:50px 50px}.room{position:absolute;border:2px solid #777f8d;background:#20252bcc;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#707887;font-size:13px}.token{position:absolute;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;border:3px solid #eee;box-shadow:0 5px 16px #0008;cursor:grab;user-select:none;z-index:3}.token.selected{outline:3px solid var(--accent);outline-offset:3px}.token.player{background:#536fd2}.token.npc{background:#a95d65}.token.monster{background:#718e50}.fog{position:absolute;background:#050608cc;z-index:4;pointer-events:none;mix-blend-mode:normal}.magicEffect{position:absolute;z-index:7;pointer-events:none;border:3px solid var(--effect-color,#7c4dff);background:color-mix(in srgb,var(--effect-color,#7c4dff) 22%,transparent);box-shadow:0 0 24px var(--effect-color,#7c4dff),inset 0 0 24px var(--effect-color,#7c4dff);animation:magicPulse 1.4s ease-in-out infinite alternate}.magicBeam{position:absolute;height:5px;transform-origin:left center;background:var(--effect-color,#7c4dff);box-shadow:0 0 16px var(--effect-color,#7c4dff);z-index:7;pointer-events:none}.spellArea{position:absolute;z-index:7;pointer-events:auto;overflow:hidden;border:2px solid var(--effect-color);box-shadow:0 0 28px var(--effect-color),inset 0 0 20px var(--effect-color);background:color-mix(in srgb,var(--effect-color) 18%,transparent)}.spellArea .spellClose{position:absolute;right:3px;top:3px;z-index:3;background:#111b;border:1px solid #fff5;color:#fff;border-radius:5px;cursor:pointer}.spellParticles{position:absolute;inset:0;pointer-events:none}.spellParticle{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--effect-color);box-shadow:0 0 10px var(--effect-color);animation:particleFall var(--dur) linear infinite;left:var(--left);top:-10px}.fireFlame{position:absolute;width:22px;height:38px;border-radius:60% 40% 60% 40%;background:var(--effect-color);box-shadow:0 0 18px var(--effect-color);animation:flame 650ms ease-in-out infinite alternate;left:var(--left);bottom:var(--bottom);transform:rotate(var(--rot))}.spellLabel{position:absolute;left:7px;bottom:5px;padding:2px 5px;border-radius:5px;background:#101216bb;color:#fff;font-size:10px}.measure{position:absolute;z-index:6;border-top:2px dashed var(--accent);transform-origin:left center;pointer-events:none}.badge{position:absolute;top:-18px;right:-8px;background:#111;color:#fff;border:1px solid var(--line);padding:2px 5px;border-radius:5px;font-size:10px}.card{background:#1b1f27;border:1px solid var(--line);border-radius:9px;padding:10px;margin-bottom:8px}.row{display:flex;justify-content:space-between;gap:8px;margin:6px 0}.muted{color:var(--muted)}.hpbar{height:7px;background:#333;border-radius:99px;overflow:hidden;margin-top:8px}.hpbar i{display:block;height:100%;background:var(--good)}.init{display:flex;align-items:center;gap:8px}.init strong{margin-left:auto}.small{font-size:11px;color:var(--muted)}input,select{background:#12151a;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:6px;width:100%}.dice{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.dice button{padding:9px 3px;background:#242a33;border:1px solid var(--line);border-radius:7px;color:#fff;cursor:pointer}.log{max-height:115px;overflow:auto;font-size:12px;color:var(--muted)}.mode{color:var(--good);font-weight:700}.hidden{display:none}@keyframes magicPulse{from{transform:scale(.96);opacity:.72}to{transform:scale(1.04);opacity:1}}@keyframes particleFall{from{transform:translateY(-15px) rotate(0deg);opacity:0}15%{opacity:1}to{transform:translateY(230px) rotate(260deg);opacity:0}}@keyframes flame{from{transform:scale(.85) rotate(var(--rot));opacity:.65}to{transform:scale(1.12) rotate(calc(var(--rot) + 4deg));opacity:1}}@media(max-width:900px){.main{grid-template-columns:190px 1fr}.right{display:none}}
-/* Névoa animada — nuvem redimensionável */
-.rpgFogLayer{position:absolute;left:-400px;top:-300px;width:2400px;height:1600px;z-index:4;pointer-events:none;overflow:visible;display:none}
-.rpgFogLayer.active{display:block}
-.rpgFogCloud{--fog-color:#dfe5ee;position:absolute;left:0;top:0;width:100%;height:100%;min-width:260px;min-height:180px;pointer-events:auto;cursor:grab;overflow:visible;filter:blur(.2px);transform-origin:center center;background:var(--fog-color)}
-.rpgFogCloud:active{cursor:grabbing}
-.rpgFogCloud.locked{cursor:default}
-.rpgFogCloud.locked::before,.rpgFogCloud.locked::after{animation-play-state:paused}
-.rpgFogCloud.gmSeeThrough{opacity:.10!important}
-.rpgFogCloud.gmSeeThrough::before,.rpgFogCloud.gmSeeThrough::after{opacity:.18}.rpgFogVisionMask{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;overflow:visible}.rpgFogVisionMask *{pointer-events:none}
-.rpgFogCloud::before{content:"";position:absolute;inset:-3%;border-radius:0;background:linear-gradient(var(--fog-color),var(--fog-color)),
-radial-gradient(ellipse at 15% 54%,color-mix(in srgb,var(--fog-color) 96%,white) 0 13%,color-mix(in srgb,var(--fog-color) 82%,transparent) 28%,transparent 55%),
-radial-gradient(ellipse at 34% 31%,color-mix(in srgb,var(--fog-color) 98%,white) 0 15%,color-mix(in srgb,var(--fog-color) 76%,transparent) 31%,transparent 57%),
-radial-gradient(ellipse at 55% 48%,color-mix(in srgb,var(--fog-color) 94%,white) 0 17%,color-mix(in srgb,var(--fog-color) 76%,transparent) 33%,transparent 59%),
-radial-gradient(ellipse at 76% 29%,color-mix(in srgb,var(--fog-color) 92%,white) 0 14%,color-mix(in srgb,var(--fog-color) 72%,transparent) 30%,transparent 56%),
-radial-gradient(ellipse at 87% 61%,color-mix(in srgb,var(--fog-color) 90%,white) 0 13%,color-mix(in srgb,var(--fog-color) 68%,transparent) 30%,transparent 55%),
-radial-gradient(ellipse at 48% 76%,color-mix(in srgb,var(--fog-color) 78%,transparent) 0 17%,transparent 52%);
-filter:blur(25px);animation:rpgCloudMove 28s ease-in-out infinite alternate}
-.rpgFogCloud::after{content:"";position:absolute;inset:4%;border-radius:58% 42% 48% 52% / 52% 58% 42% 48%;background:
-radial-gradient(ellipse at 20% 45%,color-mix(in srgb,var(--fog-color) 38%,transparent),transparent 38%),
-radial-gradient(ellipse at 45% 25%,color-mix(in srgb,var(--fog-color) 34%,transparent),transparent 42%),
-radial-gradient(ellipse at 70% 55%,color-mix(in srgb,var(--fog-color) 32%,transparent),transparent 40%),
-radial-gradient(ellipse at 50% 80%,color-mix(in srgb,var(--fog-color) 25%,transparent),transparent 45%);
-filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
-@keyframes rpgCloudMove{from{transform:translate(-2%,-1%) scale(1)}to{transform:translate(3%,2%) scale(1.045)}}
-@keyframes rpgCloudMove2{from{transform:translate(3%,2%) scale(1.02)}to{transform:translate(-3%,-2%) scale(1.08)}}
-.rpgFogResize{position:absolute;right:-10px;bottom:-10px;width:24px;height:24px;border-radius:50%;background:#d6a85d;border:2px solid #fff;box-shadow:0 2px 8px #0009;cursor:nwse-resize;z-index:3;pointer-events:auto}
-.rpgFogCloudTools{position:absolute;left:50%;top:-38px;transform:translateX(-50%);display:flex;gap:5px;opacity:.9;z-index:4;pointer-events:auto}
-.rpgFogCloudTools button{border:1px solid #555e6d;background:#171a20;color:#fff;border-radius:6px;padding:4px 7px;cursor:pointer;font-size:11px}
-.rpgFogControls{display:grid;gap:7px;margin-top:8px}.rpgFogControls .row2{display:flex;gap:7px;align-items:center}.rpgFogControls input[type=range]{padding:0}.rpgFogValue{min-width:42px;text-align:right;color:var(--muted);font-size:11px}.rpgFogSizeRow{flex-wrap:wrap}.rpgFogSizeRow .btn{padding:5px 7px;font-size:11px}.rpgFogSizeRow .rpgFogValue{min-width:38px}
-
-
-/* Páginas/mapas na barra lateral */
-.rpgPagePanel{margin-top:8px;padding:8px;border:1px solid var(--line);border-radius:9px;background:#12151a;display:grid;gap:6px}
-.rpgPagePanel[hidden]{display:none}
-.rpgPageChoice{display:flex;align-items:center;gap:7px;width:100%;padding:8px 9px;border:1px solid var(--line);border-radius:7px;background:#191d24;color:var(--text);cursor:pointer;text-align:left}
-.rpgPageChoice:hover{border-color:#555e6d;background:#20252e}
-.rpgPageChoice.active{border-color:var(--accent);color:var(--accent)}
-.rpgPageRow{display:grid;grid-template-columns:1fr 38px;gap:6px}
-.rpgPageLock{border:1px solid var(--line);border-radius:7px;background:#191d24;color:var(--muted);cursor:pointer;font-size:16px}
-.rpgPageLock:hover{border-color:#555e6d;color:var(--text)}
-.rpgPageLock.locked{border-color:var(--danger);color:var(--danger);background:#24191b}
-.rpgPageStatus{font-size:10px;color:var(--muted);padding:2px 4px 5px 4px}
-.rpgPageNew{width:100%;padding:8px 9px;border:1px dashed #555e6d;border-radius:7px;background:#171a20;color:var(--text);cursor:pointer}
-.rpgPageNew:hover{border-color:var(--accent)}
 </style></head>
 <body><div class="app"><header><div class="logo">RPG <span>FORGE</span></div><div class="session">Campanha: <b>Ruínas de Arkhon</b> · Sala <b>KR7X</b></div><div class="spacer"></div><span class="pill mode">● Mestre</span><button class="btn" id="share">Compartilhar sala</button></header>
-<div class="main"><aside class="side"><div class="section"><h3>Ferramentas</h3><div class="toolgrid"><button class="tool active" data-tool="select">↖ Selecionar</button><button class="tool" data-tool="measure">⌁ Medir</button><button class="tool" data-tool="fog">☁ Névoa</button><button class="tool" data-tool="ping">⊙ Marcar</button><button class="tool" id="rpgPageTool" type="button">🗺️ Mudar aba</button></div><div id="rpgPagePanel" class="rpgPagePanel" hidden></div></div><div class="section"><h3>🌫️ Névoa</h3><div class="rpgFogControls">
-  <button class="btn" id="rpgFogLock" style="width:100%">🔓 Travar névoa</button>
-  <button class="btn" id="rpgFogToggle" style="width:100%">🌫️ Ativar fumaça</button>
-  <button class="btn" id="rpgFogGMView" style="width:100%">👁 Mestre: ver através</button>
-  <div class="row2"><label class="small">Cor</label><input id="rpgFogColor" type="color" value="#dfe5ee" style="width:52px;height:32px;padding:2px"><span class="rpgFogValue" id="rpgFogColorValue">#DFE5EE</span></div>
-  <div class="row2"><input id="rpgFogOpacity" type="range" min="0" max="100" value="72"><span class="rpgFogValue" id="rpgFogValue">72%</span></div>
-  <div class="row2 rpgFogSizeRow"><label class="small">Tamanho</label><button class="btn" id="rpgFogSmall" type="button">− Diminuir</button><span class="rpgFogValue" id="rpgFogSizeValue">100%</span><button class="btn" id="rpgFogBig" type="button">＋ Aumentar</button></div>
-  <div class="row2"><label class="small">Visão dos tokens</label><select id="rpgFogVisionRadius" style="width:86px"><option value="1">1 bloco</option><option value="2" selected>2 blocos</option><option value="3">3 blocos</option><option value="4">4 blocos</option><option value="5">5 blocos</option></select><span class="rpgFogValue" id="rpgFogVisionValue">2</span></div>
-  <div class="small">Cada token revela automaticamente a área ao redor dele. A visão acompanha o token.</div>
-</div></div><div class="section"><h3>Mapa</h3><div class="card"><b>Ruínas — Salão Norte</b><div class="small">24 × 16 quadrados · 1 quadrado = 1,5 m</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="20">d20</button></div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
-<main class="canvasWrap" id="stage"><div class="toolbar"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomLabel" title="Clique para redefinir">100%</button><button class="btn" id="zoomIn">+</button><div class="mapToolsWrap" id="mapToolsWrap"><button class="btn mapToolsToggle" id="mapToolsToggle" title="Abrir ferramentas do mapa">⚙️</button><div class="mapToolsPanel" id="mapToolsPanel"><button class="btn" id="snap">Encaixar grade</button><button class="btn" id="importMap">📥 Importar mapa</button><button class="btn" id="exportMap">📤 Exportar mapa</button><input id="mapFile" type="file" accept="image/*,.json" class="hidden"></div></div><div class="spacer"></div><span class="pill">👥 0 conectados</span></div><div id="map"><div class="rpgFogLayer" id="rpgFogLayer"><div class="rpgFogCloud" id="rpgFogCloud"><div class="rpgFogCloudTools"><button id="rpgFogCenter" type="button">↺ Centro</button></div><div class="rpgFogResize" id="rpgFogResize" title="Arraste para redimensionar"></div></div></div><div class="grid"></div><div class="room" style="left:500px;top:230px;width:550px;height:300px">SALÃO PRINCIPAL</div><div class="room" style="left:1080px;top:230px;width:320px;height:300px">CRIPTA</div><div class="room" style="left:500px;top:590px;width:280px;height:250px">ALMOXARIFADO</div><div class="room" style="left:820px;top:590px;width:580px;height:250px">CORREDOR</div><div class="token player" id="laxus" style="left:650px;top:350px" title="Laxus">L</div><div class="token player" id="benzuke" style="left:750px;top:400px" title="Benzuke">B</div><div class="token monster" id="goblin" style="left:1120px;top:330px" title="Goblin">G</div></div><script>
-/* Páginas/mapas — controle pela barra lateral + bloqueio para jogadores */
-(function(){
-  const map=document.getElementById('map'), toolBtn=document.getElementById('rpgPageTool'), panel=document.getElementById('rpgPagePanel');
-  if(!map||!toolBtn||!panel)return;
-  const KEY='rpgForgePagesV5', STATE='rpgForgePageStateV5_', IDX='rpgForgePageIndexV5';
-  let pages=[{name:'Mapa 1',locked:false}], index=0;
-  const baseHTML=map.innerHTML;
-  window.rpgForgePageSnapshot=null;
-  window.rpgForgePageCurrentIndex=0;
-  const safeGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
-  const safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
-  try{
-    const p=JSON.parse(safeGet(KEY)||safeGet('rpgForgePagesV4')||'null');
-    if(Array.isArray(p)&&p.length) pages=p.map(pg=>Object.assign({locked:false},pg));
-  }catch(e){}
-  index=Math.max(0,Math.min(pages.length-1,Number(safeGet(IDX)||safeGet('rpgForgePageIndexV4')||0)||0));
-  function valid(html){return typeof html==='string'&&html.includes('class="grid"')&&html.includes('class="token')&&html.length>500}
-  function getSnapshot(){
-    const fog=document.getElementById('rpgFogLayer'), color=document.getElementById('rpgFogColor'), vision=document.getElementById('rpgFogVisionRadius');
-    let weather=null; try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
-    return {
-      version:5,
-      html:map.innerHTML,
-      mapStyle:map.getAttribute('style')||'',
-      weather,
-      fog:{
-        opacity:document.getElementById('rpgFogOpacity')?.value||'',
-        color:color?.value||'',
-        visionRadius:vision?.value||'',
-        active:!!fog?.classList.contains('active'),
-        locked:!!window.rpgForgeFogLocked
-      }
-    };
-  }
-  function save(i){
-    const snap=getSnapshot();
-    if(valid(snap.html))safeSet(STATE+i,JSON.stringify(snap));
-    safeSet(KEY,JSON.stringify(pages));safeSet(IDX,String(i));
-  }
-  function restore(i){
-    const raw=safeGet(STATE+i);
-    let snap=null;
-    try{snap=raw?JSON.parse(raw):null}catch(e){}
-    if(snap&&valid(snap.html)){
-      map.innerHTML=snap.html;
-      if(typeof snap.mapStyle==='string')map.setAttribute('style',snap.mapStyle);
-      window.rpgForgePageSnapshot=snap;
-    }else if(valid(raw)){
-      map.innerHTML=raw;
-      window.rpgForgePageSnapshot={version:4,html:raw,mapStyle:map.getAttribute('style')||'',weather:null,fog:null};
-    }else{
-      map.innerHTML=baseHTML;
-      window.rpgForgePageSnapshot=null;
-    }
-    window.rpgForgePageCurrentIndex=i;
-  }
-  function reloadPageKeepingRoom(){
-    try{
-      const q=new URLSearchParams(location.search);
-      const room=safeGet('rpgForgeOnlineRoomV1');
-      const role=safeGet('rpgForgeOnlineRoleV1');
-      const name=safeGet('rpgForgeOnlineName');
-      if(room)q.set('room',room);
-      if(role)q.set('role',role);
-      if(name)q.set('name',name);
-      const qs=q.toString();
-      location.href=location.pathname+(qs?'?'+qs:'')+location.hash;
-    }catch(e){location.reload()}
-  }
-  function render(){
-    panel.innerHTML='';
-    const current=pages[index]||{name:'Mapa '+(index+1),locked:false};
-    const currentLock=document.createElement('button');
-    currentLock.type='button';
-    currentLock.className='rpgPageNew';
-    currentLock.style.borderStyle='solid';
-    currentLock.textContent=current.locked?'🔓 Destravar mapa atual':'🔒 Travar mapa atual';
-    currentLock.title=current.locked?'Permitir que jogadores possam entrar neste mapa':'Impedir jogadores de trocar para este mapa';
-    currentLock.onclick=()=>{ current.locked=!current.locked; safeSet(KEY,JSON.stringify(pages)); render(); };
-    panel.appendChild(currentLock);
-    const currentStatus=document.createElement('div');
-    currentStatus.className='rpgPageStatus';
-    currentStatus.textContent=current.locked?'🔒 Este mapa está travado para jogadores.':'🔓 Este mapa está liberado para jogadores.';
-    panel.appendChild(currentStatus);
-    pages.forEach((pg,i)=>{
-      const row=document.createElement('div');row.className='rpgPageRow';
-      const b=document.createElement('button');b.type='button';b.className='rpgPageChoice'+(i===index?' active':'');
-      const safeName=String(pg.name||('Mapa '+(i+1))).replace(/[<>&]/g,'');
-      b.innerHTML=(pg.locked?'🔒 ':'🗺️ ')+'<span>'+safeName+'</span>';
-      b.title=pg.locked?'Mapa bloqueado para jogadores — o Mestre ainda pode acessá-lo':safeName;
-      b.onclick=()=>{
-        if(i===index){panel.hidden=true;return;}
-        save(index);safeSet(IDX,String(i));reloadPageKeepingRoom();
-      };
-      const lock=document.createElement('button');lock.type='button';lock.className='rpgPageLock'+(pg.locked?' locked':'');
-      lock.textContent=pg.locked?'🔒':'🔓';lock.title=pg.locked?'Destravar para jogadores':'Travar para jogadores';
-      lock.onclick=e=>{
-        e.stopPropagation();
-        pg.locked=!pg.locked;
-        safeSet(KEY,JSON.stringify(pages));
-        render();
-      };
-      row.appendChild(b);row.appendChild(lock);panel.appendChild(row);
-      if(pg.locked){
-        const st=document.createElement('div');st.className='rpgPageStatus';st.textContent='🔒 Jogadores ficam presos neste mapa';panel.appendChild(st);
-      }
-    });
-    const add=document.createElement('button');add.type='button';add.className='rpgPageNew';add.textContent='＋ Nova aba';
-    add.onclick=()=>{
-      save(index);const i=pages.length;pages.push({name:'Mapa '+(i+1),locked:false});
-      safeSet(STATE+i,JSON.stringify({version:5,html:baseHTML,mapStyle:'',weather:null,fog:null}));safeSet(KEY,JSON.stringify(pages));safeSet(IDX,String(i));reloadPageKeepingRoom();
-    };
-    panel.appendChild(add);
-  }
-  toolBtn.onclick=()=>{panel.hidden=!panel.hidden;document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));if(!panel.hidden)toolBtn.classList.add('active')};
-  /* API de acesso para a futura sincronização multiplayer: Mestre ignora bloqueio; jogadores respeitam. */
-  window.rpgForgePageAccess={
-    getPages:()=>pages,
-    isLocked:i=>!!pages[i]?.locked,
-    canEnter:(i,role='player')=>role==='master'||!pages[i]?.locked
-  };
-  restore(index);render();
-})();
-</script></main>
+<div class="main"><aside class="side"><div class="section"><h3>Ferramentas</h3><div class="toolgrid"><button class="tool active" data-tool="select">↖ Selecionar</button><button class="tool" data-tool="measure">⌁ Medir</button><button class="tool" data-tool="fog">☁ Névoa</button><button class="tool" data-tool="ping">⊙ Marcar</button></div></div><div class="section"><h3>Mapa</h3><div class="card"><b>Ruínas — Salão Norte</b><div class="small">24 × 16 quadrados · 1 quadrado = 1,5 m</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="20">d20</button></div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
+<main class="canvasWrap" id="stage"><div class="toolbar"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomLabel" title="Clique para redefinir">100%</button><button class="btn" id="zoomIn">+</button><div class="mapToolsWrap" id="mapToolsWrap"><button class="btn mapToolsToggle" id="mapToolsToggle" title="Abrir ferramentas do mapa">⚙️</button><div class="mapToolsPanel" id="mapToolsPanel"><button class="btn" id="snap">Encaixar grade</button><button class="btn" id="importMap">📥 Importar mapa</button><button class="btn" id="exportMap">📤 Exportar mapa</button><input id="mapFile" type="file" accept="image/*,.json" class="hidden"></div></div><div class="spacer"></div><span class="pill">👥 3 conectados</span></div><div id="map"><div class="grid"></div><div class="room" style="left:500px;top:230px;width:550px;height:300px">SALÃO PRINCIPAL</div><div class="room" style="left:1080px;top:230px;width:320px;height:300px">CRIPTA</div><div class="room" style="left:500px;top:590px;width:280px;height:250px">ALMOXARIFADO</div><div class="room" style="left:820px;top:590px;width:580px;height:250px">CORREDOR</div><div class="token player" id="laxus" style="left:650px;top:350px" title="Laxus">L</div><div class="token player" id="benzuke" style="left:750px;top:400px" title="Benzuke">B</div><div class="token monster" id="goblin" style="left:1120px;top:330px" title="Goblin">G</div></div></main>
 <aside class="side right"><div class="section"><h3>Selecionado</h3><div class="card" id="selected"><b>Laxus</b><div class="row"><span class="muted">PV</span><span>38 / 42</span></div><div class="hpbar"><i style="width:90%"></i></div><div class="row"><span class="muted">CA</span><span>21</span></div><div class="row"><span class="muted">Iniciativa</span><span>+7</span></div><button class="btn" style="width:100%;margin-top:7px" id="damage">Aplicar 5 dano</button></div></div><div class="section"><h3>Iniciativa</h3><div class="card init"><span class="dot player">L</span><span>Laxus</span><strong>18</strong></div><div class="card init"><span class="dot monster">G</span><span>Goblin</span><strong>14</strong></div><div class="card init"><span class="dot player">B</span><span>Benzuke</span><strong>11</strong></div><button class="btn" style="width:100%" id="next">Próximo turno →</button></div><div class="section"><h3>Chat da mesa</h3><div class="log" id="log"><div><b>Mestre:</b> Vocês entram no salão...</div><div><b>Benzuke:</b> Eu fico na frente.</div></div><div style="display:flex;gap:6px;margin-top:8px"><input id="chat" placeholder="Mensagem..."/><button class="btn" id="send">Enviar</button></div></div></aside></div></div>
+
+<script>
+(function(){
+  const selector='.token,.mapImageObject,.forgeObj';
+  function items(parent,el){return [...parent.children].filter(n=>n!==el && n.matches?.(selector));}
+  window.rpgLayer={
+    front(el){
+      if(!el?.parentElement)return;
+      const siblings=items(el.parentElement,el);
+      const max=siblings.reduce((m,n)=>Math.max(m,Number.parseInt(n.style.zIndex||getComputedStyle(n).zIndex)||0),1);
+      el.style.zIndex=String(max+1);
+      el.parentElement.appendChild(el);
+      return true;
+    },
+    back(el){
+      if(!el?.parentElement)return;
+      const siblings=items(el.parentElement,el);
+      const min=siblings.reduce((m,n)=>Math.min(m,Number.parseInt(n.style.zIndex||getComputedStyle(n).zIndex)||1),1);
+      el.style.zIndex=String(Math.max(1,min-1));
+      const first=siblings[0];
+      if(first) el.parentElement.insertBefore(el,first);
+      return true;
+    }
+  };
+})();
+</script>
 <script>
 try{
 const map=document.querySelector('#map'),stage=document.querySelector('#stage');let scale=1,x=0,y=0,tool='select',dragging=null,offset=[0,0],pan=false,panStart=[0,0],origin=[0,0],effectColor='#7c4dff',fogColor='#050608',pingColor='#d6a85d',visionColor='#d6a85d',tokenColor='#536fd2';
 function render(){map.style.transform=`translate(${x}px,${y}px) scale(${scale})`;document.querySelector('#zoomLabel').textContent=Math.round(scale*100)+'%'}render();
-document.querySelectorAll('.tool:not(#rpgPageTool)').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));b.classList.add('active');tool=b.dataset.tool});
+document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));b.classList.add('active');tool=b.dataset.tool});
 function pos(e){let r=stage.getBoundingClientRect();return [(e.clientX-r.left-x)/scale,(e.clientY-r.top-y)/scale]}
 map.querySelectorAll('.token').forEach(t=>{t.onpointerdown=e=>{if(tool!=='select')return;e.stopPropagation();dragging=t;let p=pos(e),left=parseFloat(t.style.left),top=parseFloat(t.style.top);offset=[p[0]-left,p[1]-top];t.classList.add('selected');document.querySelectorAll('.token').forEach(q=>{if(q!==t)q.classList.remove('selected')});t.setPointerCapture(e.pointerId)};t.onpointermove=e=>{if(!dragging||dragging!==t)return;let p=pos(e),nx=p[0]-offset[0],ny=p[1]-offset[1];if(document.querySelector('#snap').classList.contains('on')){nx=Math.round(nx/50)*50;ny=Math.round(ny/50)*50}t.style.left=nx+'px';t.style.top=ny+'px'};t.onpointerup=()=>dragging=null});
-stage.style.touchAction='none';
-function startMapPan(e){
-  if(tool!=='select'||e.button!==0)return;
-  if(e.target.closest('.token,.forgeObj,.spellArea,.toolbar,.rpgFogCloudTools,.objMenu,.mobMenu,.measure'))return;
-  pan=true;panStart=[e.clientX,e.clientY];origin=[x,y];
-  try{stage.setPointerCapture(e.pointerId)}catch(_){ }
-  e.preventDefault();
-}
-function moveMapPan(e){
-  if(!pan)return;
-  x=origin[0]+e.clientX-panStart[0];
-  y=origin[1]+e.clientY-panStart[1];
-  render();
-}
-function endMapPan(e){
-  if(!pan)return;
-  pan=false;
-  try{if(e.pointerId!=null)stage.releasePointerCapture(e.pointerId)}catch(_){ }
-}
-stage.addEventListener('pointerdown',e=>{
-  if(e.target.closest('.token,.forgeObj,.spellArea,.toolbar,.rpgFogCloudTools,.objMenu,.mobMenu,.measure'))return;
-  if(tool==='select'){startMapPan(e);return;}
-  if(tool==='ping'){let p=pos(e),m=document.createElement('div');m.textContent='✦';m.style.cssText=`position:absolute;left:${p[0]}px;top:${p[1]}px;z-index:8;color:${pingColor};font-size:30px;text-shadow:0 0 12px ${pingColor};pointer-events:none`;map.appendChild(m);setTimeout(()=>m.remove(),1000);return;}
-  if(tool==='fog'){let p=pos(e),f=document.createElement('div');f.className='fog';f.style.cssText=`left:${p[0]-75}px;top:${p[1]-75}px;width:150px;height:150px;border-radius:50%;background:${fogColor}dd;box-shadow:0 0 18px ${fogColor}88`;map.appendChild(f);}
-});
-stage.addEventListener('pointermove',moveMapPan);
-stage.addEventListener('pointerup',endMapPan);
-stage.addEventListener('pointercancel',endMapPan);
-stage.addEventListener('lostpointercapture',()=>{pan=false});
-stage.addEventListener('wheel',e=>{e.preventDefault();zoom(scale+(e.deltaY<0?.1:-.1))},{passive:false});
+stage.onpointerdown=e=>{if(e.target.closest('.token')||e.target.closest('#customMapBackground')||e.target.closest('.toolbar'))return;if(tool==='select'){pan=true;panStart=[e.clientX,e.clientY];origin=[x,y];stage.setPointerCapture(e.pointerId)}else if(tool==='ping'){let p=pos(e),m=document.createElement('div');m.textContent='✦';m.style.cssText=`position:absolute;left:${p[0]}px;top:${p[1]}px;z-index:8;color:${pingColor};font-size:30px;text-shadow:0 0 12px ${pingColor};pointer-events:none`;map.appendChild(m);setTimeout(()=>m.remove(),1000)}else if(tool==='fog'){let p=pos(e),f=document.createElement('div');f.className='fog';f.style.cssText=`left:${p[0]-75}px;top:${p[1]-75}px;width:150px;height:150px;border-radius:50%;background:${fogColor}dd;box-shadow:0 0 18px ${fogColor}88`;map.appendChild(f)}};stage.onpointermove=e=>{if(pan){x=origin[0]+e.clientX-panStart[0];y=origin[1]+e.clientY-panStart[1];render()}};stage.onpointerup=()=>pan=false;stage.addEventListener('wheel',e=>{e.preventDefault();zoom(scale+(e.deltaY<0?.1:-.1))},{passive:false});
 function zoom(z){scale=Math.max(.25,Math.min(3,z));render()}document.querySelector('#zoomIn').onclick=()=>zoom(scale+.1);document.querySelector('#zoomOut').onclick=()=>zoom(scale-.1);document.querySelector('#zoomLabel').onclick=()=>zoom(1);document.querySelector('#reset').onclick=()=>{scale=1;x=0;y=0;render()};document.querySelector('#snap').onclick=e=>e.currentTarget.classList.toggle('on');
 // Importar/exportar mapa funcional
 (function(){
@@ -234,11 +54,11 @@ function zoom(z){scale=Math.max(.25,Math.min(3,z));render()}document.querySelect
       if(f.type.startsWith('image/')){
         const reader=new FileReader(); reader.onload=()=>{
           let bg=document.querySelector('#customMapBackground');
-          if(!bg){bg=document.createElement('img');bg.id='customMapBackground';bg.style.cssText='position:absolute;left:0;top:0;width:2400px;height:1600px;object-fit:contain;z-index:0;pointer-events:none';map.insertBefore(bg,map.firstChild);}
-          bg.src=reader.result; logMsg2('Mapa de imagem importado: '+f.name);
+          if(!bg){bg=document.createElement('img');bg.id='customMapBackground';bg.style.cssText='position:absolute;left:0;top:0;width:2400px;height:1600px;object-fit:contain;z-index:1;pointer-events:auto';map.insertBefore(bg,map.firstChild);}
+          bg.src=reader.result; bg.dataset.locked='0'; setupMapBackground(bg); logMsg2('Mapa de imagem importado: '+f.name);
         }; reader.readAsDataURL(f);
       } else if(f.name.toLowerCase().endsWith('.json')){
-        const reader=new FileReader(); reader.onload=()=>{try{const d=JSON.parse(reader.result); if(d.tokens) d.tokens.forEach(t=>{let el=document.getElementById(t.id)||map.querySelector('[data-export-id="'+t.id+'"]'); if(el){el.style.left=t.left;el.style.top=t.top;}}); if(d.zoom){scale=d.zoom.scale||scale;x=d.zoom.x||x;y=d.zoom.y||y;render();} if(d.background){let bg=document.querySelector('#customMapBackground');if(!bg){bg=document.createElement('img');bg.id='customMapBackground';bg.style.cssText='position:absolute;left:0;top:0;width:2400px;height:1600px;object-fit:contain;z-index:0;pointer-events:none';map.insertBefore(bg,map.firstChild)}bg.src=d.background;} logMsg2('Mapa/estado importado com sucesso.');}catch(e){alert('Arquivo de mapa inválido.')}}; reader.readAsText(f);
+        const reader=new FileReader(); reader.onload=()=>{try{const d=JSON.parse(reader.result); if(d.tokens) d.tokens.forEach(t=>{let el=document.getElementById(t.id)||map.querySelector('[data-export-id="'+t.id+'"]'); if(el){el.style.left=t.left;el.style.top=t.top;}}); if(d.zoom){scale=d.zoom.scale||scale;x=d.zoom.x||x;y=d.zoom.y||y;render();} if(d.background){let bg=document.querySelector('#customMapBackground');if(!bg){bg=document.createElement('img');bg.id='customMapBackground';bg.style.cssText='position:absolute;left:0;top:0;width:2400px;height:1600px;object-fit:contain;z-index:1;pointer-events:auto';map.insertBefore(bg,map.firstChild)}bg.src=d.background;setupMapBackground(bg);} logMsg2('Mapa/estado importado com sucesso.');}catch(e){alert('Arquivo de mapa inválido.')}}; reader.readAsText(f);
       }
       file.value='';
     };
@@ -362,12 +182,12 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     .mapImageObject{position:absolute;z-index:2;cursor:move;user-select:none;touch-action:none;box-shadow:0 0 0 2px transparent}
     .mapImageObject.selected{box-shadow:0 0 0 2px var(--accent),0 0 0 5px #d6a85d33}
     .mapImageObject img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
-    .imageEditor{position:absolute;z-index:30;min-width:190px;background:#151922ee;border:1px solid var(--line);border-radius:9px;padding:8px;box-shadow:0 10px 28px #000b;display:grid;gap:5px}
+    .imageEditor{position:fixed;z-index:10050;min-width:190px;max-width:230px;max-height:calc(100vh - 20px);overflow:auto;background:#151922ee;border:1px solid var(--line);border-radius:9px;padding:8px;box-shadow:0 10px 28px #000b;display:grid;gap:5px}
     .imageEditor .title{font-weight:700;font-size:12px;margin-bottom:3px}
     .imageEditor button{background:#242a33;border:1px solid var(--line);color:#fff;border-radius:6px;padding:6px;cursor:pointer;text-align:left}
     .imageEditor button:hover{border-color:var(--accent)}
     .resizeHandle{position:absolute;width:10px;height:10px;background:var(--accent);border:2px solid #111;border-radius:2px;display:none;z-index:2}
-    .mapImageObject.selected .resizeHandle{display:block}
+    #customMapBackground{position:absolute;cursor:grab;user-select:none;touch-action:none;box-sizing:border-box}#customMapBackground.mapLocked{cursor:not-allowed;opacity:.98}.mapBgEditor{position:fixed;z-index:10000;min-width:210px;background:#151922ee;border:1px solid var(--line);border-radius:9px;padding:8px;box-shadow:0 10px 28px #000b;display:grid;gap:5px}.mapBgEditor button{background:#242a33;border:1px solid var(--line);color:#fff;border-radius:6px;padding:7px;cursor:pointer;text-align:left}.mapBgEditor button:hover{border-color:var(--accent)}.mapBgResize{position:absolute;width:12px;height:12px;border:2px solid #fff;background:var(--accent);border-radius:3px;z-index:10001;display:none;cursor:nwse-resize}.mapBgSelected .mapBgResize{display:block}.mapBgResize.se{right:-7px;bottom:-7px} .mapImageObject.selected .resizeHandle{display:block}
     .rh-nw{left:-6px;top:-6px;cursor:nwse-resize}.rh-ne{right:-6px;top:-6px;cursor:nesw-resize}.rh-sw{left:-6px;bottom:-6px;cursor:nesw-resize}.rh-se{right:-6px;bottom:-6px;cursor:nwse-resize}
   `;
   document.head.appendChild(style);
@@ -380,25 +200,32 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   function removeEditor(){document.querySelectorAll('.imageEditor').forEach(x=>x.remove());}
   function editorFor(el){
     removeEditor();
+    if(!el || !el.isConnected) return;
     const box=document.createElement('div');box.className='imageEditor';
-    box.style.left=(parseFloat(el.style.left)+parseFloat(el.style.width)+12)+'px';
-    box.style.top=parseFloat(el.style.top)+'px';
     box.innerHTML='<div class="title">🖼️ Imagem selecionada</div>';
     const buttons=[
-      ['↑ Trazer para frente',()=>{el.style.zIndex=++zCounter;}],
-      ['↓ Enviar para trás',()=>{el.style.zIndex=1;}],
-      ['↔ Aumentar largura',()=>{el.style.width=(parseFloat(el.style.width)+25)+'px';}],
-      ['↔ Diminuir largura',()=>{el.style.width=Math.max(30,parseFloat(el.style.width)-25)+'px';}],
-      ['↕ Aumentar altura',()=>{el.style.height=(parseFloat(el.style.height)+25)+'px';}],
-      ['↕ Diminuir altura',()=>{el.style.height=Math.max(30,parseFloat(el.style.height)-25)+'px';}],
+      ['↑ Trazer para frente',()=>{window.rpgLayer?.front(el);}],
+      ['↓ Enviar para trás',()=>{window.rpgLayer?.back(el);}],
+      [el.dataset.locked==='1'?'🔓 Destravar imagem':'🔒 Travar imagem',()=>{el.dataset.locked=el.dataset.locked==='1'?'0':'1';el.style.cursor=el.dataset.locked==='1'?'not-allowed':'move';}],
+      ['↔ Aumentar largura',()=>{if(el.dataset.locked==='1')return;el.style.width=(parseFloat(el.style.width)+25)+'px';}],
+      ['↔ Diminuir largura',()=>{if(el.dataset.locked==='1')return;el.style.width=Math.max(30,parseFloat(el.style.width)-25)+'px';}],
+      ['↕ Aumentar altura',()=>{if(el.dataset.locked==='1')return;el.style.height=(parseFloat(el.style.height)+25)+'px';}],
+      ['↕ Diminuir altura',()=>{if(el.dataset.locked==='1')return;el.style.height=Math.max(30,parseFloat(el.style.height)-25)+'px';}],
       ['🗑 Remover imagem',()=>{el.remove();selectedImage=null;removeEditor();}]
     ];
     buttons.forEach(([label,fn])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=e=>{e.stopPropagation();fn();};box.appendChild(b)});
-    mapEl.appendChild(box);
+    document.body.appendChild(box);
+    const r=el.getBoundingClientRect();
+    const gap=10, bw=Math.min(230,Math.max(190,box.offsetWidth||210)), bh=box.offsetHeight||260;
+    let left=r.right+gap, top=r.top;
+    if(left+bw>window.innerWidth-8) left=Math.max(8,r.left-bw-gap);
+    if(top+bh>window.innerHeight-8) top=Math.max(8,window.innerHeight-bh-8);
+    box.style.left=left+'px'; box.style.top=top+'px';
   }
   function bindImage(el){
     el.addEventListener('pointerdown',e=>{
       if(e.target.classList.contains('resizeHandle')) return;
+      if(el.dataset.locked==='1') return;
       e.stopPropagation();selectImage(el);
       const rect=mapEl.getBoundingClientRect(), sx=e.clientX, sy=e.clientY, ox=parseFloat(el.style.left)||0, oy=parseFloat(el.style.top)||0;
       const move=ev=>{el.style.left=(ox+(ev.clientX-sx)/scale)+'px';el.style.top=(oy+(ev.clientY-sy)/scale)+'px'};
@@ -425,8 +252,50 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   function addImage(src,name,w,h,x,y,z){
     const el=document.createElement('div');el.className='mapImageObject';el.dataset.imageObject='1';el.dataset.name=name||'Imagem';
     el.style.left=(x??500)+'px';el.style.top=(y??250)+'px';el.style.width=(w??600)+'px';el.style.height=(h??400)+'px';el.style.zIndex=z||(++zCounter);
-    const img=document.createElement('img');img.src=src;img.alt=name||'Imagem do mapa';el.appendChild(img);mapEl.appendChild(el);bindImage(el);selectImage(el);editorFor(el);return el;
+    const img=document.createElement('img');img.src=src;img.alt=name||'Imagem do mapa';el.appendChild(img);mapEl.appendChild(el);bindImage(el);selectImage(el);removeEditor();return el;
   }
+  function setupMapBackground(bg){
+    if(!bg)return;
+    bg.classList.add('mapBgSelected');
+    bg.style.pointerEvents='auto';
+    bg.style.cursor=bg.dataset.locked==='1'?'not-allowed':'grab';
+    let handle=bg.querySelector('.mapBgResize');
+    if(!handle){handle=document.createElement('span');handle.className='mapBgResize se';bg.appendChild(handle);}
+    bg.onpointerdown=e=>{
+      if(e.target===handle)return;
+      if(bg.dataset.locked==='1')return;
+      e.preventDefault();e.stopPropagation();
+      const sx=e.clientX,sy=e.clientY,ol=parseFloat(bg.style.left)||0,ot=parseFloat(bg.style.top)||0;
+      const move=ev=>{bg.style.left=(ol+(ev.clientX-sx)/scale)+'px';bg.style.top=(ot+(ev.clientY-sy)/scale)+'px'};
+      const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);showMapBgEditor(bg,e.clientX,e.clientY)};
+      window.addEventListener('pointermove',move);window.addEventListener('pointerup',up);
+    };
+    handle.onpointerdown=e=>{
+      e.preventDefault();e.stopPropagation();if(bg.dataset.locked==='1')return;
+      const sx=e.clientX,sy=e.clientY,ow=parseFloat(bg.style.width)||2400,oh=parseFloat(bg.style.height)||1600;
+      const move=ev=>{bg.style.width=Math.max(100,ow+(ev.clientX-sx)/scale)+'px';bg.style.height=Math.max(100,oh+(ev.clientY-sy)/scale)+'px'};
+      const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up)};
+      window.addEventListener('pointermove',move);window.addEventListener('pointerup',up);
+    };
+    bg.oncontextmenu=e=>{e.preventDefault();e.stopPropagation();showMapBgEditor(bg,e.clientX,e.clientY)};
+  }
+  function showMapBgEditor(bg,cx,cy){
+    document.querySelectorAll('.mapBgEditor').forEach(x=>x.remove());
+    const box=document.createElement('div');box.className='mapBgEditor';
+    box.style.left=Math.min(cx+8,window.innerWidth-240)+'px';box.style.top=Math.min(cy+8,window.innerHeight-260)+'px';
+    box.innerHTML='<div style="font-weight:700;font-size:12px">🗺️ Mapa selecionado</div>';
+    const add=(txt,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=txt;b.onclick=e=>{e.stopPropagation();fn();};box.appendChild(b)};
+    add('↑ Trazer para frente',()=>{window.rpgLayer?.front(bg);});
+    add('↓ Enviar para trás',()=>{window.rpgLayer?.back(bg);});
+    add(bg.dataset.locked==='1'?'🔓 Destravar mapa':'🔒 Travar mapa',()=>{bg.dataset.locked=bg.dataset.locked==='1'?'0':'1';bg.style.cursor=bg.dataset.locked==='1'?'not-allowed':'grab';box.remove();showMapBgEditor(bg,cx,cy);});
+    add('↔ Aumentar largura',()=>{if(bg.dataset.locked!=='1')bg.style.width=(parseFloat(bg.style.width)+50)+'px';});
+    add('↕ Aumentar altura',()=>{if(bg.dataset.locked!=='1')bg.style.height=(parseFloat(bg.style.height)+50)+'px';});
+    add('🗑 Remover mapa',()=>{bg.remove();box.remove();});
+    document.body.appendChild(box);
+  }
+  function bindExistingMapBackground(){const bg=document.querySelector('#customMapBackground');if(bg)setupMapBackground(bg)}
+  bindExistingMapBackground();
+  document.addEventListener('pointerdown',e=>{if(!e.target.closest('.mapBgEditor')&&!e.target.closest('#customMapBackground'))document.querySelectorAll('.mapBgEditor').forEach(x=>x.remove())});
   document.querySelector('#importMap').onclick=()=>file.click();
   document.querySelector('#exportMap').onclick=()=>{
     const objects=[...mapEl.children].filter(e=>!e.classList.contains('grid')&&!e.classList.contains('imageEditor')).map(e=>{
@@ -801,19 +670,10 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     if(title){title.title='Duplo clique para renomear';title.ondblclick=()=>{const n=prompt('Nome:',title.textContent);if(n)title.textContent=n}};
   }
 
-  // No mapa, o botão direito fica livre. O sistema de ferramentas abre com duplo clique esquerdo em área vazia.
+  // Ferramentas: apagar névoa, marcações, medições e efeitos com clique direito.
   stage.addEventListener('contextmenu',e=>{
-    if(e.target.closest('.token,.forgeObj,.spellArea,.toolbar,.rpgFogCloudTools,.objMenu,.mobMenu,.measure'))return;
-    e.preventDefault();
-  });
-  stage.addEventListener('dblclick',e=>{
-    if(e.target.closest('.token,.forgeObj,.spellArea,.toolbar,.rpgFogCloudTools,.objMenu,.mobMenu,.measure,.rpgFogResize'))return;
-    const wrap=document.querySelector('#mapToolsWrap');
-    const toggle=document.querySelector('#mapToolsToggle');
-    if(wrap&&toggle){
-      wrap.classList.add('open');
-      toggle.title='Fechar ferramentas do mapa';
-    }
+    const target=e.target.closest('.fog,.spellArea,.visionRing,.measure');
+    if(target){e.preventDefault();target.remove();logMsg2('Elemento removido do mapa.')}
   });
   logMsg2('Edição livre ativada: números com duplo clique, grade e medição funcionais.');
 })();
@@ -823,6 +683,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   const map=document.querySelector('#map'),stage=document.querySelector('#stage'),side=document.querySelector('.side');
   if(!map||!stage||!side)return;
   const log=m=>{const l=document.querySelector('#log');if(l)l.innerHTML='<div><b>Sistema:</b> '+String(m).replaceAll('<','&lt;')+'</div>'+l.innerHTML};
+  const inventoryCss=document.createElement('style');inventoryCss.textContent='.inventoryAddBox{display:grid;grid-template-columns:1fr 48px 58px auto;gap:6px;margin:12px 0}.inventoryAddBox input{box-sizing:border-box;min-width:0;background:#111419;color:#eee;border:1px solid #3b424d;border-radius:6px;padding:8px}.inventoryQuick{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}.storedInvItem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px;margin:6px 0;background:#1d222a;border:1px solid #343b46;border-radius:8px}.storedInvMain{display:flex;align-items:center;gap:9px;min-width:0}.storedInvIcon{font-size:26px;width:34px;text-align:center}.storedInvActions{display:flex;gap:4px}.storedInvActions .btn{padding:5px 8px}.invEmpty{text-align:center;padding:26px 10px;border:1px dashed #4a5260;border-radius:8px;color:#c0c7d2}.invEmpty span{font-size:12px;color:#8f99a8}.inventoryStoragePanel .small{color:#aeb6c3}@media(max-width:600px){.inventoryAddBox{grid-template-columns:1fr 44px 54px}.inventoryAdd{grid-column:1/-1}.storedInvItem{align-items:flex-start}.storedInvActions{flex-wrap:wrap}}';document.head.appendChild(inventoryCss);
   const css=document.createElement('style');css.textContent='.forgeObj{position:absolute;z-index:6;width:48px;height:48px;display:grid;place-items:center;border:2px solid #b9955a;border-radius:9px;background:#17130d;box-shadow:0 4px 12px #000b;cursor:grab;user-select:none;font-size:28px}.forgeObj.selected{outline:3px solid #d6a85d;outline-offset:2px}.forgeObj.active{filter:drop-shadow(0 0 10px #d6a85d)}.objMenu{position:absolute;z-index:50;background:#171a20;border:1px solid #555e6d;border-radius:9px;padding:7px;min-width:170px;box-shadow:0 8px 22px #000b}.objMenu button{display:block;width:100%;margin:3px 0;padding:7px;background:#242a33;color:#fff;border:1px solid #303641;border-radius:6px;text-align:left;cursor:pointer}.invItem{display:flex;align-items:center;gap:8px;padding:7px;border:1px solid #303641;border-radius:7px;background:#191d24;margin:5px 0;cursor:grab}.invItem .ico{font-size:21px;width:28px;text-align:center}.objSearch{margin-bottom:7px}.soundRow{display:flex;gap:5px;margin:5px 0}.soundRow button{flex:1}.dropHint{border:1px dashed #555e6d;padding:7px;border-radius:7px;text-align:center;color:#9ca5b3;font-size:11px;margin-top:7px}';document.head.appendChild(css);
   const objects=[
     ['torch','🔥','Tocha',['Acender','Apagar','Aumentar luz','Reduzir luz']],
@@ -885,8 +746,47 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   sounds.forEach(s=>{const b=document.createElement('button');b.className='btn';b.style.cssText='width:100%;margin:3px 0;text-align:left';b.textContent=s[1]+' '+s[2];b.onclick=()=>tone(s[3]);sl.appendChild(b)});
   // Itens já colocados no mapa também podem ser selecionados com duplo clique.
   stage.addEventListener('dblclick',e=>{const o=e.target.closest('.forgeObj');if(o){o.classList.toggle('selected');log(o.dataset.name+' selecionado.')}});
-  // Botão de inventário existente passa a abrir um painel real com os mesmos objetos.
-  const oldInv=document.querySelector('#inventory');if(oldInv)oldInv.onclick=()=>{const p=document.createElement('div');p.className='forgePanel';p.style.cssText='position:fixed;z-index:100;left:50%;top:50%;transform:translate(-50%,-50%);background:#171a20;border:1px solid #555e6d;border-radius:12px;padding:18px;width:min(420px,90vw);max-height:80vh;overflow:auto';p.innerHTML='<button class="btn" style="float:right">✕</button><h2>📦 Inventário</h2><p class="small">Arraste um item para o mapa ou dê duplo clique para colocar.</p><div class="invPanel"></div>';const list=p.querySelector('.invPanel');objects.slice(0,12).forEach(def=>{const r=document.createElement('div');r.className='invItem';r.draggable=true;r.innerHTML='<span class="ico">'+def[1]+'</span>'+def[2];r.ondragstart=e=>e.dataTransfer.setData('rpg-object',def[0]);r.ondblclick=()=>{makeObj(def);p.remove()};list.appendChild(r)});p.querySelector('button').onclick=()=>p.remove();document.body.appendChild(p)};
+  // Inventário real: armazenamento independente do mapa, com adicionar/remover e quantidade.
+  const inventoryKey='rpgForgeInventory';
+  let storedInventory=[];
+  try{storedInventory=JSON.parse(localStorage.getItem(inventoryKey)||'[]');if(!Array.isArray(storedInventory))storedInventory=[];}catch(e){storedInventory=[]}
+  function saveInventory(){localStorage.setItem(inventoryKey,JSON.stringify(storedInventory));}
+  function addInventoryItem(name,icon='📦',qty=1){
+    name=String(name||'').trim(); if(!name)return; qty=Math.max(1,parseInt(qty)||1);
+    const found=storedInventory.find(i=>i.name.toLowerCase()===name.toLowerCase());
+    if(found)found.qty+=qty; else storedInventory.push({id:Date.now()+Math.random(),name,icon,qty});
+    saveInventory();
+  }
+  function removeInventoryItem(id,qty=1){
+    const item=storedInventory.find(i=>i.id===id); if(!item)return;
+    item.qty-=Math.max(1,parseInt(qty)||1); if(item.qty<=0)storedInventory=storedInventory.filter(i=>i.id!==id);
+    saveInventory();
+  }
+  function renderInventory(list){
+    list.innerHTML='';
+    if(!storedInventory.length){list.innerHTML='<div class="invEmpty">🎒 Inventário vazio<br><span>Adicione uma espada, poção ou qualquer outro item.</span></div>';return;}
+    storedInventory.forEach(item=>{
+      const row=document.createElement('div');row.className='storedInvItem';
+      row.innerHTML='<div class="storedInvMain"><span class="storedInvIcon">'+item.icon+'</span><div><b>'+item.name.replaceAll('<','&lt;')+'</b><div class="small">Quantidade: <strong>'+item.qty+'</strong></div></div></div><div class="storedInvActions"><button class="btn invMinus">−</button><button class="btn invPlus">＋</button><button class="btn invRemove">🗑</button></div>';
+      row.querySelector('.invMinus').onclick=()=>{removeInventoryItem(item.id,1);renderInventory(list)};
+      row.querySelector('.invPlus').onclick=()=>{addInventoryItem(item.name,item.icon,1);renderInventory(list)};
+      row.querySelector('.invRemove').onclick=()=>{storedInventory=storedInventory.filter(i=>i.id!==item.id);saveInventory();renderInventory(list)};
+      list.appendChild(row);
+    });
+  }
+  const oldInv=document.querySelector('#inventory');
+  if(oldInv)oldInv.onclick=()=>{
+    document.querySelectorAll('.inventoryStoragePanel').forEach(q=>q.remove());
+    const p=document.createElement('div');p.className='forgePanel inventoryStoragePanel';
+    p.style.cssText='position:fixed;z-index:100;right:24px;top:90px;left:auto;transform:none;background:#171a20;border:1px solid #555e6d;border-radius:12px;padding:18px;width:min(440px,calc(100vw - 48px));max-height:78vh;overflow:auto;box-shadow:0 18px 55px #000b';
+    p.innerHTML='<button class="btn inventoryClose" style="float:right">✕</button><h2 style="margin:0 0 6px">📦 Inventário</h2><p class="small">Armazene os itens do personagem. A quantidade fica salva mesmo ao fechar o painel.</p><div class="inventoryAddBox"><input class="inventoryName" placeholder="Nome do item (ex.: Espada)"><input class="inventoryIcon" value="📦" maxlength="2" title="Ícone"><input class="inventoryQty" type="number" min="1" value="1" title="Quantidade"><button class="btn inventoryAdd">＋ Adicionar</button></div><div class="inventoryQuick"><button class="btn quickItem" data-name="Espada" data-icon="⚔️">⚔️ Espada</button><button class="btn quickItem" data-name="Poção" data-icon="🧪">🧪 Poção</button><button class="btn quickItem" data-name="Escudo" data-icon="🛡️">🛡️ Escudo</button><button class="btn quickItem" data-name="Moedas" data-icon="🪙">🪙 Moedas</button></div><div class="inventoryStorageList"></div>';
+    const list=p.querySelector('.inventoryStorageList');
+    const add=()=>{const name=p.querySelector('.inventoryName').value;const icon=p.querySelector('.inventoryIcon').value||'📦';const qty=p.querySelector('.inventoryQty').value;addInventoryItem(name,icon,qty);p.querySelector('.inventoryName').value='';p.querySelector('.inventoryQty').value=1;renderInventory(list)};
+    p.querySelector('.inventoryAdd').onclick=add;p.querySelector('.inventoryName').onkeydown=e=>{if(e.key==='Enter')add()};
+    p.querySelectorAll('.quickItem').forEach(b=>b.onclick=()=>{addInventoryItem(b.dataset.name,b.dataset.icon,1);renderInventory(list)});
+    p.querySelector('.inventoryClose').onclick=()=>p.remove();
+    document.body.appendChild(p);renderInventory(list);
+  };
 })();
 </script><script>
 // PATCH: PV com valor atual/máximo independentes e CA com modificador separado.
@@ -1064,498 +964,278 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   }
   btn.onclick=openPanel;
   window.rpgForge=window.rpgForge||{}; window.rpgForge.weather=()=>({...state}); window.rpgForge.setWeather=(type)=>{if(weatherNames[type]){state.type=type;build();}};
-  const savedWeather=window.rpgForgePageSnapshot?.weather;
-  if(savedWeather&&weatherNames[savedWeather.type]){
-    state={type:savedWeather.type,intensity:Number(savedWeather.intensity)||55,wind:Number(savedWeather.wind)||45,lightning:!!savedWeather.lightning};
-    build();
-  }
 })();
 </script>
-
-<script>
-// Tokens: arrastar da lateral, imagem, travar/destravar e excluir
+\n<script>
+// Tokens: arrastar da lateral, soltar no mapa, mover, menu e camadas
 (function(){
-  const mapEl=document.querySelector('#map');
-  const stageEl=document.querySelector('#stage');
-  if(!mapEl||!stageEl)return;
-  let tokenSeq=1000;
-  const input=document.createElement('input');
-  input.type='file'; input.accept='image/*'; input.className='hidden';
-  document.body.appendChild(input);
-  let imageTarget=null;
-
-  const css=document.createElement('style');
-  css.textContent=`
-    .token.locked{cursor:not-allowed!important;filter:saturate(.8);outline:2px dashed #df7474;outline-offset:2px}
-    .token.hasImage{background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;color:transparent!important;text-shadow:none}
-    .tokenMenu{position:absolute;z-index:80;min-width:190px;background:#171a20;border:1px solid #555e6d;border-radius:9px;padding:8px;box-shadow:0 10px 30px #000b}
-    .tokenMenu button{display:block;width:100%;margin:3px 0;text-align:left}
-    .tokenMenu .small{padding:3px 5px}
-  `;
-  document.head.appendChild(css);
-
-  function closeMenus(){document.querySelectorAll('.tokenMenu').forEach(m=>m.remove())}
-  function tokenName(t){return t.title || t.dataset.name || t.textContent.trim() || 'Token'}
-  function showMenu(t,e){
-    e.preventDefault(); e.stopPropagation(); closeMenus();
-    const menu=document.createElement('div'); menu.className='tokenMenu';
-    const r=stageEl.getBoundingClientRect();
-    menu.style.left=Math.max(8,e.clientX-r.left+8)+'px';
-    menu.style.top=Math.max(8,e.clientY-r.top+8)+'px';
-    menu.innerHTML='<div class="small"><b>'+tokenName(t)+'</b></div>';
-    function menuButton(label, action){
-      const b=document.createElement('button');
-      b.type='button'; b.className='btn'; b.textContent=label;
-      b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault()});
-      b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();action();});
-      menu.appendChild(b); return b;
-    }
-    menuButton('🖼️ Colocar/trocar imagem',()=>{imageTarget=t;input.value='';input.click();menu.remove()});
-    const sizeRow=document.createElement('div'); sizeRow.className='small'; sizeRow.style.marginTop='5px'; sizeRow.textContent='Tamanho'; menu.appendChild(sizeRow);
-    menuButton('➖ Diminuir',()=>{resizeToken(t,.85);});
-    menuButton('➕ Aumentar',()=>{resizeToken(t,1.18);});
-    menuButton('↔️ Virar horizontal',()=>{t.dataset.flip=t.dataset.flip==='1'?'0':'1';applyTokenTransform(t);});
-    menuButton('↺ Girar -45°',()=>{setTokenRotation(t,(Number(t.dataset.rotation)||0)-45);});
-    menuButton('↻ Girar +45°',()=>{setTokenRotation(t,(Number(t.dataset.rotation)||0)+45);});
-    const lock=document.createElement('button'); lock.className='btn'; lock.textContent=t.dataset.locked==='1'?'🔓 Destravar token':'🔒 Travar token';
-    lock.onclick=()=>{t.dataset.locked=t.dataset.locked==='1'?'0':'1';t.classList.toggle('locked',t.dataset.locked==='1');menu.remove()}; menu.appendChild(lock);
-    const front=document.createElement('button'); front.className='btn'; front.textContent='⬆️ Trazer para frente';
-    front.onclick=()=>{t.style.zIndex=++tokenSeq;menu.remove()}; menu.appendChild(front);
-    const back=document.createElement('button'); back.className='btn'; back.textContent='⬇️ Enviar para trás';
-    back.onclick=()=>{t.style.zIndex=2;menu.remove()}; menu.appendChild(back);
-    if(t.classList.contains('hasImage')){
-      const rem=document.createElement('button'); rem.className='btn'; rem.textContent='🖼️ Remover imagem';
-      rem.onclick=()=>{t.style.backgroundImage='';t.classList.remove('hasImage');t.style.color='';t.dataset.image='';menu.remove()}; menu.appendChild(rem);
-    }
-    const del=document.createElement('button'); del.className='btn'; del.textContent='🗑️ Excluir token'; del.onclick=()=>{t.remove();menu.remove()}; menu.appendChild(del);
-    stageEl.appendChild(menu);
+  const map=document.querySelector('#map'), stage=document.querySelector('#stage');
+  if(!map||!stage)return;
+  let tokenDrag=null, tokenOffset=[0,0];
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function mapPos(e){const r=stage.getBoundingClientRect(); const mx=parseFloat((window.getComputedStyle(map).transform.match(/matrix\(([^)]+)\)/)||[])[5])||0; return [(e.clientX-r.left-(window.rpgForgeScaleX||0))/1,(e.clientY-r.top-(window.rpgForgeScaleY||0))/1];}
+  // Use the same map transform state when available.
+  function pos(e){
+    const r=stage.getBoundingClientRect();
+    const tr=map.style.transform||'';
+    const m=tr.match(/translate\(([-\d.]+)px,([-\d.]+)px\) scale\(([-\d.]+)\)/);
+    const x=m?parseFloat(m[1]):0,y=m?parseFloat(m[2]):0,scale=m?parseFloat(m[3]):1;
+    return [(e.clientX-r.left-x)/scale,(e.clientY-r.top-y)/scale];
   }
-
-  function applyTokenTransform(t){
-    const rot=Number(t.dataset.rotation)||0;
-    const flip=t.dataset.flip==='1'?-1:1;
-    t.style.transform='rotate('+rot+'deg) scaleX('+flip+')';
+  function openTokenMenu(t,e){
+    e?.preventDefault();e?.stopPropagation();
+    document.querySelectorAll('.tokenContextMenu').forEach(m=>m.remove());
+    const menu=document.createElement('div');
+    menu.className='tokenContextMenu card';
+    const r=stage.getBoundingClientRect();
+    menu.style.cssText='position:fixed;z-index:9999;left:'+Math.min((e?.clientX||r.left)+8,window.innerWidth-230)+'px;top:'+Math.min((e?.clientY||r.top)+8,window.innerHeight-250)+'px;min-width:210px';
+    menu.innerHTML='<b>🎭 '+esc(t.title||t.textContent||'Token')+'</b>'
+      +'<button class="btn" data-act="image">🖼️ Colocar imagem</button>'
+      +'<button class="btn" data-act="lock">🔒 '+(t.dataset.locked==='1'?'Destravar':'Travar')+'</button>'
+      +'<button class="btn" data-act="front">↑ Trazer para frente</button>'
+      +'<button class="btn" data-act="back">↓ Enviar para trás</button>'
+      +'<button class="btn" data-act="delete">🗑 Excluir token</button>'
+      +'<input type="file" accept="image/*" class="hidden" data-file>';
+    menu.querySelectorAll('button').forEach(b=>b.style.cssText='width:100%;margin-top:6px;text-align:left');
+    const file=menu.querySelector('[data-file]');
+    menu.querySelector('[data-act="image"]').onclick=()=>file.click();
+    file.onchange=()=>{const f=file.files?.[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{t.style.backgroundImage='url("'+rd.result+'")';t.style.backgroundSize='cover';t.style.backgroundPosition='center';t.style.backgroundRepeat='no-repeat';t.textContent='';t.dataset.image=rd.result;menu.remove()};rd.readAsDataURL(f)};
+    menu.querySelector('[data-act="lock"]').onclick=()=>{t.dataset.locked=t.dataset.locked==='1'?'0':'1';t.style.cursor=t.dataset.locked==='1'?'not-allowed':'grab';menu.remove()};
+    menu.querySelector('[data-act="front"]').onclick=()=>{window.rpgLayer?.front(t);menu.remove()};
+    menu.querySelector('[data-act="back"]').onclick=()=>{window.rpgLayer?.back(t);menu.remove()};
+    menu.querySelector('[data-act="delete"]').onclick=()=>{t.remove();menu.remove()};
+    document.body.appendChild(menu);
+    setTimeout(()=>document.addEventListener('pointerdown',function close(ev){if(!menu.contains(ev.target)){menu.remove();document.removeEventListener('pointerdown',close)}},{once:true}),0);
   }
-  function setTokenRotation(t,v){
-    t.dataset.rotation=String(((v%360)+360)%360);
-    applyTokenTransform(t);
-  }
-  function resizeToken(t,f){
-    const currentW=parseFloat(t.style.width)||t.getBoundingClientRect().width||42;
-    const currentH=parseFloat(t.style.height)||t.getBoundingClientRect().height||42;
-    const w=Math.max(24,Math.min(180,currentW*f));
-    const h=Math.max(24,Math.min(180,currentH*f));
-    t.style.width=w+'px';
-    t.style.height=h+'px';
-    t.dataset.tokenWidth=String(w);
-    t.dataset.tokenHeight=String(h);
-  }
-
-  input.onchange=()=>{
-    const file=input.files&&input.files[0]; if(!file||!imageTarget)return;
-    const target=imageTarget;
-    const reader=new FileReader();
-    reader.onload=()=>{target.style.backgroundImage='url("'+reader.result+'")';target.classList.add('hasImage');target.dataset.image=reader.result;target.textContent='';imageTarget=null};
-    reader.readAsDataURL(file);
-  };
-
-  function prepareToken(t){
-    if(!t||t.dataset.tokenEnhanced==='1')return;
-    t.dataset.tokenEnhanced='1';
-    if(!t.id)t.id='token-'+(++tokenSeq);
-    if(!t.dataset.rotation)t.dataset.rotation='0';
-    if(!t.dataset.flip)t.dataset.flip='0';
-    if(!t.dataset.locked)t.dataset.locked='0';
-    if(t.dataset.image){t.style.backgroundImage='url("'+t.dataset.image+'")';t.classList.add('hasImage');t.textContent=''}
-    if(t.dataset.tokenWidth)t.style.width=t.dataset.tokenWidth+'px';
-    if(t.dataset.tokenHeight)t.style.height=t.dataset.tokenHeight+'px';
-    applyTokenTransform(t);
-    t.addEventListener('contextmenu',e=>showMenu(t,e));
-
-    // Arraste independente do sistema global da mesa.
-    let moving=false, ox=0, oy=0;
+  function bindToken(t){
+    if(!t||t.dataset.tokenBound==='1')return;
+    t.dataset.tokenBound='1';
+    t.addEventListener('contextmenu',e=>openTokenMenu(t,e));
     t.addEventListener('pointerdown',e=>{
-      if(e.button!==0 || t.dataset.locked==='1')return;
-      if(e.target.closest('button'))return;
+      if(e.button!==0||t.dataset.locked==='1')return;
+      if(e.target.closest?.('.tokenContextMenu'))return;
+      const toolBtn=document.querySelector('.tool.active');
+      if(toolBtn&&toolBtn.dataset.tool!=='select')return;
       e.stopPropagation();
-      moving=true;
-      const p=pos(e), left=parseFloat(t.style.left)||0, top=parseFloat(t.style.top)||0;
-      ox=p[0]-left; oy=p[1]-top;
+      const p=pos(e);
+      tokenDrag={t,id:e.pointerId};
+      tokenOffset=[p[0]-(parseFloat(t.style.left)||0),p[1]-(parseFloat(t.style.top)||0)];
       t.classList.add('selected');
-      document.querySelectorAll('.token').forEach(q=>{if(q!==t)q.classList.remove('selected')});
-      t.setPointerCapture(e.pointerId);
-      e.preventDefault();
+      document.querySelectorAll('#map .token').forEach(q=>{if(q!==t)q.classList.remove('selected')});
+      try{t.setPointerCapture(e.pointerId)}catch(_){}
     });
     t.addEventListener('pointermove',e=>{
-      if(!moving)return;
-      const p=pos(e); let nx=p[0]-ox, ny=p[1]-oy;
-      const snapBtn=document.querySelector('#snap');
-      if(snapBtn?.classList.contains('on')){nx=Math.round(nx/50)*50;ny=Math.round(ny/50)*50}
-      t.style.left=nx+'px'; t.style.top=ny+'px';
-      if(typeof window.rpgForgeUpdateFogVision==='function')window.rpgForgeUpdateFogVision();
+      if(!tokenDrag||tokenDrag.t!==t)return;
+      const p=pos(e); t.style.left=(p[0]-tokenOffset[0])+'px'; t.style.top=(p[1]-tokenOffset[1])+'px';
     });
-    const stop=()=>{moving=false};
-    t.addEventListener('pointerup',stop); t.addEventListener('pointercancel',stop);
+    t.addEventListener('pointerup',()=>{if(tokenDrag?.t===t)tokenDrag=null});
+    t.addEventListener('pointercancel',()=>{if(tokenDrag?.t===t)tokenDrag=null});
   }
-
-  mapEl.querySelectorAll('.token').forEach(prepareToken);
-
-  document.querySelectorAll('.tokenItem[data-kind]').forEach(item=>{
-    item.draggable=true;
-    item.addEventListener('dragstart',e=>{e.dataTransfer.effectAllowed='copy';e.dataTransfer.setData('rpg-token-kind',item.dataset.kind);e.dataTransfer.setData('rpg-token-name',(item.textContent||'Token').replace(/PJ|NPC|Monstro/g,'').trim())});
+  function createToken(kind,name,x,y){
+    const t=document.createElement('div');
+    t.className='token '+kind; t.title=name; t.textContent=name==='Laxus'?'L':name==='Benzuke'?'B':name==='Guarda'?'N':name==='Goblin'?'G':name.charAt(0).toUpperCase();
+    t.style.left=x+'px';t.style.top=y+'px';t.style.zIndex='3';
+    map.appendChild(t);bindToken(t);return t;
+  }
+  document.querySelectorAll('.tokenItem[draggable="true"]').forEach(item=>{
+    item.addEventListener('dragstart',e=>{
+      const kind=item.dataset.kind||'npc';
+      const name=item.textContent.replace(/PJ|NPC|Monstro/g,'').trim();
+      e.dataTransfer.effectAllowed='copy';
+      e.dataTransfer.setData('application/x-rpg-token',JSON.stringify({kind,name}));
+      e.dataTransfer.setData('text/plain',name);
+      item.style.opacity='.55';
+    });
+    item.addEventListener('dragend',()=>item.style.opacity='');
   });
-
-  stageEl.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('rpg-token-kind')){e.preventDefault();e.dataTransfer.dropEffect='copy'}});
-  stageEl.addEventListener('drop',e=>{
-    const kind=e.dataTransfer.getData('rpg-token-kind'); if(!kind)return;
-    e.preventDefault();
-    const name=e.dataTransfer.getData('rpg-token-name')||'Token';
-    const p=pos(e);
-    const el=document.createElement('div');
-    el.className='token '+kind; el.id='token-'+(++tokenSeq); el.title=name;
-    el.textContent=kind==='player'?'P':kind==='npc'?'N':'M';
-    el.style.left=(p[0]-21)+'px'; el.style.top=(p[1]-21)+'px'; el.style.zIndex=4;
-    mapEl.appendChild(el); prepareToken(el);
-    if(typeof logMsg==='function')logMsg('Token '+name+' colocado no mapa.');
+  stage.addEventListener('dragover',e=>{if(e.dataTransfer.types.includes('application/x-rpg-token')){e.preventDefault();e.dataTransfer.dropEffect='copy'}});
+  stage.addEventListener('drop',e=>{
+    const raw=e.dataTransfer.getData('application/x-rpg-token');if(!raw)return;e.preventDefault();
+    try{const d=JSON.parse(raw),p=pos(e);createToken(d.kind,d.name,Math.max(0,p[0]-21),Math.max(0,p[1]-21));}catch(_){}
   });
-
-  // Bloqueia o menu de clique direito nativo apenas sobre tokens.
-  mapEl.addEventListener('contextmenu',e=>{if(e.target.closest('.token'))e.preventDefault()});
-  document.addEventListener('pointerdown',e=>{if(!e.target.closest('.tokenMenu'))closeMenus()});
-
-  // Reforça o bloqueio durante drag para tokens existentes e novos.
-  const obs=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){if(n.matches?.('.token'))prepareToken(n);n.querySelectorAll?.('.token').forEach(prepareToken);}})));
-  obs.observe(mapEl,{childList:true,subtree:true});
+  document.querySelectorAll('#map .token').forEach(bindToken);
+  new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){if(n.matches?.('.token'))bindToken(n);n.querySelectorAll?.('.token').forEach(bindToken)}}))).observe(map,{childList:true});
 })();
-</script>
-<script>
-// Névoa: nuvem gigante animada, arrastável, redimensionável e com visão dinâmica dos tokens.
+</script>\n<script>
 (function(){
-  const fog=document.getElementById('rpgFogLayer'),cloud=document.getElementById('rpgFogCloud'),toggle=document.getElementById('rpgFogToggle'),range=document.getElementById('rpgFogOpacity'),value=document.getElementById('rpgFogValue'),color=document.getElementById('rpgFogColor'),colorValue=document.getElementById('rpgFogColorValue');
-  const resize=document.getElementById('rpgFogResize'),center=document.getElementById('rpgFogCenter'),big=document.getElementById('rpgFogBig'),small=document.getElementById('rpgFogSmall'),lock=document.getElementById('rpgFogLock');
-  const sizeValue=document.getElementById('rpgFogSizeValue'),visionRadius=document.getElementById('rpgFogVisionRadius'),visionValue=document.getElementById('rpgFogVisionValue');
-  const gmView=document.getElementById('rpgFogGMView');
-  let mask=document.getElementById('rpgFogMask');
-  if(!fog||!cloud||!toggle||!range||!value)return;
-  // A máscara é criada aqui para que a visão acompanhe os tokens mesmo quando
-  // o conteúdo do mapa é restaurado ao trocar de aba.
-  function ensureMask(){
-    if(mask && document.body.contains(mask)) return mask;
-    let svg=document.getElementById('rpgFogVisionSvg');
-    if(!svg){
-      svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-      svg.id='rpgFogVisionSvg';
-      svg.setAttribute('width','1');svg.setAttribute('height','1');
-      svg.style.position='absolute';svg.style.width='1px';svg.style.height='1px';
-      svg.style.left='-99999px';svg.style.top='-99999px';svg.style.pointerEvents='none';
-      const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
-      mask=document.createElementNS('http://www.w3.org/2000/svg','mask');
-      mask.id='rpgFogMask';
-      mask.setAttribute('maskUnits','userSpaceOnUse');
-      const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
-      rect.setAttribute('x','0');rect.setAttribute('y','0');rect.setAttribute('fill','white');
-      mask.appendChild(rect);defs.appendChild(mask);svg.appendChild(defs);document.body.appendChild(svg);
-    } else {
-      mask=svg.querySelector('#rpgFogMask');
+  const map=document.getElementById('map');
+  if(!map) return;
+
+  // Camadas: inclui mapa de fundo, imagens, tokens e objetos.
+  window.rpgLayer={
+    front(el){
+      if(!el || !el.parentElement) return;
+      const all=[...el.parentElement.children].filter(n=>n!==el && n.matches?.('#customMapBackground,.mapImageObject,.token,.forgeObj'));
+      const max=all.reduce((m,n)=>Math.max(m,parseInt(getComputedStyle(n).zIndex)||0),1);
+      el.style.zIndex=String(max+1);
+    },
+    back(el){
+      if(!el || !el.parentElement) return;
+      const all=[...el.parentElement.children].filter(n=>n!==el && n.matches?.('#customMapBackground,.mapImageObject,.token,.forgeObj'));
+      const min=all.reduce((m,n)=>Math.min(m,parseInt(getComputedStyle(n).zIndex)||1),1);
+      el.style.zIndex=String(Math.max(1,min-1));
     }
-    return mask;
+  };
+
+  function scaleNow(){
+    const tr=map.style.transform||'';
+    const m=tr.match(/scale\\(([-\\d.]+)\\)/);
+    return m?parseFloat(m[1]):1;
   }
-  const map=document.getElementById('map'),grid=map&&map.querySelector('.grid');
-  function gridSize(){return {w:grid?grid.offsetWidth:map.clientWidth,h:grid?grid.offsetHeight:map.clientHeight,left:grid?grid.offsetLeft:0,top:grid?grid.offsetTop:0}}
-  const fogPageIndex=(()=>{try{return Number(localStorage.getItem('rpgForgePageIndexV5')||localStorage.getItem('rpgForgePageIndexV4')||0)||0}catch(e){return 0}})();
-  const FOG_OPACITY_KEY='rpgForgeFogOpacityV4_'+fogPageIndex;
-  const FOG_GM_VIEW_KEY='rpgForgeFogGMViewV1_'+fogPageIndex;
-  function fogGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
-  function fogSet(k,v){try{localStorage.setItem(k,String(v))}catch(e){}}
-  const savedOpacity=fogGet(FOG_OPACITY_KEY);
-  const pageSnap=window.rpgForgePageSnapshot||null;
-  const fogSnap=pageSnap&&pageSnap.fog?pageSnap.fog:null;
-  if(savedOpacity!==null){
-    const ov=Math.max(0,Math.min(100,Number(savedOpacity)||72));
-    range.value=String(ov);
+  function closeMenus(){document.querySelectorAll('.mapBgEditor,.imageEditor').forEach(x=>x.remove());}
+  document.addEventListener('pointerdown',e=>{
+    if(e.target.closest('.imageEditor')) return;
+    if(e.target.closest('.mapImageObject')) return;
+    document.querySelectorAll('.imageEditor').forEach(x=>x.remove());
+  },true);
+  window.addEventListener('resize',()=>document.querySelectorAll('.imageEditor').forEach(x=>x.remove()));
+
+  function makeMenu(el,e,isBg){
+    closeMenus();
+    const menu=document.createElement('div');
+    menu.className=isBg?'mapBgEditor':'imageEditor';
+    menu.style.position='fixed';
+    menu.style.left=Math.min((e?.clientX||100)+8,window.innerWidth-250)+'px';
+    menu.style.top=Math.min((e?.clientY||100)+8,window.innerHeight-330)+'px';
+    menu.innerHTML='<div class="title">'+(isBg?'🗺️ Mapa':'🖼️ Imagem')+' selecionado</div>';
+    const add=(label,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();fn();});menu.appendChild(b)};
+    add('↑ Trazer para frente',()=>window.rpgLayer.front(el));
+    add('↓ Enviar para trás',()=>window.rpgLayer.back(el));
+    add(el.dataset.locked==='1'?'🔓 Destravar':'🔒 Travar',()=>{el.dataset.locked=el.dataset.locked==='1'?'0':'1';el.style.cursor=el.dataset.locked==='1'?'not-allowed':'grab';el.classList.toggle('mapLocked',el.dataset.locked==='1');closeMenus();});
+    add('↔ Aumentar largura',()=>{if(el.dataset.locked!=='1')el.style.width=(parseFloat(el.offsetWidth)+50)+'px';});
+    add('↔ Diminuir largura',()=>{if(el.dataset.locked!=='1')el.style.width=Math.max(50,parseFloat(el.offsetWidth)-50)+'px';});
+    add('↕ Aumentar altura',()=>{if(el.dataset.locked!=='1')el.style.height=(parseFloat(el.offsetHeight)+50)+'px';});
+    add('↕ Diminuir altura',()=>{if(el.dataset.locked!=='1')el.style.height=Math.max(50,parseFloat(el.offsetHeight)-50)+'px';});
+    add('🗑 Remover '+(isBg?'mapa':'imagem'),()=>{el.remove();closeMenus();});
+    document.body.appendChild(menu);
   }
-  if(fogSnap){
-    if(fogSnap.opacity!=='') range.value=String(Math.max(0,Math.min(100,Number(fogSnap.opacity)||72)));
-    if(fogSnap.color){color.value=fogSnap.color;}
-    if(fogSnap.visionRadius && visionRadius) visionRadius.value=String(Number(fogSnap.visionRadius)===3?2:fogSnap.visionRadius);
-    if(fogSnap.active) fog.classList.add('active'); else fog.classList.remove('active');
-    window.rpgForgeFogLocked=!!fogSnap.locked;
-  }
-  const savedGMView=fogGet(FOG_GM_VIEW_KEY)==='1';
-  let gmSeeThrough=savedGMView;
-  function applyGMView(){
-    if(gmSeeThrough){cloud.classList.add('gmSeeThrough');if(gmView){gmView.textContent='👁 Mestre: névoa transparente';gmView.classList.add('active')}}
-    else{cloud.classList.remove('gmSeeThrough');if(gmView){gmView.textContent='👁 Mestre: ver através';gmView.classList.remove('active')}}
-  }
-  if(gmView){gmView.addEventListener('click',()=>{gmSeeThrough=!gmSeeThrough;fogSet(FOG_GM_VIEW_KEY,gmSeeThrough?'1':'0');applyGMView()});}
-  function setOpacity(save=true){const v=Math.max(0,Math.min(100,Number(range.value)||0));cloud.style.opacity=String(v/100);value.textContent=v+'%';if(save)fogSet(FOG_OPACITY_KEY,v)}
-  range.addEventListener('input',()=>setOpacity(true));setOpacity(false);
-  applyGMView();
-  function setColor(){cloud.style.setProperty('--fog-color',color.value);colorValue.textContent=color.value.toUpperCase()}
-  color.addEventListener('input',setColor);setColor();
-  toggle.addEventListener('click',()=>{fog.classList.toggle('active');const on=fog.classList.contains('active');toggle.textContent=on?'☀️ Desativar fumaça':'🌫️ Ativar fumaça';toggle.classList.toggle('active',on);updateVision()});
-  function updateSizeLabel(){if(sizeValue){const g=gridSize();sizeValue.textContent=Math.round((cloud.offsetWidth/Math.max(1,g.w))*100)+'%'}}
-  function setSizePercent(percent){
-    const p=Math.max(10,Math.min(100,Number(percent)||100)),g=gridSize(),oldW=cloud.offsetWidth,oldH=cloud.offsetHeight;
-    const w=Math.max(260,g.w*p/100),h=Math.max(180,g.h*p/100),oldLeft=parseFloat(cloud.style.left)||g.left,oldTop=parseFloat(cloud.style.top)||g.top;
-    cloud.style.width=w+'px';cloud.style.height=h+'px';cloud.style.left=(oldLeft+(oldW-w)/2)+'px';cloud.style.top=(oldTop+(oldH-h)/2)+'px';updateSizeLabel();updateVision();
-  }
-  function currentSize(){const g=gridSize();return Math.round((cloud.offsetWidth/Math.max(1,g.w))*100)}
-  function scale(f){setSizePercent(currentSize()*f)}
-  big.onclick=e=>{e.stopPropagation();scale(1.15)};
-  small.onclick=e=>{e.stopPropagation();scale(.87)};
-  center.onclick=e=>{e.stopPropagation();const g=gridSize();cloud.style.left=(g.left+(g.w-cloud.offsetWidth)/2)+'px';cloud.style.top=(g.top+(g.h-cloud.offsetHeight)/2)+'px';updateVision()};
-  let fogLocked=false;window.rpgForgeFogLocked=false;let drag=false,dx=0,dy=0,resizing=false,startX=0,startY=0,startW=0,startH=0, fogMoveMode=false;
-  const fogMoveMenu=document.createElement('div');
-  fogMoveMenu.id='rpgFogMoveMenu';
-  fogMoveMenu.style.cssText='position:fixed;z-index:9999;display:none;background:#171a20;border:1px solid #555e6d;border-radius:8px;padding:5px;box-shadow:0 8px 20px #000b';
-  const fogMoveBtn=document.createElement('button');
-  fogMoveBtn.type='button'; fogMoveBtn.textContent='↔ Mover névoa';
-  fogMoveBtn.style.cssText='border:0;background:#242a33;color:#fff;border-radius:6px;padding:7px 12px;cursor:pointer';
-  fogMoveMenu.appendChild(fogMoveBtn); document.body.appendChild(fogMoveMenu);
-  function updateFogMoveUI(){
-    fogMoveBtn.textContent=fogMoveMode?'✓ Mover névoa (ativo)':'↔ Mover névoa';
-    cloud.style.cursor=(fogMoveMode&&!fogLocked)?'grab':'default';
-  }
-  lock.addEventListener('click',()=>{fogLocked=!fogLocked;window.rpgForgeFogLocked=fogLocked;if(fogLocked)fogMoveMode=false;lock.textContent=fogLocked?'🔒 Destravar névoa':'🔓 Travar névoa';lock.classList.toggle('active',fogLocked);cloud.classList.toggle('locked',fogLocked);updateFogMoveUI();});
-  function pointInsideFog(e){
-    const r=cloud.getBoundingClientRect();
-    return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
-  }
-  // O menu da névoa não usa mais botão direito; o controle continua disponível pelo painel da névoa.
-  map.addEventListener('contextmenu',e=>{
-    if(pointInsideFog(e)){e.preventDefault();e.stopPropagation();}
-  });
-  fogMoveBtn.addEventListener('click',()=>{if(!fogLocked){fogMoveMode=true;updateFogMoveUI();}fogMoveMenu.style.display='none';});
-  document.addEventListener('pointerdown',e=>{if(!fogMoveMenu.contains(e.target))fogMoveMenu.style.display='none';});
-  // A nuvem só recebe ponteiro quando o modo de mover está ativo; assim os tokens continuam clicáveis.
-  cloud.style.pointerEvents='none';
-  function syncFogPointer(){cloud.style.pointerEvents=(fogMoveMode&&!fogLocked)?'auto':'none';}
-  const oldUpdateFogMoveUI=updateFogMoveUI;
-  updateFogMoveUI=function(){oldUpdateFogMoveUI();syncFogPointer()};
-  cloud.addEventListener('pointerdown',e=>{if(fogLocked||!fogMoveMode||e.target.closest('button')||e.target===resize||e.target.closest('svg'))return;drag=true;const r=cloud.getBoundingClientRect();dx=e.clientX-r.left;dy=e.clientY-r.top;cloud.setPointerCapture(e.pointerId);e.preventDefault()});
-  cloud.addEventListener('pointermove',e=>{if(!drag)return;const lr=fog.getBoundingClientRect(),nx=e.clientX-lr.left-dx,ny=e.clientY-lr.top-dy,g=gridSize();const minX=g.left-cloud.offsetWidth*.35,maxX=g.left+g.w-cloud.offsetWidth*.65,minY=g.top-cloud.offsetHeight*.35,maxY=g.top+g.h-cloud.offsetHeight*.65;cloud.style.left=Math.min(maxX,Math.max(minX,nx))+'px';cloud.style.top=Math.min(maxY,Math.max(minY,ny))+'px';updateVision()});
-  cloud.addEventListener('pointerup',()=>drag=false);cloud.addEventListener('pointercancel',()=>drag=false);
-  resize.addEventListener('pointerdown',e=>{if(fogLocked)return;resizing=true;startX=e.clientX;startY=e.clientY;startW=cloud.offsetWidth;startH=cloud.offsetHeight;resize.setPointerCapture(e.pointerId);e.stopPropagation();e.preventDefault()});
-  resize.addEventListener('pointermove',e=>{if(!resizing)return;const f=Math.max((startW+(e.clientX-startX))/startW,(startH+(e.clientY-startY))/startH);scale(Math.max(.25,Math.min(3,f)))});
-  resize.addEventListener('pointerup',()=>resizing=false);resize.addEventListener('pointercancel',()=>resizing=false);
-  function getRadius(){return (Number(visionRadius&&visionRadius.value)||2)*50}
-  function clearVisionHoles(){
-    if(!mask)return;
-    mask.querySelectorAll('circle').forEach(c=>c.remove());
-  }
-  function updateVision(){
-    mask=ensureMask();
-    if(!mask)return;
-    clearVisionHoles();
-    // Somente tokens dos jogadores revelam a névoa. Monstros/NPCs continuam ocultos.
-    const tokens=map.querySelectorAll('.token.player');
-    const g=gridSize(), radius=getRadius();
-    // Calcula a posição pela tela e converte para o espaço interno da névoa.
-    // Assim a visão fica exatamente centrada no token mesmo com zoom/pan do mapa.
-    const cloudRect=cloud.getBoundingClientRect();
-    const cloudScaleX=cloud.offsetWidth/Math.max(1,cloudRect.width);
-    const cloudScaleY=cloud.offsetHeight/Math.max(1,cloudRect.height);
-    if(visionValue)visionValue.textContent=String(Math.round(radius/50));
-    const maskEl=mask;
-    maskEl.setAttribute('maskUnits','userSpaceOnUse');
-    maskEl.setAttribute('x','0');maskEl.setAttribute('y','0');
-    maskEl.setAttribute('width',String(Math.max(1,cloud.offsetWidth)));
-    maskEl.setAttribute('height',String(Math.max(1,cloud.offsetHeight)));
-    const base=maskEl.querySelector('rect');
-    if(base){base.setAttribute('x','0');base.setAttribute('y','0');base.setAttribute('width',String(Math.max(1,cloud.offsetWidth)));base.setAttribute('height',String(Math.max(1,cloud.offsetHeight)));base.setAttribute('fill','white');}
-    tokens.forEach(t=>{
-      const tr=t.getBoundingClientRect();
-      const tx=tr.left+tr.width/2, ty=tr.top+tr.height/2;
-      const cx=(tx-cloudRect.left)*cloudScaleX;
-      const cy=(ty-cloudRect.top)*cloudScaleY;
-      const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-      c.setAttribute('cx',String(cx));
-      c.setAttribute('cy',String(cy));
-      // 1 bloco = 50px no mapa; o raio acompanha a escala da própria névoa.
-      c.setAttribute('r',String(radius*cloudScaleX));
-      c.setAttribute('fill','black');
-      maskEl.appendChild(c);
+
+  function bindMapObject(el,isBg){
+    if(!el || el.dataset.rpgMapController==='1') return;
+    el.dataset.rpgMapController='1';
+    el.style.pointerEvents='auto';
+    el.style.touchAction='none';
+    el.style.cursor=el.dataset.locked==='1'?'not-allowed':'grab';
+    el.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();makeMenu(el,e,isBg);});
+    el.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();makeMenu(el,e,isBg);});
+    el.addEventListener('pointerdown',e=>{
+      if(e.button!==0 || e.target.classList.contains('mapBgResize') || el.dataset.locked==='1') return;
+      e.preventDefault();e.stopPropagation();
+      closeMenus();
+      const tr=map.style.transform||'';
+      const mm=tr.match(/translate\\(([-\\d.]+)px,\\s*([-\\d.]+)px\\) scale\\(([-\\d.]+)\\)/);
+      const sx=mm?parseFloat(mm[1]):0, sy=mm?parseFloat(mm[2]):0, sc=mm?parseFloat(mm[3]):1;
+      const startX=e.clientX,startY=e.clientY;
+      const ox=parseFloat(el.style.left)||0,oy=parseFloat(el.style.top)||0;
+      const move=ev=>{el.style.left=(ox+(ev.clientX-startX)/sc)+'px';el.style.top=(oy+(ev.clientY-startY)/sc)+'px';};
+      const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);};
+      window.addEventListener('pointermove',move);window.addEventListener('pointerup',up,{once:true});
     });
-    // Branco = névoa visível; círculos pretos = área revelada pelos jogadores.
-    cloud.style.webkitMaskImage='url(#rpgFogMask)';
-    cloud.style.maskImage='url(#rpgFogMask)';
-    cloud.style.webkitMaskRepeat='no-repeat';
-    cloud.style.maskRepeat='no-repeat';
-    cloud.style.webkitMaskSize=cloud.offsetWidth+'px '+cloud.offsetHeight+'px';
-    cloud.style.maskSize=cloud.offsetWidth+'px '+cloud.offsetHeight+'px';
-  }
-  if(visionRadius)visionRadius.addEventListener('change',updateVision);
-  setSizePercent(100);const g=gridSize();cloud.style.left=g.left+'px';cloud.style.top=g.top+'px';updateVision();
-  // Atualiza a visão enquanto qualquer token existente ou criado é arrastado.
-  // Observa apenas tokens. Nunca observe a própria máscara da névoa,
-  // pois updateVision() altera a máscara e isso causaria um loop infinito.
-  const tokenObservers=new Map();
-  function watchToken(t){
-    if(!t||!t.classList?.contains('token')||tokenObservers.has(t))return;
-    const ob=new MutationObserver(()=>updateVision());
-    ob.observe(t,{attributes:true,attributeFilter:['style','class']});
-    tokenObservers.set(t,ob);
-  }
-  map.querySelectorAll('.token').forEach(watchToken);
-  const observer=new MutationObserver(muts=>{
-    for(const m of muts){
-      if(m.target?.closest?.('.rpgFogVisionMask')) continue;
-      m.addedNodes?.forEach(n=>{
-        if(n.nodeType===1){
-          if(n.classList?.contains('token')) watchToken(n);
-          n.querySelectorAll?.('.token').forEach(watchToken);
-        }
-      });
-      m.removedNodes?.forEach(n=>{
-        if(n.nodeType===1){
-          if(tokenObservers.has(n)){tokenObservers.get(n).disconnect();tokenObservers.delete(n)}
-          n.querySelectorAll?.('.token').forEach(t=>{if(tokenObservers.has(t)){tokenObservers.get(t).disconnect();tokenObservers.delete(t)}});
-        }
+    if(isBg){
+      let h=el.querySelector('.mapBgResize');
+      if(!h){h=document.createElement('span');h.className='mapBgResize se';el.appendChild(h);}
+      h.addEventListener('pointerdown',e=>{
+        if(el.dataset.locked==='1')return;e.preventDefault();e.stopPropagation();
+        const sc=scaleNow(),sx=e.clientX,sy=e.clientY,ow=el.offsetWidth,oh=el.offsetHeight;
+        const move=ev=>{el.style.width=Math.max(100,ow+(ev.clientX-sx)/sc)+'px';el.style.height=Math.max(100,oh+(ev.clientY-sy)/sc)+'px';};
+        const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up)};
+        window.addEventListener('pointermove',move);window.addEventListener('pointerup',up,{once:true});
       });
     }
-    if(muts.some(m=>m.addedNodes?.length||m.removedNodes?.length)) updateVision();
-  });
-  observer.observe(map,{childList:true,subtree:true});
-  window.rpgForgeUpdateFogVision=updateVision;
-  window.addEventListener('resize',()=>{updateSizeLabel();updateVision()});
+  }
+
+  // Rebind the existing imported map and future imported maps.
+  const existing=document.getElementById('customMapBackground');
+  if(existing) bindMapObject(existing,true);
+  document.querySelectorAll('.mapImageObject').forEach(x=>bindMapObject(x,false));
+  new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{
+    if(n.nodeType!==1)return;
+    if(n.id==='customMapBackground')bindMapObject(n,true);
+    if(n.matches?.('.mapImageObject'))bindMapObject(n,false);
+    n.querySelectorAll?.('.mapImageObject').forEach(x=>bindMapObject(x,false));
+  }))).observe(map,{childList:true,subtree:true});
 })();
 
 </script>
 
 <script>
-/* RPG Forge Online — sincronização sem destruir os eventos da mesa */
+/* CONTROLADOR FINAL DO MAPA IMPORTADO — substitui handlers antigos */
 (function(){
-  const WS_PROTO = location.protocol === 'https:' ? 'wss' : 'ws';
-  let ws=null, room='', role='', name='', joined=false;
-  let suppressUntil=0, sendTimer=null, lastPlayers=[];
-  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const now=()=>performance.now();
-  function overlay(){
-    if(document.getElementById('onlineOverlay')) return;
-    const o=document.createElement('div');o.id='onlineOverlay';
-    o.innerHTML='<div class="onlineCard"><div class="onlineLogo">RPG <b>FORGE</b></div><h1>Sala Online</h1><p>Crie uma mesa ou entre em uma sala existente.</p><input id="onlineName" placeholder="Seu nome" maxlength="24"><input id="onlineRoom" placeholder="Código da sala (ex.: ARKHON)" maxlength="12"><div class="onlineBtns"><button id="createRoom">👑 Criar sala</button><button id="joinRoom">👤 Entrar na sala</button></div><div id="onlineStatus" class="onlineStatus">Servidor online</div></div>';
-    document.body.appendChild(o);
-    try{const stored=localStorage.getItem('rpgForgeOnlineName');if(stored)document.getElementById('onlineName').value=stored}catch(e){}
-    document.getElementById('createRoom').onclick=()=>start(true);
-    document.getElementById('joinRoom').onclick=()=>start(false);
-  }
-  function status(t,err=false){const e=document.getElementById('onlineStatus');if(e){e.textContent=t;e.style.color=err?'#df7474':'#9ca5b3'}}
-  function applyHeader(){
-    const pill=document.querySelector('header .mode');if(pill)pill.textContent=role==='gm'?'● Mestre':'● Jogador';
-    const sess=document.querySelector('header .session');if(sess)sess.innerHTML='Campanha: <b>Ruínas de Arkhon</b> · Sala <b>'+esc(room||'----')+'</b>';
-    const share=document.getElementById('share');
-    if(share){share.textContent='🔗 Compartilhar sala';share.onclick=()=>{const link=location.origin+'/?room='+encodeURIComponent(room);if(navigator.clipboard)navigator.clipboard.writeText(link).then(()=>{share.textContent='✓ Link copiado';setTimeout(()=>share.textContent='🔗 Compartilhar sala',1400)}).catch(()=>prompt('Copie o link da sala:',link));else prompt('Copie o link da sala:',link)}}
-  }
-  function presencePill(){return document.querySelector('.toolbar .pill')}
-  function showPlayers(){
-    document.querySelector('.onlinePlayersPanel')?.remove();
-    const p=document.createElement('div');p.className='onlinePlayersPanel';
-    const rows=lastPlayers.length?lastPlayers.map(x=>'<div class="onlinePlayerRow"><span>'+(x.role==='gm'?'👑':'👤')+' '+esc(x.name)+'</span><small>'+(x.role==='gm'?'Mestre':'Jogador')+'</small></div>').join(''):'<div class="small">Ninguém conectado.</div>';
-    p.innerHTML='<div class="onlinePlayersHead"><b>👥 Pessoas na sala</b><button type="button" class="onlinePlayersClose">✕</button></div>'+rows;
-    document.body.appendChild(p);p.querySelector('.onlinePlayersClose').onclick=()=>p.remove();
-  }
-  function updatePresence(players){
-    lastPlayers=Array.isArray(players)?players:[];
-    const p=presencePill();if(p){p.textContent='👥 '+lastPlayers.length+' conectado'+(lastPlayers.length===1?'':'s');p.title='Clique para ver quem está na sala';p.onclick=showPlayers}
-    document.querySelector('.onlinePlayersPanel')?.remove();
-  }
-  function sameNode(a,b){
-    if(!a||!b||a.nodeType!==b.nodeType)return false;
-    if(a.nodeType===3)return true;
-    if(a.id&&b.id)return a.id===b.id;
-    if(a.tagName!==b.tagName)return false;
-    const ac=(a.className&&typeof a.className==='string')?a.className:'';
-    const bc=(b.className&&typeof b.className==='string')?b.className:'';
-    if(ac!==bc)return false;
-    const at=a.getAttribute('data-export-id'),bt=b.getAttribute('data-export-id');
-    if(at||bt)return at===bt;
-    if(a.classList.contains('token')||b.classList.contains('token'))return (a.title||a.textContent||'')===(b.title||b.textContent||'');
-    return true;
-  }
-  function syncAttrs(dst,src){
-    for(const a of [...src.attributes]){
-      if(dst.getAttribute(a.name)!==a.value)dst.setAttribute(a.name,a.value);
+  const map=document.getElementById('map');
+  if(!map)return;
+
+  function closeMapMenu(){document.querySelectorAll('.finalMapMenu').forEach(m=>m.remove());}
+  function layer(el,dir){
+    if(!el||!el.parentElement)return;
+    const siblings=[...el.parentElement.children].filter(n=>n!==el && (n.id==='customMapBackground'||n.classList.contains('mapImageObject')||n.classList.contains('token')||n.classList.contains('forgeObj')));
+    if(dir==='front'){
+      const max=siblings.reduce((v,n)=>Math.max(v,parseInt(getComputedStyle(n).zIndex)||0),0);
+      el.style.zIndex=String(max+1);
+    }else{
+      const min=siblings.reduce((v,n)=>Math.min(v,parseInt(getComputedStyle(n).zIndex)||1),1);
+      el.style.zIndex=String(Math.max(1,min-1));
     }
-    for(const a of [...dst.attributes]){
-      if(!src.hasAttribute(a.name) && a.name!=='id')dst.removeAttribute(a.name);
-    }
-    if(dst.nodeType===1 && !dst.isEqualNode(src) && dst.childElementCount===0 && src.childElementCount===0 && dst.textContent!==src.textContent)dst.textContent=src.textContent;
   }
-  function patchChildren(dst,src){
-    const wanted=[...src.childNodes], existing=[...dst.childNodes], used=new Set();
-    wanted.forEach((sn,i)=>{
-      let match=null;
-      if(sn.nodeType===1){
-        match=existing.find((en,j)=>!used.has(j)&&sameNode(en,sn));
-      }else if(sn.nodeType===3){
-        match=existing.find((en,j)=>!used.has(j)&&en.nodeType===3);
-      }
-      if(match){const j=existing.indexOf(match);used.add(j);if(sn.nodeType===1){syncAttrs(match,sn);patchChildren(match,sn)}else if(match.textContent!==sn.textContent)match.textContent=sn.textContent;}
-      else{dst.appendChild(sn.cloneNode(true));}
+  function makeMenu(el,e){
+    closeMapMenu();
+    const menu=document.createElement('div');
+    menu.className='finalMapMenu';
+    menu.style.cssText='position:fixed;z-index:2147483647;min-width:220px;background:#151922;border:1px solid #596273;border-radius:9px;padding:8px;box-shadow:0 12px 35px #000c;display:grid;gap:5px;';
+    menu.style.left=Math.max(5,Math.min((e?.clientX||100)+8,window.innerWidth-240))+'px';
+    menu.style.top=Math.max(5,Math.min((e?.clientY||100)+8,window.innerHeight-330))+'px';
+    const title=document.createElement('div');title.textContent='🗺️ Mapa';title.style.fontWeight='700';title.style.padding='3px 5px 6px';menu.appendChild(title);
+    const button=(txt,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=txt;b.style.cssText='background:#242a33;border:1px solid #3b4452;color:#fff;border-radius:6px;padding:8px;text-align:left;cursor:pointer;';b.addEventListener('pointerdown',ev=>ev.stopPropagation());b.addEventListener('click',ev=>{ev.preventDefault();ev.stopPropagation();fn();});menu.appendChild(b);};
+    button('↑ Trazer para frente',()=>{layer(el,'front');});
+    button('↓ Enviar para trás',()=>{layer(el,'back');});
+    button(el.dataset.locked==='1'?'🔓 Destravar mapa':'🔒 Travar mapa',()=>{el.dataset.locked=el.dataset.locked==='1'?'0':'1';el.style.cursor=el.dataset.locked==='1'?'not-allowed':'grab';menu.remove();makeMenu(el,e);});
+    button('↔ Aumentar largura',()=>{if(el.dataset.locked!=='1')el.style.width=(el.offsetWidth+50)+'px';});
+    button('↔ Diminuir largura',()=>{if(el.dataset.locked!=='1')el.style.width=Math.max(100,el.offsetWidth-50)+'px';});
+    button('↕ Aumentar altura',()=>{if(el.dataset.locked!=='1')el.style.height=(el.offsetHeight+50)+'px';});
+    button('↕ Diminuir altura',()=>{if(el.dataset.locked!=='1')el.style.height=Math.max(100,el.offsetHeight-50)+'px';});
+    button('🗑 Excluir mapa',()=>{el.remove();menu.remove();});
+    document.body.appendChild(menu);
+  }
+  function install(el){
+    if(!el||el.dataset.finalMapController==='1')return;
+    el.dataset.finalMapController='1';
+    // Remove the old listeners by cloning the element once.
+    const fresh=el.cloneNode(true);
+    fresh.dataset.finalMapController='1';
+    el.replaceWith(fresh);el=fresh;
+    el.style.pointerEvents='auto';
+    el.style.userSelect='none';
+    el.style.touchAction='none';
+    el.style.cursor=el.dataset.locked==='1'?'not-allowed':'grab';
+    el.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();makeMenu(el,e);});
+    el.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();makeMenu(el,e);});
+    let resize=el.querySelector('.mapBgResize');
+    if(!resize){resize=document.createElement('span');resize.className='mapBgResize se';el.appendChild(resize);}
+    resize.style.display='block';
+    resize.addEventListener('pointerdown',e=>{
+      if(el.dataset.locked==='1')return;
+      e.preventDefault();e.stopPropagation();
+      const sx=e.clientX,sy=e.clientY,ow=el.offsetWidth,oh=el.offsetHeight;
+      const move=ev=>{const sc=window.__rpgMapScale||1;el.style.width=Math.max(100,ow+(ev.clientX-sx)/sc)+'px';el.style.height=Math.max(100,oh+(ev.clientY-sy)/sc)+'px';};
+      const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up)};
+      window.addEventListener('pointermove',move);window.addEventListener('pointerup',up,{once:true});
     });
-    for(let i=existing.length-1;i>=0;i--)if(!used.has(i)&&existing[i].parentNode===dst)dst.removeChild(existing[i]);
+    el.addEventListener('pointerdown',e=>{
+      if(e.button!==0||e.target===resize||el.dataset.locked==='1')return;
+      e.preventDefault();e.stopPropagation();closeMapMenu();
+      const mapEl=document.getElementById('map');
+      const tr=getComputedStyle(mapEl).transform;
+      let sc=1;const m=tr&&tr!=='none'?tr.match(/matrix\(([^)]+)\)/):null;if(m){const a=m[1].split(',');sc=parseFloat(a[0])||1;}
+      window.__rpgMapScale=sc;
+      const sx=e.clientX,sy=e.clientY,ol=parseFloat(el.style.left)||0,ot=parseFloat(el.style.top)||0;
+      const move=ev=>{el.style.left=(ol+(ev.clientX-sx)/sc)+'px';el.style.top=(ot+(ev.clientY-sy)/sc)+'px';};
+      const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up)};
+      window.addEventListener('pointermove',move);window.addEventListener('pointerup',up,{once:true});
+    });
   }
-  function applyMapHTML(html){
-    const map=document.getElementById('map');if(!map||typeof html!=='string')return;
-    const tpl=document.createElement('template');tpl.innerHTML=html;
-    suppressUntil=now()+500;
-    patchChildren(map,tpl.content);
-    window.rpgForgeUpdateFogVision?.();
-  }
-  function sendState(){
-    if(!joined||!ws||ws.readyState!==WebSocket.OPEN)return;
-    const map=document.getElementById('map');if(!map)return;
-    ws.send(JSON.stringify({type:'state',html:map.innerHTML}));
-  }
-  function scheduleState(){
-    if(!joined||now()<suppressUntil)return;
-    clearTimeout(sendTimer);sendTimer=setTimeout(sendState,120);
-  }
-  function start(create){
-    name=(document.getElementById('onlineName').value||'Jogador').trim().slice(0,24)||'Jogador';
-    room=(document.getElementById('onlineRoom').value||'').trim().toUpperCase().replace(/[^A-Z0-9_-]/g,'').slice(0,12);
-    if(create&&!room)room=Math.random().toString(36).slice(2,6).toUpperCase();
-    if(!room){status('Digite o código da sala.',true);return}
-    try{
-      localStorage.setItem('rpgForgeOnlineName',name);
-      localStorage.setItem('rpgForgeOnlineRoomV1',room);
-      localStorage.setItem('rpgForgeOnlineRoleV1',create?'gm':'player');
-    }catch(e){}
-    role=create?'gm':'player';
-    const u=WS_PROTO+'://'+location.host+'/?room='+encodeURIComponent(room)+'&role='+role+'&name='+encodeURIComponent(name);
-    try{ws=new WebSocket(u)}catch(e){status('Não foi possível conectar.',true);return}
-    status('Conectando...');
-    ws.onopen=()=>{joined=true;status('Conectado à sala '+room);applyHeader();setTimeout(()=>document.getElementById('onlineOverlay')?.remove(),180)};
-    ws.onmessage=e=>{
-      let m;try{m=JSON.parse(e.data)}catch(_){return}
-      if(m.type==='hello'){room=m.room||room;role=m.role||role;applyHeader();return}
-      if(m.type==='state'&&m.html){applyMapHTML(m.html);return}
-      if(m.type==='presence'){updatePresence(m.players);return}
-      if(m.type==='chat'&&typeof window.logMsg==='function')window.logMsg(m.text);
-    };
-    ws.onclose=()=>{joined=false;clearTimeout(sendTimer);updatePresence([]);applyHeader();status('Conexão encerrada.',true)};
-    ws.onerror=()=>status('Erro de conexão.',true);
-  }
-  function observe(){
-    const map=document.getElementById('map');if(!map)return;
-    const ob=new MutationObserver(()=>{if(now()>=suppressUntil)scheduleState()});
-    ob.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class','src','value','data-page','data-hp','data-ac','data-locked']});
-  }
-  function boot(){
-    overlay();observe();
-    const q=new URLSearchParams(location.search);
-    if(q.get('room')){
-      document.getElementById('onlineRoom').value=q.get('room').toUpperCase().slice(0,12);
-      if(q.get('name'))document.getElementById('onlineName').value=q.get('name').slice(0,24);
-      start(q.get('role')==='gm');
-    }
-    updatePresence([]);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+  function scan(){const bg=document.getElementById('customMapBackground');if(bg)install(bg);}
+  scan();
+  new MutationObserver(()=>scan()).observe(map,{childList:true,subtree:true});
+  document.addEventListener('pointerdown',e=>{if(!e.target.closest('.finalMapMenu'))closeMapMenu();});
 })();
 </script>
-<style id="rpgOnlineStyle">
-#onlineOverlay{position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at 50% 35%,#242a35,#0b0e12 70%);display:grid;place-items:center;font-family:system-ui,Segoe UI,sans-serif}.onlineCard{width:min(430px,calc(100vw - 30px));padding:30px;border:1px solid #39414e;border-radius:18px;background:#15191f;box-shadow:0 24px 80px #000b}.onlineLogo{font-size:18px;font-weight:800;letter-spacing:.5px}.onlineLogo b{color:#d6a85d}.onlineCard h1{font-size:30px;margin:24px 0 6px}.onlineCard p{color:#9ca5b3;margin:0 0 22px}.onlineCard input{display:block;width:100%;margin:9px 0;padding:12px;border-radius:9px}.onlineBtns{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.onlineBtns button{padding:12px;border:1px solid #414958;border-radius:9px;background:#202631;color:#fff;cursor:pointer}.onlineBtns button:hover{border-color:#d6a85d}.onlineStatus{font-size:12px;color:#9ca5b3;margin-top:14px;text-align:center}.onlinePlayersPanel{position:fixed;z-index:100000;right:18px;top:66px;width:min(320px,calc(100vw - 36px));padding:12px;background:#15191f;border:1px solid #39414e;border-radius:12px;box-shadow:0 18px 50px #000b}.onlinePlayersHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.onlinePlayersClose{border:1px solid #414958;background:#202631;color:#fff;border-radius:6px;padding:4px 8px;cursor:pointer}.onlinePlayerRow{display:flex;justify-content:space-between;gap:12px;padding:9px 6px;border-top:1px solid #303641}.onlinePlayerRow small{color:#9ca5b3}
-</style>
 </body></html>
