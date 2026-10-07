@@ -1,12 +1,18 @@
-const http=require('http'),fs=require('fs'),path=require('path'),url=require('url'),WebSocket=require('ws');
-const PORT=process.env.PORT||3000;
-const publicDir=path.join(__dirname,'public');
-const rooms=new Map();
-const server=http.createServer((req,res)=>{let p=url.parse(req.url).pathname;if(p==='/'||p==='/index.html')p='/index.html';const file=path.join(publicDir,p);if(!file.startsWith(publicDir)||!fs.existsSync(file)){res.writeHead(404);return res.end('Not found')}res.writeHead(200,{'Content-Type':p.endsWith('.html')?'text/html; charset=utf-8':'application/octet-stream','Cache-Control':'no-store'});fs.createReadStream(file).pipe(res)});
-const wss=new WebSocket.Server({server});
-function roomState(room){if(!rooms.has(room))rooms.set(room,{html:null,clients:new Set()});return rooms.get(room)}
-function roomPresence(r){return [...r.clients].map(c=>({name:c.name,role:c.role}));}
-function broadcast(r,msg,except){const s=JSON.stringify(msg);for(const c of r.clients)if(c!==except&&c.readyState===WebSocket.OPEN)c.send(s)}
-function broadcastPresence(r){broadcast(r,{type:'presence',count:r.clients.size,players:roomPresence(r)})}
-wss.on('connection',(ws,req)=>{const q=new URL(req.url,'http://localhost').searchParams;const room=(q.get('room')||'TEST').toUpperCase().slice(0,12);const role=q.get('role')==='gm'?'gm':'player';const name=(q.get('name')||'Jogador').slice(0,24);const r=roomState(room);ws.room=room;ws.role=role;ws.name=name;r.clients.add(ws);ws.send(JSON.stringify({type:'hello',room,role,name}));if(r.html)ws.send(JSON.stringify({type:'state',html:r.html,initial:true}));broadcastPresence(r);ws.on('message',raw=>{let m;try{m=JSON.parse(raw)}catch{return}if(m.type==='state'){if(role!=='gm'&&r.clients.size>0){/* jogadores também podem movimentar fichas; estado compartilhado */}if(typeof m.html==='string'&&m.html.length<5_000_000){r.html=m.html;broadcast(r,{type:'state',html:m.html},ws)}}});ws.on('close',()=>{r.clients.delete(ws);broadcastPresence(r);if(!r.clients.size)rooms.delete(room)})});
-server.listen(PORT,()=>console.log(`RPG Forge online em http://localhost:${PORT}`));
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const PORT = process.env.PORT || 3000;
+const root = __dirname;
+const server = http.createServer((req,res)=>{
+  let file = req.url === '/' ? 'index.html' : req.url.replace(/^\//,'');
+  file = path.normalize(file);
+  if (file.includes('..')) { res.writeHead(403); return res.end('Forbidden'); }
+  const full = path.join(root,file);
+  fs.readFile(full,(err,data)=>{
+    if(err){res.writeHead(404,{'Content-Type':'text/plain; charset=utf-8'});return res.end('Arquivo não encontrado');}
+    const ext=path.extname(full).toLowerCase();
+    const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json'};
+    res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream'});res.end(data);
+  });
+});
+server.listen(PORT,()=>console.log(`RPG Forge rodando em http://localhost:${PORT}`));

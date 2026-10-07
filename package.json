@@ -1,10 +1,8 @@
 {
-  "name":"rpg-forge-online",
-  "version":"1.0.0",
-  "private":true,
-  "description":"RPG Forge — mesa virtual online de teste",
-  "main":"server.js",
-  "scripts":{"start":"node server.js"},
-  "engines":{"node":">=18"},
-  "dependencies":{"ws":"^8.18.0"}
+  "name": "rpg-forge",
+  "version": "1.0.0",
+  "description": "RPG Forge - mesa virtual",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": {}
 }
