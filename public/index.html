@@ -118,6 +118,19 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     }
     window.rpgForgePageCurrentIndex=i;
   }
+  function reloadPageKeepingRoom(){
+    try{
+      const q=new URLSearchParams(location.search);
+      const room=safeGet('rpgForgeOnlineRoomV1');
+      const role=safeGet('rpgForgeOnlineRoleV1');
+      const name=safeGet('rpgForgeOnlineName');
+      if(room)q.set('room',room);
+      if(role)q.set('role',role);
+      if(name)q.set('name',name);
+      const qs=q.toString();
+      location.href=location.pathname+(qs?'?'+qs:'')+location.hash;
+    }catch(e){location.reload()}
+  }
   function render(){
     panel.innerHTML='';
     const current=pages[index]||{name:'Mapa '+(index+1),locked:false};
@@ -141,7 +154,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
       b.title=pg.locked?'Mapa bloqueado para jogadores — o Mestre ainda pode acessá-lo':safeName;
       b.onclick=()=>{
         if(i===index){panel.hidden=true;return;}
-        save(index);safeSet(IDX,String(i));location.reload();
+        save(index);safeSet(IDX,String(i));reloadPageKeepingRoom();
       };
       const lock=document.createElement('button');lock.type='button';lock.className='rpgPageLock'+(pg.locked?' locked':'');
       lock.textContent=pg.locked?'🔒':'🔓';lock.title=pg.locked?'Destravar para jogadores':'Travar para jogadores';
@@ -159,7 +172,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     const add=document.createElement('button');add.type='button';add.className='rpgPageNew';add.textContent='＋ Nova aba';
     add.onclick=()=>{
       save(index);const i=pages.length;pages.push({name:'Mapa '+(i+1),locked:false});
-      safeSet(STATE+i,JSON.stringify({version:5,html:baseHTML,mapStyle:'',weather:null,fog:null}));safeSet(KEY,JSON.stringify(pages));safeSet(IDX,String(i));location.reload();
+      safeSet(STATE+i,JSON.stringify({version:5,html:baseHTML,mapStyle:'',weather:null,fog:null}));safeSet(KEY,JSON.stringify(pages));safeSet(IDX,String(i));reloadPageKeepingRoom();
     };
     panel.appendChild(add);
   }
@@ -1500,7 +1513,11 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     room=(document.getElementById('onlineRoom').value||'').trim().toUpperCase().replace(/[^A-Z0-9_-]/g,'').slice(0,12);
     if(create&&!room)room=Math.random().toString(36).slice(2,6).toUpperCase();
     if(!room){status('Digite o código da sala.',true);return}
-    try{localStorage.setItem('rpgForgeOnlineName',name)}catch(e){}
+    try{
+      localStorage.setItem('rpgForgeOnlineName',name);
+      localStorage.setItem('rpgForgeOnlineRoomV1',room);
+      localStorage.setItem('rpgForgeOnlineRoleV1',create?'gm':'player');
+    }catch(e){}
     role=create?'gm':'player';
     const u=WS_PROTO+'://'+location.host+'/?room='+encodeURIComponent(room)+'&role='+role+'&name='+encodeURIComponent(name);
     try{ws=new WebSocket(u)}catch(e){status('Não foi possível conectar.',true);return}
@@ -1524,7 +1541,11 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   function boot(){
     overlay();observe();
     const q=new URLSearchParams(location.search);
-    if(q.get('room')){document.getElementById('onlineRoom').value=q.get('room').toUpperCase().slice(0,12);if(q.get('name'))document.getElementById('onlineName').value=q.get('name').slice(0,24);document.getElementById('joinRoom').click()}
+    if(q.get('room')){
+      document.getElementById('onlineRoom').value=q.get('room').toUpperCase().slice(0,12);
+      if(q.get('name'))document.getElementById('onlineName').value=q.get('name').slice(0,24);
+      start(q.get('role')==='gm');
+    }
     updatePresence([]);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
