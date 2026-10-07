@@ -1,5 +1,11 @@
-# RPG Forge
+RPG Forge — Magias no grid
 
-Versão com cenários independentes e correção da névoa.
+Nesta versão, a aba de edição das magias é aberta no próprio efeito depois que ele é colocado no grid.
 
-A névoa mantém sua própria instância ao trocar de cenário, evitando perda dos controles e listeners quando o conteúdo do mapa é restaurado. O estado de cada cenário (ativação, cor, opacidade, tamanho/posição, travamento e visão) é reaplicado ao voltar para ele.
+- Duplo clique em uma magia no grid abre “Editar magia”.
+- Largura e altura podem ser ajustadas na aba.
+- Botões de diminuir/aumentar e aplicar tamanho funcionam.
+- Bordas e cantos dourados permitem redimensionar livremente.
+- “Mover magia” permite arrastar o efeito pelo grid.
+- Salvar/Fechar fecha a aba, mantendo as alterações salvas por cenário.
+- O código também evita a duplicação do clique que poderia criar duas magias ao colocar no grid.
