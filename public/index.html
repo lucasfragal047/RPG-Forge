@@ -66,13 +66,19 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
 (function(){
   const map=document.getElementById('map'), toolBtn=document.getElementById('rpgPageTool'), panel=document.getElementById('rpgPagePanel');
   if(!map||!toolBtn||!panel)return;
-  const KEY='rpgForgeScenariosV3';
-  const IDKEY='rpgForgeScenarioCurrentV3';
+  const KEY='rpgForgeScenariosV4';
+  const IDKEY='rpgForgeScenarioCurrentV4';
+  const NS='rpgForgeScenarioLocalV4_';
   const baseHTML=map.innerHTML;
   const safeGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
   const safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}
   const uid=()=> 'cenario-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
-  function read(){try{const a=JSON.parse(safeGet(KEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
+  function read(){try{
+    let a=JSON.parse(safeGet(KEY)||'[]');
+    if(Array.isArray(a)&&a.length)return a;
+    const legacy=JSON.parse(safeGet('rpgForgeScenariosV3')||'[]');
+    return Array.isArray(legacy)?legacy:[];
+  }catch(e){return[]}}
   function write(a){safeSet(KEY,JSON.stringify(a))}
   let scenarios=read();
   if(!scenarios.length){
@@ -101,6 +107,14 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
       version:10,
       html:map.innerHTML,
       mapStyle:map.getAttribute('style')||'',
+      mapClass:map.getAttribute('class')||'',
+      localUI:{
+        fogOpacity:document.getElementById('rpgFogOpacity')?.value||'',
+        fogColor:document.getElementById('rpgFogColor')?.value||'',
+        fogVision:document.getElementById('rpgFogVisionRadius')?.value||'',
+        fogActive:!!document.getElementById('rpgFogLayer')?.classList.contains('active'),
+        snap:!!document.getElementById('snap')?.classList.contains('on')
+      },
       transform:{scale:typeof window.rpgForgeViewport?.scale==='number'?window.rpgForgeViewport.scale:null,x:typeof window.rpgForgeViewport?.x==='number'?window.rpgForgeViewport.x:null,y:typeof window.rpgForgeViewport?.y==='number'?window.rpgForgeViewport.y:null},
       weather,
       fog:{
@@ -114,17 +128,29 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   function valid(st){return st&&typeof st.html==='string'&&st.html.includes('class="grid"')&&st.html.length>500}
   function saveCurrent(){const s=pg();if(!s)return;s.state=snapshot();write(scenarios)}
   function applySnapshot(st){
-    if(!valid(st)){map.innerHTML=baseHTML;window.rpgForgePageSnapshot=null;return}
+    if(!valid(st)){
+      map.innerHTML=baseHTML;
+      map.removeAttribute('style');
+      window.rpgForgePageSnapshot=null;
+      window.rpgForgeScenarioLocalUI=null;
+      return;
+    }
+    map.innerHTML='';
+    map.setAttribute('data-scenario-restoring','1');
     map.innerHTML=st.html;
     if(typeof st.mapStyle==='string')map.setAttribute('style',st.mapStyle);else map.removeAttribute('style');
+    if(typeof st.mapClass==='string')map.setAttribute('class',st.mapClass);
     window.rpgForgePageSnapshot=st;
+    window.rpgForgeScenarioLocalUI=st.localUI||null;
     window.rpgForgeScenarioCurrentId=currentId;
     window.rpgForgeScenarioName=()=>pg()?.name||'Cenário';
+    window.rpgForgeScenarioStorageKey=(key)=>NS+currentId+'_'+key;
     if(st.transform)window.rpgForgePendingViewport=st.transform;
   }
 
   window.rpgForgeScenarioCurrentId=currentId;
   window.rpgForgeScenarioName=()=>pg()?.name||'Cenário';
+  window.rpgForgeScenarioStorageKey=(key)=>NS+currentId+'_'+key;
   const active=pg();
   applySnapshot(active?.state);
 
@@ -1204,7 +1230,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   const FOG_GM_VIEW_KEY='rpgForgeFogGMViewV2_'+SCENARIO_ID;
   function fogGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
   function fogSet(k,v){try{localStorage.setItem(k,String(v))}catch(e){}}
-  const savedOpacity=fogGet(FOG_OPACITY_KEY);
+  const savedOpacity=fogSnap&&fogSnap.opacity!==undefined?String(fogSnap.opacity):fogGet(FOG_OPACITY_KEY);
   const pageSnap=window.rpgForgePageSnapshot||null;
   const fogSnap=pageSnap&&pageSnap.fog?pageSnap.fog:null;
   if(savedOpacity!==null){
