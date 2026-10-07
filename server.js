@@ -149,7 +149,13 @@ io.on('connection', socket => {
     if(!p || (p.role!=='gm' && p.pageId!==pageId)) return ack({ok:false,error:'Sem permissão para salvar esta aba.'});
     if(!state || typeof state.html!=='string') return ack({ok:false,error:'Estado inválido.'});
     page.state={version:5,html:state.html,mapStyle:String(state.mapStyle||''),weather:state.weather||null,fog:state.fog||null,updatedAt:Date.now(),sourceClientId:socket.data.clientId};
-    socket.to(room.code).emit('pagina-estado-atualizado',{page:publicPage(page),currentPageId:pageId});
+    // O estado é privado do cenário: só quem está vendo ESTA aba recebe a atualização.
+    for (const s of io.sockets.sockets.values()) {
+      if (s.id === socket.id) continue;
+      if (s.data.roomCode !== room.code) continue;
+      const viewer = room.players.get(s.data.clientId);
+      if (viewer?.pageId === pageId) s.emit('pagina-estado-atualizado',{page:publicPage(page),currentPageId:pageId});
+    }
     ack({ok:true});
   });
 

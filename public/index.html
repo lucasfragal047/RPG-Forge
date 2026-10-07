@@ -186,8 +186,13 @@ body.room-locked .app{visibility:hidden}
     render();
   }
   function createPage(){
-    const name=prompt('Nome da nova sala/cenário:','Nova sala');if(!name)return;
-    window.rpgForgeRoomSocket?.emit('pagina-criar',{name},res=>{if(!res?.ok)alert(res?.error||'Não foi possível criar a aba.')});
+    const name=prompt('Nome do novo cenário:','Novo cenário');if(!name)return;
+    window.rpgForgeRoomSocket?.emit('pagina-criar',{name},res=>{
+      if(!res?.ok){alert(res?.error||'Não foi possível criar o cenário.');return;}
+      // O novo cenário pertence à mesma sala, mas começa com estado próprio.
+      // Só o Mestre troca para ele; os demais jogadores permanecem no cenário em que estavam.
+      if(res.page) switchPage(res.page);
+    });
   }
   function renamePage(pg){
     const name=prompt('Nome da aba:',pg.name);if(!name)return;
@@ -199,6 +204,16 @@ body.room-locked .app{visibility:hidden}
     window.rpgForgeRoomSocket?.emit('pagina-excluir',{pageId:pg.id},res=>{if(!res?.ok)alert(res?.error||'Não foi possível excluir.')});
   }
   function toggleLock(pg){window.rpgForgeRoomSocket?.emit('pagina-travar',{pageId:pg.id,locked:!pg.locked},res=>{if(!res?.ok)alert(res?.error||'Não foi possível alterar o bloqueio.')})}
+  function resetToScenarioBase(){
+    suppressSync=true;
+    try{
+      map.innerHTML=baseHTML;
+      map.setAttribute('style','');
+      window.rpgForgePageSnapshot=null;
+    }finally{setTimeout(()=>suppressSync=false,80)}
+    window.rpgForgePageCurrentIndex=currentIndex;
+    if(window.rpgForgeRebindAfterRemoteState)window.rpgForgeRebindAfterRemoteState();
+  }
   function applyState(snap){
     if(!snap||!valid(snap.html))return;
     suppressSync=true;
@@ -212,6 +227,7 @@ body.room-locked .app{visibility:hidden}
     currentPageId=payload.currentPageId||payload.page?.id||currentPageId;
     const idx=pages.findIndex(p=>p.id===currentPageId);if(idx>=0)currentIndex=idx;
     if(payload.page?.state)applyState(payload.page.state);
+    else resetToScenarioBase();
     render();
   }
   window.rpgForgePageSync={
