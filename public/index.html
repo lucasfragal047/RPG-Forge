@@ -261,13 +261,14 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
 <div class="main"><aside class="side"><div class="section"><h3>Ferramentas</h3><div class="toolgrid"><button class="tool active" data-tool="select">↖ Selecionar</button><button class="tool" data-tool="measure">⌁ Medir</button><button class="tool" data-tool="fog">☁ Névoa</button><button class="tool" data-tool="ping">⊙ Marcar</button><button class="tool" id="rpgPageTool" type="button">🗺️ Cenários</button></div><div id="rpgPagePanel" class="rpgPagePanel" hidden></div></div><div class="section"><h3>🎭 Modo de jogo</h3><div class="card"><div class="small" id="roleDescription">Você está como Jogador.</div><button class="btn" id="toggleRole" style="width:100%;margin-top:8px">Tornar-se Mestre</button></div></div><div class="section"><h3>🌫️ Névoa</h3><div class="rpgFogControls">
   <button class="btn" id="rpgFogLock" style="width:100%">🔓 Travar névoa</button>
   <button class="btn" id="rpgFogToggle" style="width:100%">🌫️ Ativar fumaça</button>
+  <button class="btn" id="rpgFogClear" style="width:100%;margin-top:6px">🧹 Limpar névoa</button>
   <button class="btn" id="rpgFogGMView" style="width:100%">👁 Mestre: ver através</button>
   <div class="row2"><label class="small">Cor</label><input id="rpgFogColor" type="color" value="#dfe5ee" style="width:52px;height:32px;padding:2px"><span class="rpgFogValue" id="rpgFogColorValue">#DFE5EE</span></div>
   <div class="row2"><input id="rpgFogOpacity" type="range" min="0" max="100" value="72"><span class="rpgFogValue" id="rpgFogValue">72%</span></div>
   <div class="row2 rpgFogSizeRow"><label class="small">Tamanho</label><button class="btn" id="rpgFogSmall" type="button">− Diminuir</button><span class="rpgFogValue" id="rpgFogSizeValue">100%</span><button class="btn" id="rpgFogBig" type="button">＋ Aumentar</button></div>
   <div class="row2"><label class="small">Visão dos tokens</label><select id="rpgFogVisionRadius" style="width:86px"><option value="1">1 bloco</option><option value="2" selected>2 blocos</option><option value="3">3 blocos</option><option value="4">4 blocos</option><option value="5">5 blocos</option></select><span class="rpgFogValue" id="rpgFogVisionValue">2</span></div>
   <div class="small">Cada token revela automaticamente a área ao redor dele. A visão acompanha o token.</div>
-</div></div><div class="section"><h3>Mapa</h3><div class="card"><b>Ruínas — Salão Norte</b><div class="small">24 × 16 quadrados · 1 quadrado = 1,5 m</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="20">d20</button></div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
+</div></div><div class="section"><h3>Mapa</h3><div class="card"><b>Ruínas — Salão Norte</b><div class="small">24 × 16 quadrados · 1 quadrado = 1,5 m</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button><button class="btn" id="clearGridContent" style="width:100%;margin-top:7px">🧹 Limpar grid</button><div class="small" style="margin-top:6px">Remove o que foi colocado no mapa, mantendo o cenário/base.</div></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="20">d20</button></div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
 <main class="canvasWrap" id="stage"><div class="toolbar"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomLabel" title="Clique para redefinir">100%</button><button class="btn" id="zoomIn">+</button><div class="mapToolsWrap" id="mapToolsWrap"><button class="btn mapToolsToggle" id="mapToolsToggle" title="Abrir ferramentas do mapa">⚙️</button><div class="mapToolsPanel" id="mapToolsPanel"><button class="btn" id="snap">Encaixar grade</button><button class="btn" id="importMap">📥 Importar mapa</button><button class="btn" id="exportMap">📤 Exportar mapa</button><input id="mapFile" type="file" accept="image/*,.json" class="hidden"></div></div><div class="spacer"></div><span class="pill" id="roleHint">Modo local</span></div><div id="map"><div class="rpgFogLayer" id="rpgFogLayer"><div class="rpgFogCloud" id="rpgFogCloud"><div class="rpgFogCloudTools"><button id="rpgFogCenter" type="button">↺ Centro</button></div><div class="rpgFogResize" id="rpgFogResize" title="Arraste para redimensionar"></div></div></div><div class="grid"></div><div class="room" style="left:500px;top:230px;width:550px;height:300px">SALÃO PRINCIPAL</div><div class="room" style="left:1080px;top:230px;width:320px;height:300px">CRIPTA</div><div class="room" style="left:500px;top:590px;width:280px;height:250px">ALMOXARIFADO</div><div class="room" style="left:820px;top:590px;width:580px;height:250px">CORREDOR</div><div class="token player" id="laxus" style="left:650px;top:350px" title="Laxus">L</div><div class="token player" id="benzuke" style="left:750px;top:400px" title="Benzuke">B</div><div class="token monster" id="goblin" style="left:1120px;top:330px" title="Goblin">G</div></div><script>
 /* Páginas/mapas locais — sem sistema de salas. O modo Mestre/Jogador é escolhido no botão lateral. */
 (function(){
@@ -423,7 +424,7 @@ function render(){map.style.transform=`translate(${x}px,${y}px) scale(${scale})`
 document.querySelectorAll('.tool:not(#rpgPageTool)').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));b.classList.add('active');tool=b.dataset.tool});
 function pos(e){let r=stage.getBoundingClientRect();return [(e.clientX-r.left-x)/scale,(e.clientY-r.top-y)/scale]}
 map.querySelectorAll('.token').forEach(t=>{t.onpointerdown=e=>{if(tool!=='select'||!canMoveVisionToken(t))return;e.stopPropagation();dragging=t;let p=pos(e),left=parseFloat(t.style.left),top=parseFloat(t.style.top);offset=[p[0]-left,p[1]-top];t.classList.add('selected');document.querySelectorAll('.token').forEach(q=>{if(q!==t)q.classList.remove('selected')});t.setPointerCapture(e.pointerId)};t.onpointermove=e=>{if(!dragging||dragging!==t)return;let p=pos(e),nx=p[0]-offset[0],ny=p[1]-offset[1];if(document.querySelector('#snap').classList.contains('on')){nx=Math.round(nx/50)*50;ny=Math.round(ny/50)*50}t.style.left=nx+'px';t.style.top=ny+'px';updateVisionFocusRing()};t.onpointerup=()=>dragging=null});
-stage.onpointerdown=e=>{if(e.target.closest('.token')||e.target.closest('.toolbar'))return;if(tool==='select'){pan=true;panStart=[e.clientX,e.clientY];origin=[x,y];stage.setPointerCapture(e.pointerId)}else if(tool==='ping'){let p=pos(e),m=document.createElement('div');m.textContent='✦';m.style.cssText=`position:absolute;left:${p[0]}px;top:${p[1]}px;z-index:8;color:${pingColor};font-size:30px;text-shadow:0 0 12px ${pingColor};pointer-events:none`;map.appendChild(m);setTimeout(()=>m.remove(),1000)}else if(tool==='fog'){let p=pos(e),f=document.createElement('div');f.className='fog';f.style.cssText=`left:${p[0]-75}px;top:${p[1]-75}px;width:150px;height:150px;border-radius:50%;background:${fogColor}dd;box-shadow:0 0 18px ${fogColor}88`;map.appendChild(f)}};stage.onpointermove=e=>{if(pan){x=origin[0]+e.clientX-panStart[0];y=origin[1]+e.clientY-panStart[1];render()}};stage.onpointerup=()=>pan=false;stage.addEventListener('wheel',e=>{e.preventDefault();zoom(scale+(e.deltaY<0?.1:-.1))},{passive:false});
+stage.onpointerdown=e=>{if(e.target.closest('.token')||e.target.closest('.toolbar'))return;if(tool==='select'){pan=true;panStart=[e.clientX,e.clientY];origin=[x,y];stage.setPointerCapture(e.pointerId)}else if(tool==='ping'){let p=pos(e),m=document.createElement('div');m.textContent='✦';m.className='rpgPingMarker';m.style.cssText=`position:absolute;left:${p[0]}px;top:${p[1]}px;z-index:8;color:${pingColor};font-size:30px;text-shadow:0 0 12px ${pingColor};pointer-events:none`;map.appendChild(m);setTimeout(()=>m.remove(),1000)}else if(tool==='fog'){let p=pos(e),f=document.createElement('div');f.className='fog';f.style.cssText=`left:${p[0]-75}px;top:${p[1]-75}px;width:150px;height:150px;border-radius:50%;background:${fogColor}dd;box-shadow:0 0 18px ${fogColor}88`;map.appendChild(f)}};stage.onpointermove=e=>{if(pan){x=origin[0]+e.clientX-panStart[0];y=origin[1]+e.clientY-panStart[1];render()}};stage.onpointerup=()=>pan=false;stage.addEventListener('wheel',e=>{e.preventDefault();zoom(scale+(e.deltaY<0?.1:-.1))},{passive:false});
 function zoom(z){scale=Math.max(.25,Math.min(3,z));render()}document.querySelector('#zoomIn').onclick=()=>zoom(scale+.1);document.querySelector('#zoomOut').onclick=()=>zoom(scale-.1);document.querySelector('#zoomLabel').onclick=()=>zoom(1);document.querySelector('#reset').onclick=()=>{scale=1;x=0;y=0;render()};document.querySelector('#snap').onclick=e=>e.currentTarget.classList.toggle('on');
 // Importar/exportar mapa funcional
 (function(){
@@ -1029,10 +1030,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
             if(isServerMode()&&roleIsMaster()){
               latestSyncEvent={action:'play',item,local:true};lastLocalPlayItemId=item.id;
               const ok=await postSync({action:'play',item:{id:item.id,name:item.name,url:item.url}});
-              // O servidor também devolve o evento ao Mestre, mas ele é ignorado para evitar duplicação.
-              // Portanto, o Mestre precisa iniciar a reprodução localmente imediatamente.
-              localPlay(item,true);
-              if(!ok){showSyncBanner(panel,null,'⚠️ O servidor não respondeu; reproduzindo localmente.')}
+              if(!ok){localPlay(item,false);showSyncBanner(panel,null,'⚠️ O servidor não respondeu; este cliente está reproduzindo sozinho.')}
               return;
             }
             localPlay(item,false);
@@ -2140,6 +2138,22 @@ window.tool = window.tool || 'select';
   function setColor(){cloud.style.setProperty('--fog-color',color.value);colorValue.textContent=color.value.toUpperCase()}
   color.addEventListener('input',setColor);setColor();
   toggle.addEventListener('click',()=>{fog.classList.toggle('active');const on=fog.classList.contains('active');toggle.textContent=on?'☀️ Desativar fumaça':'🌫️ Ativar fumaça';toggle.classList.toggle('active',on);updateVision()});
+  const clearFog=document.getElementById('rpgFogClear');
+  if(clearFog){
+    clearFog.addEventListener('click',()=>{
+      fog.classList.remove('active');
+      if(toggle){toggle.textContent='🌫️ Ativar fumaça';toggle.classList.remove('active');}
+      fogMoveMode=false; fogLocked=false; window.rpgForgeFogLocked=false;
+      cloud.classList.remove('locked','gmSeeThrough');
+      try{closeFogEditor();}catch(_){}
+      try{updateFogMoveUI();}catch(_){}
+      const g=gridSize();
+      setSizePercent(100);
+      cloud.style.left=g.left+'px';cloud.style.top=g.top+'px';
+      updateVision();
+      try{window.rpgForgeSaveCurrentPageNow?.()}catch(_){}
+    });
+  }
   function updateSizeLabel(){if(sizeValue){const g=gridSize();sizeValue.textContent=Math.round((cloud.offsetWidth/Math.max(1,g.w))*100)+'%'}}
   function setSizePercent(percent){
     const p=Math.max(10,Math.min(100,Number(percent)||100)),g=gridSize(),oldW=cloud.offsetWidth,oldH=cloud.offsetHeight;
@@ -2433,6 +2447,100 @@ window.tool = window.tool || 'select';
     stage.addEventListener('touchend',e=>{if(e.touches.length<2)pinchStart=null},{passive:true});
     stage.addEventListener('touchcancel',()=>{pinchStart=null},{passive:true});
   }
+})();
+</script>
+<script id="clearGridContentScript">
+(function(){
+  const map=document.getElementById('map');
+  const stage=document.getElementById('stage');
+  const clearFogBtn=document.getElementById('rpgFogClear');
+  const clearGridBtn=document.getElementById('clearGridContent');
+  if(!map)return;
+  const log=(msg)=>{
+    const l=document.getElementById('log');
+    if(l)l.innerHTML='<div><b>Sistema:</b> '+String(msg).replaceAll('<','&lt;')+'</div>'+l.innerHTML;
+  };
+  const save=()=>{
+    try{window.rpgForgeSaveCurrentPageNow?.();}
+    catch(_){try{window.rpgForgeSaveCurrentPage?.();}catch(__){}}
+  };
+  function closeEditors(){
+    document.querySelectorAll('.spellEditor,.imageEditor,.tokenEditPanel,.tokenMenu,.visionPicker,.visionPanel,.forgePanel,.itemMenu,.objMenu,.mobMenu,.hideTab,.weatherPanel').forEach(el=>el.remove());
+  }
+  function clearFog(){
+    const fog=document.getElementById('rpgFogLayer');
+    const cloud=document.getElementById('rpgFogCloud');
+    const toggle=document.getElementById('rpgFogToggle');
+    const range=document.getElementById('rpgFogOpacity');
+    map.querySelectorAll('.fog').forEach(el=>el.remove());
+    if(fog){fog.classList.remove('active');}
+    if(cloud){
+      cloud.classList.remove('locked','gmSeeThrough');
+      cloud.style.pointerEvents='none';
+    }
+    window.rpgForgeFogLocked=false;
+    if(toggle){toggle.textContent='🌫️ Ativar fumaça';toggle.classList.remove('active');}
+    if(range)range.value='72';
+    try{document.querySelectorAll('#rpgFogVisionSvg circle').forEach(c=>c.remove());}catch(_){ }
+    try{window.rpgForgeUpdateFogVision?.();}catch(_){ }
+    try{window.dispatchEvent(new CustomEvent('rpgforge:clear-fog'));}catch(_){ }
+    save();
+    log('Toda a névoa foi removida.');
+  }
+  function clearGrid(){
+    // Remove somente o conteúdo colocado por cima do mapa. O mapa/base continua.
+    const removableSelectors=[
+      '.token',
+      '.forgeObj',
+      '.spellArea',
+      '.magicEffect',
+      '.magicBeam',
+      '.fog',
+      '.visionRing',
+      '.measure',
+      '.rpgPingMarker',
+      '.spellFx',
+      '.spellParticle',
+      '.visionMask',
+      '.weatherParticle',
+      '.weatherSun',
+      '.weatherCloud',
+      '.weatherFogBank',
+      '.weatherLightning',
+      '.weatherBolt',
+      '.weatherGridFlash'
+    ];
+    let removed=0;
+    for(const sel of removableSelectors){
+      map.querySelectorAll(sel).forEach(el=>{el.remove();removed++;});
+    }
+    // Clima fica fora do #map; apenas desligue sua camada visual.
+    try{window.rpgForge?.setWeather?.('clear');}catch(_){ }
+    try{document.getElementById('weatherOverlay')?.classList.remove('active');}catch(_){ }
+    try{document.querySelectorAll('.weatherPanel').forEach(el=>el.remove());}catch(_){ }
+
+    // Remove também menus e editores abertos, mas não toca no mapa/base.
+    closeEditors();
+    // A névoa principal permanece no DOM porque é a ferramenta-base do editor,
+    // porém fica totalmente desligada e vazia.
+    const fog=document.getElementById('rpgFogLayer');
+    const cloud=document.getElementById('rpgFogCloud');
+    const toggle=document.getElementById('rpgFogToggle');
+    if(fog)fog.classList.remove('active');
+    if(cloud)cloud.classList.remove('locked','gmSeeThrough');
+    window.rpgForgeFogLocked=false;
+    if(toggle){toggle.textContent='🌫️ Ativar fumaça';toggle.classList.remove('active');}
+    try{document.querySelectorAll('#rpgFogVisionSvg circle').forEach(c=>c.remove());}catch(_){ }
+    try{window.rpgForgeUpdateFogVision?.();}catch(_){ }
+    try{window.rpgForgeClearMagicEditor?.();}catch(_){ }
+    try{window.dispatchEvent(new CustomEvent('rpgforge:clear-fog'));}catch(_){ }
+    save();
+    log('Grid limpo: tokens, magias, objetos e efeitos foram retirados. O mapa foi mantido.');
+  }
+  window.rpgForgeClearFog=clearFog;
+  window.rpgForgeClearGrid=clearGrid;
+  if(clearFogBtn)clearFogBtn.onclick=clearFog;
+  if(clearGridBtn)clearGridBtn.onclick=(e)=>{e.preventDefault();e.stopPropagation();clearGrid();};
 })();
 </script>
 </body></html>
