@@ -13,6 +13,3 @@ Este pacote mantém a versão mais recente da mesa e inclui o servidor Node para
 Depois do deploy, abra a URL `https://SEU-SERVICO.onrender.com`. Os jogadores entram nessa mesma URL. O SSE em `/api/sound/events` mantém o Som / efeito sincronizado no serviço.
 
 Observação: navegadores podem bloquear reprodução automática de áudio/YouTube até que cada jogador faça uma interação inicial no navegador.
-
-## Som YouTube sincronizado
-Em cada dispositivo, o usuário precisa tocar uma vez em “Ativar áudio neste dispositivo” para permitir reprodução com som pelo navegador. Depois disso, os comandos do Mestre são recebidos pelo servidor e reproduzidos nesse cliente.

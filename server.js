@@ -46,9 +46,9 @@ function handleSoundPost(req,res){
       const msg=JSON.parse(body||'{}');
       if(msg.action==='play'){
         if(!msg.item || !msg.item.id || !msg.item.url){return json(res,400,{ok:false,error:'Som inválido.'})}
-        soundState={seq:soundState.seq+1,action:'play',item:{id:String(msg.item.id),name:String(msg.item.name||'Som do YouTube'),url:String(msg.item.url)},clientId:msg.clientId?String(msg.clientId):null,commandId:msg.commandId?String(msg.commandId):null,at:Date.now()};
+        soundState={seq:soundState.seq+1,action:'play',item:{id:String(msg.item.id),name:String(msg.item.name||'Som do YouTube'),url:String(msg.item.url)},at:Date.now()};
       }else if(msg.action==='stop'){
-        soundState={seq:soundState.seq+1,action:'stop',item:null,clientId:msg.clientId?String(msg.clientId):null,commandId:msg.commandId?String(msg.commandId):null,at:Date.now()};
+        soundState={seq:soundState.seq+1,action:'stop',item:null,at:Date.now()};
       }else{
         return json(res,400,{ok:false,error:'Ação inválida.'});
       }
