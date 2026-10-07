@@ -1,25 +1,24 @@
-const http=require('http');
-const fs=require('fs');
-const path=require('path');
-const {Server}=require('socket.io');
-
-const PORT=process.env.PORT||3000;
-const publicDir=path.join(__dirname,'public');
-
-const server=http.createServer((req,res)=>{
-  let p=decodeURIComponent(req.url.split('?')[0]);
-  if(p==='/') p='/index.html';
-  const file=path.normalize(path.join(publicDir,p));
-  if(!file.startsWith(publicDir)){res.writeHead(403);return res.end('Forbidden');}
-  fs.readFile(file,(err,data)=>{
-    if(err){res.writeHead(err.code==='ENOENT'?404:500,{'Content-Type':'text/plain; charset=utf-8'});return res.end(err.code==='ENOENT'?'Not found':'Server error');}
-    const types={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml'};
-    res.writeHead(200,{'Content-Type':types[path.extname(file).toLowerCase()]||'application/octet-stream'});
-    res.end(data);
-  });
-});
-const io=new Server(server);
+const http=require('http');const fs=require('fs');const path=require('path');const {Server}=require('socket.io');
+const PORT=process.env.PORT||3000, publicDir=path.join(__dirname,'public');
+const rooms=new Map();
+function newPage(id,name){return {id,name,locked:false,allowedPlayers:[],state:null}}
+function newRoom(id){return {id,pages:[newPage('page-1','Mapa 1')],players:new Map(),gm:null}}
+function roomFor(id){return rooms.get(id)}
+function publicState(room,socketId){const me=room.players.get(socketId);return {role:me?.role||'player',currentPageId:me?.pageId||room.pages[0].id,pages:room.pages.map(p=>({id:p.id,name:p.name,locked:p.locked,allowedPlayers:p.allowedPlayers,state:p.state})),players:[...room.players.values()].map(p=>({id:p.id,name:p.name,role:p.role,pageId:p.pageId,clientId:p.clientId}))}}
+function sendRoom(roomId){const room=rooms.get(roomId);if(!room)return;for(const [sid] of room.players)io.to(sid).emit('pagina-atualizada',publicState(room,sid))}
+function gmOnly(socket,room){const p=room?.players.get(socket.id);return p&&p.role==='gm'}
+const server=http.createServer((req,res)=>{let u=decodeURIComponent(req.url.split('?')[0]);if(u==='/')u='/index.html';const file=path.normalize(path.join(publicDir,u));if(!file.startsWith(publicDir))return res.writeHead(403).end();fs.readFile(file,(e,d)=>{if(e)return res.writeHead(404).end('Not found');const ext=path.extname(file);const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json'};res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream'});res.end(d)})});
+const io=new Server(server,{cors:{origin:true,credentials:true}});
 io.on('connection',socket=>{
-  socket.on('entrar-sala',sala=>{if(!sala)return; socket.join(String(sala)); socket.to(String(sala)).emit('jogador-entrou',{id:socket.id});});
+ socket.on('criar-sala',({sala='KR7X',clientId,nome='Mestre'}={})=>{sala=String(sala).trim().toUpperCase();if(!sala)return socket.emit('sala-erro','Código de sala inválido.');if(rooms.has(sala))return socket.emit('sala-ja-existe',sala);const room=newRoom(sala);room.gm=socket.id;const p={id:socket.id,clientId:clientId||socket.id,name:String(nome||'Mestre').slice(0,40),role:'gm',pageId:room.pages[0].id};room.players.set(socket.id,p);socket.data.room=sala;socket.join(sala);socket.emit('sala-criada',publicState(room,socket.id));sendRoom(sala)});
+ socket.on('entrar-sala',({sala='KR7X',clientId,nome='Jogador'}={})=>{sala=String(sala).trim().toUpperCase();const room=roomFor(sala);if(!room)return socket.emit('sala-nao-encontrada',sala);const existing=[...room.players.values()].find(p=>p.clientId===clientId);const role=existing?.role||'player';const page=existing?.pageId||room.pages[0].id;const p={id:socket.id,clientId:clientId||socket.id,name:String(nome||'Jogador').slice(0,40),role,pageId:page};room.players.set(socket.id,p);if(role==='player'){const pg=room.pages.find(x=>x.id===page);if(pg&&!pg.allowedPlayers.includes(p.clientId))pg.allowedPlayers.push(p.clientId)}socket.data.room=sala;socket.join(sala);socket.emit('sala-estado',publicState(room,socket.id));sendRoom(sala)});
+ socket.on('pagina-trocar',({sala,pageId})=>{const room=roomFor(String(sala));const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg)return;if(me.role!=='gm'&&(pg.locked||!pg.allowedPlayers.includes(me.clientId))){socket.emit('pagina-acesso-negado','O Mestre não liberou este mapa para você.');return}me.pageId=pg.id;socket.emit('pagina-troca-confirmada',{pageId:pg.id});sendRoom(String(sala))});
+ socket.on('pagina-salvar-estado',({sala,pageId,state})=>{const room=roomFor(String(sala));const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg||!state||typeof state.html!=='string')return;if(me.role!=='gm'&&(pg.locked||me.pageId!==pg.id))return;pg.state=state;for(const [sid,p] of room.players){if(p.pageId===pg.id)io.to(sid).emit('pagina-estado',{pageId:pg.id,state})}});
+ socket.on('pagina-criar',({sala,name})=>{const room=roomFor(String(sala));if(!room||!gmOnly(socket,room))return;const id='page-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);room.pages.push(newPage(id,String(name||'Novo mapa').slice(0,40)));sendRoom(String(sala));socket.emit('pagina-troca-confirmada',{pageId:id})});
+ socket.on('pagina-renomear',({sala,pageId,name})=>{const room=roomFor(String(sala));if(!room||!gmOnly(socket,room))return;const p=room.pages.find(x=>x.id===pageId);if(p)p.name=String(name||p.name).slice(0,40);sendRoom(String(sala))});
+ socket.on('pagina-excluir',({sala,pageId})=>{const room=roomFor(String(sala));if(!room||!gmOnly(socket,room)||room.pages.length<=1)return;room.pages=room.pages.filter(p=>p.id!==pageId);for(const p of room.players.values())if(p.pageId===pageId)p.pageId=room.pages[0].id;sendRoom(String(sala));socket.emit('pagina-troca-confirmada',{pageId:room.pages[0].id})});
+ socket.on('pagina-travar',({sala,pageId,locked})=>{const room=roomFor(String(sala));if(!room||!gmOnly(socket,room))return;const p=room.pages.find(x=>x.id===pageId);if(p)p.locked=!!locked;sendRoom(String(sala))});
+ socket.on('pagina-atribuir',({sala,pageId,playerId})=>{const room=roomFor(String(sala));if(!room||!gmOnly(socket,room))return;const pg=room.pages.find(p=>p.id===pageId);const pl=[...room.players.values()].find(p=>p.id===playerId);if(!pg||!pl||pl.role==='gm')return;for(const p of room.pages)p.allowedPlayers=p.allowedPlayers.filter(id=>id!==pl.clientId);pg.allowedPlayers.push(pl.clientId);pl.pageId=pg.id;io.to(pl.id).emit('pagina-troca-confirmada',{pageId:pg.id});sendRoom(String(sala))});
+ socket.on('disconnect',()=>{const sala=socket.data.room,room=roomFor(sala);if(!room)return;room.players.delete(socket.id);if(room.gm===socket.id){room.gm=null;if(room.players.size===0)rooms.delete(sala)}sendRoom(sala)});
 });
-server.listen(PORT,()=>console.log(`RPG Forge rodando na porta ${PORT}`));
+server.listen(PORT,()=>console.log(`RPG Forge em http://localhost:${PORT}`));

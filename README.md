@@ -1,19 +1,24 @@
 # RPG Forge — Mesa Virtual
 
-Estrutura pronta para Render:
+Mesa virtual multiplayer para RPG. Uma única sala contém vários mapas/páginas independentes.
 
+## Estrutura
 - `server.js`
 - `package.json`
 - `README.md`
 - `public/index.html`
 
-## Render
-Build Command: `npm install`
-Start Command: `npm start`
+## Rodar localmente
+```bash
+npm install
+npm start
+```
+Abra `http://localhost:3000`.
 
-## Recursos
-- Aba **📜 Ficha completa**
-- Aba **📦 Inventário** funcional
-- Aba **🗺️ Mudar mapa** restaurada e ligada ao sistema de mapas da campanha
-- Importar/exportar mapa
-- Socket.IO para a sala multiplayer
+## Render
+- Build Command: `npm install`
+- Start Command: `npm start`
+
+O primeiro jogador que entra na sala vira Mestre. Os demais entram como jogadores. O Mestre pode criar, renomear, excluir, travar mapas e atribuir cada jogador a um mapa. Tudo ocorre dentro da mesma sala; trocar de mapa não cria outra sala.
+
+O estado de cada mapa é separado, incluindo tokens, objetos, posições e névoa. O servidor valida as permissões, então o jogador não pode liberar outro mapa apenas alterando o navegador/localStorage.
