@@ -62,55 +62,65 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   <div class="small">Cada token revela automaticamente a área ao redor dele. A visão acompanha o token.</div>
 </div></div><div class="section"><h3>Sistema de cenário</h3><div class="card"><b id="scenarioSideName">Salão Norte</b><div class="small">Cada cenário funciona como uma aba independente da mesma campanha.</div></div><button class="btn" style="width:100%" id="reset">Centralizar cenário</button></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="20">d20</button></div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
 <main class="canvasWrap" id="stage"><div class="toolbar"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomLabel" title="Clique para redefinir">100%</button><button class="btn" id="zoomIn">+</button><div class="mapToolsWrap" id="mapToolsWrap"><button class="btn mapToolsToggle" id="mapToolsToggle" title="Abrir ferramentas do mapa">⚙️</button><div class="mapToolsPanel" id="mapToolsPanel"><button class="btn" id="snap">Encaixar grade</button><button class="btn" id="importMap">📥 Importar mapa</button><button class="btn" id="exportMap">📤 Exportar mapa</button><input id="mapFile" type="file" accept="image/*,.json" class="hidden"></div></div><div class="spacer"></div><span class="pill" id="scenarioStatus">● Cenário local</span></div><div id="map"><div class="rpgFogLayer" id="rpgFogLayer"><div class="rpgFogCloud" id="rpgFogCloud"><div class="rpgFogCloudTools"><button id="rpgFogCenter" type="button">↺ Centro</button></div><div class="rpgFogResize" id="rpgFogResize" title="Arraste para redimensionar"></div></div></div><div class="grid"></div><div class="room" style="left:500px;top:230px;width:550px;height:300px">SALÃO PRINCIPAL</div><div class="room" style="left:1080px;top:230px;width:320px;height:300px">CRIPTA</div><div class="room" style="left:500px;top:590px;width:280px;height:250px">ALMOXARIFADO</div><div class="room" style="left:820px;top:590px;width:580px;height:250px">CORREDOR</div><div class="token player" id="laxus" style="left:650px;top:350px" title="Laxus">L</div><div class="token player" id="benzuke" style="left:750px;top:400px" title="Benzuke">B</div><div class="token monster" id="goblin" style="left:1120px;top:330px" title="Goblin">G</div></div><script>
-/* Sistema de cenários — cada cenário é uma tela independente da mesma campanha. */
+/* Sistema de cenários V6 — cada cenário possui uma tela/estado próprio. */
 (function(){
   const map=document.getElementById('map'), toolBtn=document.getElementById('rpgPageTool'), panel=document.getElementById('rpgPagePanel');
   if(!map||!toolBtn||!panel)return;
-  const KEY='rpgForgeScenariosV5';
-  const IDKEY='rpgForgeScenarioCurrentV5';
-  const NS='rpgForgeScenarioLocalV5_';
+  const KEY='rpgForgeScenariosV6';
+  const OLD_KEY='rpgForgeScenariosV5';
+  const IDKEY='rpgForgeScenarioCurrentV6';
+  const OLD_IDKEY='rpgForgeScenarioCurrentV5';
+  const NS='rpgForgeScenarioLocalV6_';
   const baseHTML=map.innerHTML;
-  const blankHTML=()=>baseHTML
-    .replace(/<div class=\"room[\s\S]*?<\/div>/g,'')
-    .replace(/<div class=\"token [\s\S]*?<\/div>/g,'');
+  // Estrutura-base de uma tela nova: somente a grade e a camada de névoa, sem conteúdo do cenário anterior.
+  const blankHTML=()=>{
+    const holder=document.createElement('div');
+    holder.innerHTML=baseHTML;
+    holder.querySelectorAll('.room,.token,.mapImageObject,.forgeObj,.magicEffect,.spellArea,.measure,.badge,.fog').forEach(e=>e.remove());
+    return holder.innerHTML;
+  };
   const safeGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
-  const safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}
+  const safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+  const safeRemove=k=>{try{localStorage.removeItem(k)}catch(e){}};
   const uid=()=> 'cenario-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
-  function read(){try{
-    let a=JSON.parse(safeGet(KEY)||'[]');
-    if(Array.isArray(a)&&a.length)return a;
-    const legacyKeys=['rpgForgeScenariosV4','rpgForgeScenariosV3'];
-    for(const lk of legacyKeys){
-      const legacy=JSON.parse(safeGet(lk)||'[]');
-      if(Array.isArray(legacy)&&legacy.length){
-        // Migração: os dados antigos podiam ter sido copiados entre cenários.
-        // Mantemos o primeiro cenário e isolamos os demais quando o conteúdo é idêntico.
-        const first=legacy[0];
-        const firstHtml=first?.state?.html||'';
-        a=legacy.map((sc,i)=>{
-          const copy=JSON.parse(JSON.stringify(sc));
-          if(i>0 && firstHtml && copy.state?.html===firstHtml){
-            copy.state=null; copy.storage={};
-          }
-          return copy;
-        });
-        safeSet(KEY,JSON.stringify(a));
-        return a;
+  const clone=o=>{try{return JSON.parse(JSON.stringify(o))}catch(e){return null}};
+
+  function read(){
+    try{
+      const v6=JSON.parse(safeGet(KEY)||'null');
+      if(Array.isArray(v6)&&v6.length)return v6;
+    }catch(e){}
+    // Migração única e conservadora: preserva o primeiro cenário; os cenários antigos
+    // posteriores são recriados como telas vazias para impedir que conteúdo compartilhado
+    // das versões anteriores continue contaminando uma tela nova.
+    try{
+      const old=JSON.parse(safeGet(OLD_KEY)||'[]');
+      if(Array.isArray(old)&&old.length){
+        const migrated=old.map((sc,i)=>({
+          id:sc.id||uid(),
+          name:sc.name||('Cenário '+(i+1)),
+          locked:!!sc.locked,
+          state:i===0 ? clone(sc.state) : null,
+          storage:i===0 ? clone(sc.storage)||{} : {}
+        }));
+        safeSet(KEY,JSON.stringify(migrated));
+        return migrated;
       }
-    }
+    }catch(e){}
     return [];
-  }catch(e){return[]}}
+  }
   function write(a){safeSet(KEY,JSON.stringify(a))}
   let scenarios=read();
   if(!scenarios.length){
     const id=uid();
-    scenarios=[{id,name:'Salão Norte',locked:false,state:null}];
+    scenarios=[{id,name:'Salão Norte',locked:false,state:null,storage:{}}];
     safeSet(IDKEY,id); write(scenarios);
   }
   const hashId=decodeURIComponent((location.hash.match(/^#cenario=(.+)$/)||[])[1]||'');
-  let currentId=(hashId&&scenarios.some(s=>s.id===hashId)?hashId:null)||safeGet(IDKEY)||scenarios[0].id;
+  const oldCurrent=safeGet(OLD_IDKEY);
+  let currentId=(hashId&&scenarios.some(s=>s.id===hashId)?hashId:null)||safeGet(IDKEY)||oldCurrent||scenarios[0].id;
   if(!scenarios.some(s=>s.id===currentId)){currentId=scenarios[0].id;safeSet(IDKEY,currentId)}
-  if(location.hash!=='#cenario='+encodeURIComponent(currentId)){history.replaceState(null,'','#cenario='+encodeURIComponent(currentId));}
+  if(location.hash!=='#cenario='+encodeURIComponent(currentId))history.replaceState(null,'','#cenario='+encodeURIComponent(currentId));
 
   const pg=()=>scenarios.find(s=>s.id===currentId)||scenarios[0];
   const titleEl=document.getElementById('scenarioHeaderName'), sideEl=document.getElementById('scenarioSideName');
@@ -122,82 +132,42 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     window.rpgForgeScenarioCurrentId=currentId;
     window.rpgForgeScenarioName=()=>pg()?.name||'Cenário';
   }
-
   function snapshot(){
-    const fog=document.getElementById('rpgFogLayer'), color=document.getElementById('rpgFogColor'), vision=document.getElementById('rpgFogVisionRadius'), cloud=document.getElementById('rpgFogCloud');
-    let weather=null; try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
+    const fog=document.getElementById('rpgFogLayer'),color=document.getElementById('rpgFogColor'),vision=document.getElementById('rpgFogVisionRadius'),cloud=document.getElementById('rpgFogCloud');
+    let weather=null;try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
     return {
-      version:12,
-      scenarioScreen:true,
-      html:map.innerHTML,
-      mapStyle:map.getAttribute('style')||'',
-      mapClass:map.getAttribute('class')||'',
-      localUI:{
-        fogOpacity:document.getElementById('rpgFogOpacity')?.value||'',
-        fogColor:document.getElementById('rpgFogColor')?.value||'',
-        fogVision:document.getElementById('rpgFogVisionRadius')?.value||'',
-        fogActive:!!document.getElementById('rpgFogLayer')?.classList.contains('active'),
-        snap:!!document.getElementById('snap')?.classList.contains('on')
-      },
+      version:13,scenarioScreen:true,html:map.innerHTML,mapStyle:map.getAttribute('style')||'',mapClass:map.getAttribute('class')||'',
+      localUI:{fogOpacity:document.getElementById('rpgFogOpacity')?.value||'',fogColor:document.getElementById('rpgFogColor')?.value||'',fogVision:document.getElementById('rpgFogVisionRadius')?.value||'',fogActive:!!fog?.classList.contains('active'),snap:!!document.getElementById('snap')?.classList.contains('on')},
       transform:{scale:typeof window.rpgForgeViewport?.scale==='number'?window.rpgForgeViewport.scale:null,x:typeof window.rpgForgeViewport?.x==='number'?window.rpgForgeViewport.x:null,y:typeof window.rpgForgeViewport?.y==='number'?window.rpgForgeViewport.y:null},
       weather,
-      fog:{
-        opacity:document.getElementById('rpgFogOpacity')?.value||'',
-        color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),
-        locked:!!window.rpgForgeFogLocked,gmView:!!cloud?.classList.contains('gmSeeThrough'),
-        left:cloud?.style.left||'',top:cloud?.style.top||'',width:cloud?.style.width||'',height:cloud?.style.height||''
-      }
+      fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked,gmView:!!cloud?.classList.contains('gmSeeThrough'),left:cloud?.style.left||'',top:cloud?.style.top||'',width:cloud?.style.width||'',height:cloud?.style.height||''}
     };
   }
-  function valid(st){return st&&typeof st.html==='string'&&st.html.includes('class="grid"')&&st.html.length>500}
+  function valid(st){return !!(st&&typeof st.html==='string'&&st.html.includes('class="grid"')&&st.html.length>300)}
   function captureStorage(){
-    const out={};
-    try{
-      for(let i=0;i<localStorage.length;i++){
-        const k=localStorage.key(i); if(!k) continue;
-        if(k===KEY||k===IDKEY||k.startsWith(NS)) continue;
-        if(k==='rpgForgePageIndexV4'||k==='rpgForgePageIndexV5') continue;
-        out[k]=localStorage.getItem(k);
-      }
-    }catch(e){}
-    return out;
+    const out={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k)continue;if([KEY,OLD_KEY,IDKEY,OLD_IDKEY].includes(k)||k.startsWith(NS)||k.startsWith('rpgForgeScenarioLocalV5_'))continue;if(k==='rpgForgePageIndexV4'||k==='rpgForgePageIndexV5')continue;out[k]=localStorage.getItem(k)}}catch(e){}return out;
   }
   function restoreStorage(st){
     try{
-      const keep=new Set([KEY,IDKEY]);
-      const scopedKeys=[];
-      for(let i=0;i<localStorage.length;i++){
-        const k=localStorage.key(i); if(!k||keep.has(k)||k.startsWith(NS)) continue;
-        if(k==='rpgForgePageIndexV4'||k==='rpgForgePageIndexV5') continue;
-        scopedKeys.push(k);
-      }
-      scopedKeys.forEach(k=>localStorage.removeItem(k));
-      Object.entries(st||{}).forEach(([k,v])=>{try{localStorage.setItem(k,String(v))}catch(e){}});
+      const keep=new Set([KEY,OLD_KEY,IDKEY,OLD_IDKEY]);
+      const remove=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k||keep.has(k)||k.startsWith(NS)||k.startsWith('rpgForgeScenarioLocalV5_'))continue;if(k==='rpgForgePageIndexV4'||k==='rpgForgePageIndexV5')continue;remove.push(k)}
+      remove.forEach(k=>safeRemove(k));Object.entries(st||{}).forEach(([k,v])=>safeSet(k,String(v)));
     }catch(e){}
   }
   function saveCurrent(){const s=pg();if(!s)return;s.state=snapshot();s.storage=captureStorage();write(scenarios)}
   function applySnapshot(st){
-    if(!valid(st)){
-      map.innerHTML=(currentId===scenarios[0]?.id)?baseHTML:blankHTML();
-      map.removeAttribute('style');
-      window.rpgForgePageSnapshot=null;
-      window.rpgForgeScenarioLocalUI=null;
-      return;
-    }
-    map.innerHTML='';
-    map.setAttribute('data-scenario-restoring','1');
-    map.innerHTML=st.html;
-    if(typeof st.mapStyle==='string')map.setAttribute('style',st.mapStyle);else map.removeAttribute('style');
-    if(typeof st.mapClass==='string')map.setAttribute('class',st.mapClass);
-    window.rpgForgePageSnapshot=st;
-    window.rpgForgeScenarioLocalUI=st.localUI||null;
+    const has=valid(st);
+    map.innerHTML=has?st.html:blankHTML();
+    map.setAttribute('data-scenario-id',currentId);
+    if(has&&typeof st.mapStyle==='string')map.setAttribute('style',st.mapStyle);else map.removeAttribute('style');
+    if(has&&typeof st.mapClass==='string')map.setAttribute('class',st.mapClass);else map.setAttribute('class','');
+    window.rpgForgePageSnapshot=has?st:null;
+    window.rpgForgeScenarioLocalUI=has?(st.localUI||null):null;
     window.rpgForgeScenarioCurrentId=currentId;
     window.rpgForgeScenarioName=()=>pg()?.name||'Cenário';
     window.rpgForgeScenarioStorageKey=(key)=>NS+currentId+'_'+key;
-    if(st.transform)window.rpgForgePendingViewport=st.transform;
-    else window.rpgForgePendingViewport=null;
+    window.rpgForgePendingViewport=has&&st.transform?st.transform:{scale:1,x:0,y:0};
   }
-
   window.rpgForgeScenarioCurrentId=currentId;
   window.rpgForgeScenarioName=()=>pg()?.name||'Cenário';
   window.rpgForgeScenarioStorageKey=(key)=>NS+currentId+'_'+key;
@@ -207,43 +177,17 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
 
   function render(){
     panel.innerHTML='';updateNames();
-    const h=document.createElement('div');h.className='rpgPageStatus';h.innerHTML='<b>🗂️ Cenários da campanha</b><br><span class="small">Cada cenário é uma tela independente. Tudo que você colocar em uma tela fica somente nela.</span>';panel.appendChild(h);
+    const h=document.createElement('div');h.className='rpgPageStatus';h.innerHTML='<b>🗂️ Cenários da campanha</b><br><span class="small">Cada cenário é uma tela independente. O conteúdo de uma tela nunca é usado em outra.</span>';panel.appendChild(h);
     scenarios.forEach(sc=>{
       const row=document.createElement('div');row.className='rpgPageRow';row.style.gridTemplateColumns='1fr 38px 38px';
       const b=document.createElement('button');b.type='button';b.className='rpgPageChoice'+(sc.id===currentId?' active':'');b.textContent=(sc.id===currentId?'● ':'○ ')+sc.name;b.onclick=()=>switchTo(sc.id);row.appendChild(b);
       const ren=document.createElement('button');ren.type='button';ren.className='rpgPageLock';ren.textContent='✏️';ren.title='Renomear cenário';ren.onclick=e=>{e.stopPropagation();const n=prompt('Nome do cenário:',sc.name);if(n?.trim()){saveCurrent();sc.name=n.trim().slice(0,50);write(scenarios);render()}};row.appendChild(ren);
-      const del=document.createElement('button');del.type='button';del.className='rpgPageLock';del.textContent='×';del.title='Fechar cenário';del.disabled=scenarios.length<=1;del.onclick=e=>{e.stopPropagation();if(scenarios.length<=1)return;if(confirm('Fechar o cenário “'+sc.name+'”?')){const idx=scenarios.findIndex(x=>x.id===sc.id);scenarios=scenarios.filter(x=>x.id!==sc.id);if(sc.id===currentId){currentId=scenarios[Math.max(0,idx-1)].id;safeSet(IDKEY,currentId)}write(scenarios);location.reload()}};row.appendChild(del);
-      panel.appendChild(row);
+      const del=document.createElement('button');del.type='button';del.className='rpgPageLock';del.textContent='×';del.title='Fechar cenário';del.disabled=scenarios.length<=1;del.onclick=e=>{e.stopPropagation();if(scenarios.length<=1)return;if(confirm('Fechar o cenário “'+sc.name+'”?')){const idx=scenarios.findIndex(x=>x.id===sc.id);scenarios=scenarios.filter(x=>x.id!==sc.id);if(sc.id===currentId){currentId=scenarios[Math.max(0,idx-1)].id;safeSet(IDKEY,currentId)}write(scenarios);location.reload()}};row.appendChild(del);panel.appendChild(row);
     });
-    const add=document.createElement('button');add.type='button';add.className='rpgPageNew';add.textContent='＋ Novo cenário';add.onclick=()=>{
-      saveCurrent();
-      const n=prompt('Nome do novo cenário:','Cenário '+(scenarios.length+1));
-      if(!n?.trim())return;
-      const id=uid();
-      // Um cenário novo usa a mesma estrutura/base do sistema, mas começa com uma tela própria.
-      // Não copia mapa, tokens, névoa, efeitos ou estados do cenário atual.
-      const blank=blankHTML();
-      scenarios.push({id,name:n.trim().slice(0,50),locked:false,state:{version:12,scenarioScreen:true,html:blank,mapStyle:'',mapClass:'',localUI:{},transform:{scale:1,x:0,y:0},weather:null,fog:null},storage:{}});
-      currentId=id;safeSet(IDKEY,currentId);write(scenarios);
-      location.hash='cenario='+encodeURIComponent(currentId);
-      location.reload();
-    };panel.appendChild(add);
-    const dup=document.createElement('button');dup.type='button';dup.className='rpgPageNew';dup.textContent='⧉ Duplicar cenário atual';dup.onclick=()=>{saveCurrent();const base=pg();const id=uid();scenarios.push({id,name:(base?.name||'Cenário')+' — cópia',locked:false,state:base?.state?JSON.parse(JSON.stringify(base.state)):null});currentId=id;safeSet(IDKEY,id);write(scenarios);location.reload()};panel.appendChild(dup);
+    const add=document.createElement('button');add.type='button';add.className='rpgPageNew';add.textContent='＋ Novo cenário';add.onclick=()=>{saveCurrent();const n=prompt('Nome do novo cenário:','Cenário '+(scenarios.length+1));if(!n?.trim())return;const id=uid();scenarios.push({id,name:n.trim().slice(0,50),locked:false,state:null,storage:{}});currentId=id;safeSet(IDKEY,currentId);write(scenarios);location.hash='cenario='+encodeURIComponent(currentId);location.reload()};panel.appendChild(add);
+    const dup=document.createElement('button');dup.type='button';dup.className='rpgPageNew';dup.textContent='⧉ Duplicar cenário atual';dup.onclick=()=>{saveCurrent();const base=pg(),id=uid();scenarios.push({id,name:(base?.name||'Cenário')+' — cópia',locked:false,state:clone(base?.state),storage:clone(base?.storage)||{}});currentId=id;safeSet(IDKEY,currentId);write(scenarios);location.hash='cenario='+encodeURIComponent(currentId);location.reload()};panel.appendChild(dup);
   }
-  function switchTo(id){
-    if(id===currentId)return;
-    const target=scenarios.find(s=>s.id===id);
-    if(!target)return;
-    saveCurrent();
-    // A aba selecionada é a fonte única da tela atual. O hash evita que o navegador
-    // ou outra rotina escolha acidentalmente o cenário anterior durante o reload.
-    currentId=id;
-    safeSet(IDKEY,currentId);
-    write(scenarios);
-    location.hash='cenario='+encodeURIComponent(currentId);
-    location.reload();
-  }
-
+  function switchTo(id){if(id===currentId)return;const target=scenarios.find(s=>s.id===id);if(!target)return;saveCurrent();currentId=id;safeSet(IDKEY,currentId);write(scenarios);location.hash='cenario='+encodeURIComponent(currentId);location.reload()}
   toolBtn.onclick=()=>{panel.hidden=!panel.hidden;document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));if(!panel.hidden)toolBtn.classList.add('active');render()};
   window.rpgForgeSaveCurrentPage=saveCurrent;
   window.rpgForgePageAccess={getPages:()=>scenarios,isLocked:id=>!!scenarios.find(s=>s.id===id)?.locked,canEnter:()=>true};
