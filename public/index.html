@@ -181,7 +181,36 @@ function render(){map.style.transform=`translate(${x}px,${y}px) scale(${scale})`
 document.querySelectorAll('.tool:not(#rpgPageTool)').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));b.classList.add('active');tool=b.dataset.tool});
 function pos(e){let r=stage.getBoundingClientRect();return [(e.clientX-r.left-x)/scale,(e.clientY-r.top-y)/scale]}
 map.querySelectorAll('.token').forEach(t=>{t.onpointerdown=e=>{if(tool!=='select')return;e.stopPropagation();dragging=t;let p=pos(e),left=parseFloat(t.style.left),top=parseFloat(t.style.top);offset=[p[0]-left,p[1]-top];t.classList.add('selected');document.querySelectorAll('.token').forEach(q=>{if(q!==t)q.classList.remove('selected')});t.setPointerCapture(e.pointerId)};t.onpointermove=e=>{if(!dragging||dragging!==t)return;let p=pos(e),nx=p[0]-offset[0],ny=p[1]-offset[1];if(document.querySelector('#snap').classList.contains('on')){nx=Math.round(nx/50)*50;ny=Math.round(ny/50)*50}t.style.left=nx+'px';t.style.top=ny+'px'};t.onpointerup=()=>dragging=null});
-stage.onpointerdown=e=>{if(e.target.closest('.token')||e.target.closest('.toolbar'))return;if(tool==='select'){pan=true;panStart=[e.clientX,e.clientY];origin=[x,y];stage.setPointerCapture(e.pointerId)}else if(tool==='ping'){let p=pos(e),m=document.createElement('div');m.textContent='✦';m.style.cssText=`position:absolute;left:${p[0]}px;top:${p[1]}px;z-index:8;color:${pingColor};font-size:30px;text-shadow:0 0 12px ${pingColor};pointer-events:none`;map.appendChild(m);setTimeout(()=>m.remove(),1000)}else if(tool==='fog'){let p=pos(e),f=document.createElement('div');f.className='fog';f.style.cssText=`left:${p[0]-75}px;top:${p[1]-75}px;width:150px;height:150px;border-radius:50%;background:${fogColor}dd;box-shadow:0 0 18px ${fogColor}88`;map.appendChild(f)}};stage.onpointermove=e=>{if(pan){x=origin[0]+e.clientX-panStart[0];y=origin[1]+e.clientY-panStart[1];render()}};stage.onpointerup=()=>pan=false;stage.addEventListener('wheel',e=>{e.preventDefault();zoom(scale+(e.deltaY<0?.1:-.1))},{passive:false});
+stage.style.touchAction='none';
+function startMapPan(e){
+  if(tool!=='select'||e.button!==0)return;
+  if(e.target.closest('.token,.forgeObj,.spellArea,.toolbar,.rpgFogCloudTools,.objMenu,.mobMenu,.measure'))return;
+  pan=true;panStart=[e.clientX,e.clientY];origin=[x,y];
+  try{stage.setPointerCapture(e.pointerId)}catch(_){ }
+  e.preventDefault();
+}
+function moveMapPan(e){
+  if(!pan)return;
+  x=origin[0]+e.clientX-panStart[0];
+  y=origin[1]+e.clientY-panStart[1];
+  render();
+}
+function endMapPan(e){
+  if(!pan)return;
+  pan=false;
+  try{if(e.pointerId!=null)stage.releasePointerCapture(e.pointerId)}catch(_){ }
+}
+stage.addEventListener('pointerdown',e=>{
+  if(e.target.closest('.token,.forgeObj,.spellArea,.toolbar,.rpgFogCloudTools,.objMenu,.mobMenu,.measure'))return;
+  if(tool==='select'){startMapPan(e);return;}
+  if(tool==='ping'){let p=pos(e),m=document.createElement('div');m.textContent='✦';m.style.cssText=`position:absolute;left:${p[0]}px;top:${p[1]}px;z-index:8;color:${pingColor};font-size:30px;text-shadow:0 0 12px ${pingColor};pointer-events:none`;map.appendChild(m);setTimeout(()=>m.remove(),1000);return;}
+  if(tool==='fog'){let p=pos(e),f=document.createElement('div');f.className='fog';f.style.cssText=`left:${p[0]-75}px;top:${p[1]-75}px;width:150px;height:150px;border-radius:50%;background:${fogColor}dd;box-shadow:0 0 18px ${fogColor}88`;map.appendChild(f);}
+});
+stage.addEventListener('pointermove',moveMapPan);
+stage.addEventListener('pointerup',endMapPan);
+stage.addEventListener('pointercancel',endMapPan);
+stage.addEventListener('lostpointercapture',()=>{pan=false});
+stage.addEventListener('wheel',e=>{e.preventDefault();zoom(scale+(e.deltaY<0?.1:-.1))},{passive:false});
 function zoom(z){scale=Math.max(.25,Math.min(3,z));render()}document.querySelector('#zoomIn').onclick=()=>zoom(scale+.1);document.querySelector('#zoomOut').onclick=()=>zoom(scale-.1);document.querySelector('#zoomLabel').onclick=()=>zoom(1);document.querySelector('#reset').onclick=()=>{scale=1;x=0;y=0;render()};document.querySelector('#snap').onclick=e=>e.currentTarget.classList.toggle('on');
 // Importar/exportar mapa funcional
 (function(){
