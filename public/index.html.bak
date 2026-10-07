@@ -66,39 +66,18 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
 (function(){
   const map=document.getElementById('map'), toolBtn=document.getElementById('rpgPageTool'), panel=document.getElementById('rpgPagePanel');
   if(!map||!toolBtn||!panel)return;
-  const KEY='rpgForgeScenariosV5';
-  const IDKEY='rpgForgeScenarioCurrentV5';
-  const NS='rpgForgeScenarioLocalV5_';
+  const KEY='rpgForgeScenariosV4';
+  const IDKEY='rpgForgeScenarioCurrentV4';
+  const NS='rpgForgeScenarioLocalV4_';
   const baseHTML=map.innerHTML;
-  const blankHTML=()=>baseHTML
-    .replace(/<div class=\"room[\s\S]*?<\/div>/g,'')
-    .replace(/<div class=\"token [\s\S]*?<\/div>/g,'');
   const safeGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
   const safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}
   const uid=()=> 'cenario-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
   function read(){try{
     let a=JSON.parse(safeGet(KEY)||'[]');
     if(Array.isArray(a)&&a.length)return a;
-    const legacyKeys=['rpgForgeScenariosV4','rpgForgeScenariosV3'];
-    for(const lk of legacyKeys){
-      const legacy=JSON.parse(safeGet(lk)||'[]');
-      if(Array.isArray(legacy)&&legacy.length){
-        // Migração: os dados antigos podiam ter sido copiados entre cenários.
-        // Mantemos o primeiro cenário e isolamos os demais quando o conteúdo é idêntico.
-        const first=legacy[0];
-        const firstHtml=first?.state?.html||'';
-        a=legacy.map((sc,i)=>{
-          const copy=JSON.parse(JSON.stringify(sc));
-          if(i>0 && firstHtml && copy.state?.html===firstHtml){
-            copy.state=null; copy.storage={};
-          }
-          return copy;
-        });
-        safeSet(KEY,JSON.stringify(a));
-        return a;
-      }
-    }
-    return [];
+    const legacy=JSON.parse(safeGet('rpgForgeScenariosV3')||'[]');
+    return Array.isArray(legacy)?legacy:[];
   }catch(e){return[]}}
   function write(a){safeSet(KEY,JSON.stringify(a))}
   let scenarios=read();
@@ -127,8 +106,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     const fog=document.getElementById('rpgFogLayer'), color=document.getElementById('rpgFogColor'), vision=document.getElementById('rpgFogVisionRadius'), cloud=document.getElementById('rpgFogCloud');
     let weather=null; try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
     return {
-      version:12,
-      scenarioScreen:true,
+      version:10,
       html:map.innerHTML,
       mapStyle:map.getAttribute('style')||'',
       mapClass:map.getAttribute('class')||'',
@@ -178,7 +156,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   function saveCurrent(){const s=pg();if(!s)return;s.state=snapshot();s.storage=captureStorage();write(scenarios)}
   function applySnapshot(st){
     if(!valid(st)){
-      map.innerHTML=(currentId===scenarios[0]?.id)?baseHTML:blankHTML();
+      map.innerHTML=baseHTML;
       map.removeAttribute('style');
       window.rpgForgePageSnapshot=null;
       window.rpgForgeScenarioLocalUI=null;
@@ -195,7 +173,6 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     window.rpgForgeScenarioName=()=>pg()?.name||'Cenário';
     window.rpgForgeScenarioStorageKey=(key)=>NS+currentId+'_'+key;
     if(st.transform)window.rpgForgePendingViewport=st.transform;
-    else window.rpgForgePendingViewport=null;
   }
 
   window.rpgForgeScenarioCurrentId=currentId;
@@ -222,8 +199,10 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
       const id=uid();
       // Um cenário novo usa a mesma estrutura/base do sistema, mas começa com uma tela própria.
       // Não copia mapa, tokens, névoa, efeitos ou estados do cenário atual.
-      const blank=blankHTML();
-      scenarios.push({id,name:n.trim().slice(0,50),locked:false,state:{version:12,scenarioScreen:true,html:blank,mapStyle:'',mapClass:'',localUI:{},transform:{scale:1,x:0,y:0},weather:null,fog:null},storage:{}});
+      const blank=baseHTML
+        .replace(/<div class=\"room[\s\S]*?<\/div>/g,'')
+        .replace(/<div class=\"token [\s\S]*?<\/div>/g,'');
+      scenarios.push({id,name:n.trim().slice(0,50),locked:false,state:{version:11,html:blank,mapStyle:'',mapClass:'',localUI:{},transform:{scale:1,x:0,y:0},weather:null,fog:null},storage:{}});
       currentId=id;safeSet(IDKEY,currentId);write(scenarios);
       location.hash='cenario='+encodeURIComponent(currentId);
       location.reload();
