@@ -126,7 +126,32 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     };
   }
   function valid(st){return st&&typeof st.html==='string'&&st.html.includes('class="grid"')&&st.html.length>500}
-  function saveCurrent(){const s=pg();if(!s)return;s.state=snapshot();write(scenarios)}
+  function captureStorage(){
+    const out={};
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i); if(!k) continue;
+        if(k===KEY||k===IDKEY||k.startsWith(NS)) continue;
+        if(k==='rpgForgePageIndexV4'||k==='rpgForgePageIndexV5') continue;
+        out[k]=localStorage.getItem(k);
+      }
+    }catch(e){}
+    return out;
+  }
+  function restoreStorage(st){
+    try{
+      const keep=new Set([KEY,IDKEY]);
+      const scopedKeys=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i); if(!k||keep.has(k)||k.startsWith(NS)) continue;
+        if(k==='rpgForgePageIndexV4'||k==='rpgForgePageIndexV5') continue;
+        scopedKeys.push(k);
+      }
+      scopedKeys.forEach(k=>localStorage.removeItem(k));
+      Object.entries(st||{}).forEach(([k,v])=>{try{localStorage.setItem(k,String(v))}catch(e){}});
+    }catch(e){}
+  }
+  function saveCurrent(){const s=pg();if(!s)return;s.state=snapshot();s.storage=captureStorage();write(scenarios)}
   function applySnapshot(st){
     if(!valid(st)){
       map.innerHTML=baseHTML;
@@ -152,6 +177,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   window.rpgForgeScenarioName=()=>pg()?.name||'Cenário';
   window.rpgForgeScenarioStorageKey=(key)=>NS+currentId+'_'+key;
   const active=pg();
+  restoreStorage(active?.storage||{});
   applySnapshot(active?.state);
 
   function render(){
@@ -1230,9 +1256,9 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   const FOG_GM_VIEW_KEY='rpgForgeFogGMViewV2_'+SCENARIO_ID;
   function fogGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
   function fogSet(k,v){try{localStorage.setItem(k,String(v))}catch(e){}}
-  const savedOpacity=fogSnap&&fogSnap.opacity!==undefined?String(fogSnap.opacity):fogGet(FOG_OPACITY_KEY);
   const pageSnap=window.rpgForgePageSnapshot||null;
   const fogSnap=pageSnap&&pageSnap.fog?pageSnap.fog:null;
+  const savedOpacity=fogSnap&&fogSnap.opacity!==undefined?String(fogSnap.opacity):fogGet(FOG_OPACITY_KEY);
   if(savedOpacity!==null){
     const ov=Math.max(0,Math.min(100,Number(savedOpacity)||72));
     range.value=String(ov);
@@ -1360,7 +1386,11 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     cloud.style.maskSize=cloud.offsetWidth+'px '+cloud.offsetHeight+'px';
   }
   if(visionRadius)visionRadius.addEventListener('change',()=>{updateVision();window.rpgForgeSaveCurrentPage?.()});
-  setSizePercent(100);const g=gridSize();cloud.style.left=g.left+'px';cloud.style.top=g.top+'px';updateVision();
+  const g=gridSize();
+  if(!fogSnap || (!fogSnap.width && !fogSnap.height)) setSizePercent(100);
+  else { updateSizeLabel(); updateVision(); }
+  if(!fogSnap || (!fogSnap.left && !fogSnap.top)){ cloud.style.left=g.left+'px'; cloud.style.top=g.top+'px'; }
+  updateVision();
   // Atualiza a visão enquanto qualquer token existente ou criado é arrastado.
   // Observa apenas tokens. Nunca observe a própria máscara da névoa,
   // pois updateVision() altera a máscara e isso causaria um loop infinito.
