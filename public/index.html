@@ -256,7 +256,58 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   .side,.spellEditor{transition:none}
 }
 
-</style></head>
+</style>
+<style id="mobilePolish">
+@media (max-width:900px){
+  :root{--mobile-gutter:8px}
+  body{overscroll-behavior:none;-webkit-text-size-adjust:100%}
+  header{padding-left:calc(8px + env(safe-area-inset-left));padding-right:calc(8px + env(safe-area-inset-right))}
+  .canvasWrap{padding-bottom:env(safe-area-inset-bottom)}
+  .toolbar{top:calc(8px + env(safe-area-inset-top));left:var(--mobile-gutter);right:var(--mobile-gutter)}
+  .toolbar .btn,.toolbar .pill,.mapToolsToggle{min-width:44px;min-height:44px}
+  .side{top:calc(52px + env(safe-area-inset-top));height:calc(100dvh - 52px - env(safe-area-inset-top));width:min(90vw,360px)}
+  .sideCollapse{min-width:44px!important;width:44px!important;height:44px!important}
+  .section{padding:11px 10px}
+  .toolgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .tool,.btn,.tokenItem,.magicSideItem,.invItem,button,select,input{min-height:44px}
+  .tool,.btn{padding:10px 11px}
+  .log{max-height:150px}
+  .mapToolsPanel{max-width:calc(100vw - 20px);padding:7px}
+  .mapToolsPanel .btn{min-width:128px}
+  .forgePanel{inset:3% 2%;max-height:92dvh;width:auto!important;border-radius:13px;padding:14px;}
+  .spellEditor{width:min(96vw,380px)!important;max-height:78dvh!important}
+  .spellEditorGrid,.spellEditorBtns,.spellEditorRotate{grid-template-columns:1fr 1fr}
+  .hideTab{width:min(94vw,560px)!important;left:3%!important;right:3%!important}
+  .hideCols{grid-template-columns:1fr}
+  .objMenu{position:fixed!important;left:8px!important;right:8px!important;bottom:calc(8px + env(safe-area-inset-bottom));top:auto!important;min-width:0!important;width:auto!important;z-index:3000!important}
+  .objMenu button{min-height:44px;font-size:14px}
+  .imageEditor{max-width:94vw;max-height:76dvh;overflow:auto}
+  .youtubeSoundPanel{max-width:94vw!important;max-height:86dvh!important;overflow:auto!important;left:3%!important;right:3%!important;top:7%!important;width:auto!important}
+  .youtubeSoundPanel iframe{height:min(42vw,240px)!important;min-height:180px}
+  .youtubeSoundPanel button{min-height:44px}
+  .pf2eSheetPanel{height:min(94dvh,820px)!important;max-height:94dvh!important}
+  .spellArea.spellEditing .spellResizeHandle{width:26px;height:26px}
+  .spellResizeHandle.n,.spellResizeHandle.s{height:26px}
+  .spellResizeHandle.e,.spellResizeHandle.w{width:26px}
+}
+@media (max-width:520px){
+  header .logo{font-size:13px}
+  header .pill{font-size:10px;padding:6px 7px}
+  .toolbar .btn{font-size:11px;padding:8px 9px}
+  .mapToolsPanel{left:0;right:auto;width:calc(100vw - 20px);}
+  .mapToolsPanel .btn{min-width:0;flex:1 1 120px}
+  .spellEditorGrid{grid-template-columns:1fr}
+  .spellEditorBtns,.spellEditorRotate{grid-template-columns:1fr 1fr}
+  .pf2eGrid,.pf2eSix{grid-template-columns:1fr}
+  .pf2eRow{grid-template-columns:1fr 1fr 34px}
+}
+@media (pointer:coarse){
+  .token,.forgeObj,.spellArea{touch-action:none}
+  .token,.forgeObj{user-select:none;-webkit-user-select:none}
+}
+</style>
+
+</head>
 <body><div class="app"><header><div class="logo">RPG <span>FORGE</span></div><div class="session">Campanha: <b>Ruínas de Arkhon</b></div><div class="spacer"></div><span class="pill mode" id="modeBadge">● Jogador</span></header>
 <div class="main"><aside class="side"><div class="section"><h3>Ferramentas</h3><div class="toolgrid"><button class="tool active" data-tool="select">↖ Selecionar</button><button class="tool" data-tool="measure">⌁ Medir</button><button class="tool" data-tool="fog">☁ Névoa</button><button class="tool" data-tool="ping">⊙ Marcar</button><button class="tool" id="rpgPageTool" type="button">🗺️ Cenários</button></div><div id="rpgPagePanel" class="rpgPagePanel" hidden></div></div><div class="section"><h3>🎭 Modo de jogo</h3><div class="card"><div class="small" id="roleDescription">Você está como Jogador.</div><button class="btn" id="toggleRole" style="width:100%;margin-top:8px">Tornar-se Mestre</button></div></div><div class="section"><h3>🌫️ Névoa</h3><div class="rpgFogControls">
   <button class="btn" id="rpgFogLock" style="width:100%">🔓 Travar névoa</button>
