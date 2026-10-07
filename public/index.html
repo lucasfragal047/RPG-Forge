@@ -86,8 +86,10 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     scenarios=[{id,name:'Salão Norte',locked:false,state:null}];
     safeSet(IDKEY,id); write(scenarios);
   }
-  let currentId=safeGet(IDKEY)||scenarios[0].id;
+  const hashId=decodeURIComponent((location.hash.match(/^#cenario=(.+)$/)||[])[1]||'');
+  let currentId=(hashId&&scenarios.some(s=>s.id===hashId)?hashId:null)||safeGet(IDKEY)||scenarios[0].id;
   if(!scenarios.some(s=>s.id===currentId)){currentId=scenarios[0].id;safeSet(IDKEY,currentId)}
+  if(location.hash!=='#cenario='+encodeURIComponent(currentId)){history.replaceState(null,'','#cenario='+encodeURIComponent(currentId));}
 
   const pg=()=>scenarios.find(s=>s.id===currentId)||scenarios[0];
   const titleEl=document.getElementById('scenarioHeaderName'), sideEl=document.getElementById('scenarioSideName');
@@ -190,10 +192,36 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
       const del=document.createElement('button');del.type='button';del.className='rpgPageLock';del.textContent='×';del.title='Fechar cenário';del.disabled=scenarios.length<=1;del.onclick=e=>{e.stopPropagation();if(scenarios.length<=1)return;if(confirm('Fechar o cenário “'+sc.name+'”?')){const idx=scenarios.findIndex(x=>x.id===sc.id);scenarios=scenarios.filter(x=>x.id!==sc.id);if(sc.id===currentId){currentId=scenarios[Math.max(0,idx-1)].id;safeSet(IDKEY,currentId)}write(scenarios);location.reload()}};row.appendChild(del);
       panel.appendChild(row);
     });
-    const add=document.createElement('button');add.type='button';add.className='rpgPageNew';add.textContent='＋ Novo cenário';add.onclick=()=>{saveCurrent();const n=prompt('Nome do novo cenário:','Cenário '+(scenarios.length+1));if(!n?.trim())return;const id=uid();scenarios.push({id,name:n.trim().slice(0,50),locked:false,state:null});currentId=id;safeSet(IDKEY,id);write(scenarios);location.reload()};panel.appendChild(add);
+    const add=document.createElement('button');add.type='button';add.className='rpgPageNew';add.textContent='＋ Novo cenário';add.onclick=()=>{
+      saveCurrent();
+      const n=prompt('Nome do novo cenário:','Cenário '+(scenarios.length+1));
+      if(!n?.trim())return;
+      const id=uid();
+      // Um cenário novo usa a mesma estrutura/base do sistema, mas começa com uma tela própria.
+      // Não copia mapa, tokens, névoa, efeitos ou estados do cenário atual.
+      const blank=baseHTML
+        .replace(/<div class=\"room[\s\S]*?<\/div>/g,'')
+        .replace(/<div class=\"token [\s\S]*?<\/div>/g,'');
+      scenarios.push({id,name:n.trim().slice(0,50),locked:false,state:{version:11,html:blank,mapStyle:'',mapClass:'',localUI:{},transform:{scale:1,x:0,y:0},weather:null,fog:null},storage:{}});
+      currentId=id;safeSet(IDKEY,currentId);write(scenarios);
+      location.hash='cenario='+encodeURIComponent(currentId);
+      location.reload();
+    };panel.appendChild(add);
     const dup=document.createElement('button');dup.type='button';dup.className='rpgPageNew';dup.textContent='⧉ Duplicar cenário atual';dup.onclick=()=>{saveCurrent();const base=pg();const id=uid();scenarios.push({id,name:(base?.name||'Cenário')+' — cópia',locked:false,state:base?.state?JSON.parse(JSON.stringify(base.state)):null});currentId=id;safeSet(IDKEY,id);write(scenarios);location.reload()};panel.appendChild(dup);
   }
-  function switchTo(id){if(id===currentId)return;saveCurrent();currentId=id;safeSet(IDKEY,currentId);write(scenarios);location.reload()}
+  function switchTo(id){
+    if(id===currentId)return;
+    const target=scenarios.find(s=>s.id===id);
+    if(!target)return;
+    saveCurrent();
+    // A aba selecionada é a fonte única da tela atual. O hash evita que o navegador
+    // ou outra rotina escolha acidentalmente o cenário anterior durante o reload.
+    currentId=id;
+    safeSet(IDKEY,currentId);
+    write(scenarios);
+    location.hash='cenario='+encodeURIComponent(currentId);
+    location.reload();
+  }
 
   toolBtn.onclick=()=>{panel.hidden=!panel.hidden;document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));if(!panel.hidden)toolBtn.classList.add('active');render()};
   window.rpgForgeSaveCurrentPage=saveCurrent;
