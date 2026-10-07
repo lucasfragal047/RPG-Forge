@@ -3,8 +3,8 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = process.env.PORT || 3000;
-const publicDir = path.join(__dirname, 'public');
-const mime = {
+const PUBLIC = path.join(__dirname, 'public');
+const TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -13,32 +13,33 @@ const mime = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon'
+  '.svg': 'image/svg+xml'
 };
 
 const server = http.createServer((req, res) => {
-  let requestPath;
-  try { requestPath = decodeURIComponent((req.url || '/').split('?')[0]); }
-  catch { res.writeHead(400); return res.end('Bad request'); }
-  if (requestPath === '/') requestPath = '/index.html';
+  const raw = decodeURIComponent((req.url || '/').split('?')[0]);
+  const requestPath = raw === '/' ? '/index.html' : raw;
+  const file = path.normalize(path.join(PUBLIC, requestPath));
 
-  const file = path.normalize(path.join(publicDir, requestPath));
-  if (!file.startsWith(publicDir + path.sep) && file !== publicDir) {
-    res.writeHead(403); return res.end('Forbidden');
+  if (!file.startsWith(PUBLIC + path.sep) && file !== path.join(PUBLIC, 'index.html')) {
+    res.writeHead(403);
+    return res.end('Forbidden');
   }
 
   fs.readFile(file, (err, data) => {
     if (err) {
-      if (requestPath !== '/index.html') return res.writeHead(404).end('Not found');
-      return res.writeHead(404).end('index.html not found');
+      res.writeHead(err.code === 'ENOENT' ? 404 : 500);
+      return res.end(err.code === 'ENOENT' ? 'Not found' : 'Server error');
     }
     res.writeHead(200, {
-      'Content-Type': mime[path.extname(file).toLowerCase()] || 'application/octet-stream',
+      'Content-Type': TYPES[path.extname(file).toLowerCase()] || 'application/octet-stream',
       'Cache-Control': 'no-cache'
     });
     res.end(data);
   });
 });
 
-server.listen(PORT, () => console.log(`RPG Forge rodando em http://localhost:${PORT} — sem sistema de salas`));
+server.listen(PORT, () => {
+  console.log(`LuMaThHu rodando em http://localhost:${PORT}`);
+  console.log('Sistema de cenários local ativo — sem sistema de salas.');
+});
