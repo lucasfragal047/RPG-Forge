@@ -801,10 +801,19 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     if(title){title.title='Duplo clique para renomear';title.ondblclick=()=>{const n=prompt('Nome:',title.textContent);if(n)title.textContent=n}};
   }
 
-  // Ferramentas: apagar névoa, marcações, medições e efeitos com clique direito.
+  // No mapa, o botão direito fica livre. O sistema de ferramentas abre com duplo clique esquerdo em área vazia.
   stage.addEventListener('contextmenu',e=>{
-    const target=e.target.closest('.fog,.spellArea,.visionRing,.measure');
-    if(target){e.preventDefault();target.remove();logMsg2('Elemento removido do mapa.')}
+    if(e.target.closest('.token,.forgeObj,.spellArea,.toolbar,.rpgFogCloudTools,.objMenu,.mobMenu,.measure'))return;
+    e.preventDefault();
+  });
+  stage.addEventListener('dblclick',e=>{
+    if(e.target.closest('.token,.forgeObj,.spellArea,.toolbar,.rpgFogCloudTools,.objMenu,.mobMenu,.measure,.rpgFogResize'))return;
+    const wrap=document.querySelector('#mapToolsWrap');
+    const toggle=document.querySelector('#mapToolsToggle');
+    if(wrap&&toggle){
+      wrap.classList.add('open');
+      toggle.title='Fechar ferramentas do mapa';
+    }
   });
   logMsg2('Edição livre ativada: números com duplo clique, grade e medição funcionais.');
 })();
@@ -1313,14 +1322,9 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     const r=cloud.getBoundingClientRect();
     return e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
   }
-  // O menu de mover pode ser aberto com botão direito sem bloquear os tokens.
+  // O menu da névoa não usa mais botão direito; o controle continua disponível pelo painel da névoa.
   map.addEventListener('contextmenu',e=>{
-    if(e.target.closest('.token'))return;
-    if(!pointInsideFog(e))return;
-    e.preventDefault(); e.stopPropagation();
-    fogMoveMenu.style.left=Math.min(e.clientX,window.innerWidth-170)+'px';
-    fogMoveMenu.style.top=Math.min(e.clientY,window.innerHeight-55)+'px';
-    fogMoveMenu.style.display='block';
+    if(pointInsideFog(e)){e.preventDefault();e.stopPropagation();}
   });
   fogMoveBtn.addEventListener('click',()=>{if(!fogLocked){fogMoveMode=true;updateFogMoveUI();}fogMoveMenu.style.display='none';});
   document.addEventListener('pointerdown',e=>{if(!fogMoveMenu.contains(e.target))fogMoveMenu.style.display='none';});
