@@ -1,8 +1,14 @@
-# LuMaThHu — servidor
+# RPG Forge — Mesa Virtual
 
-O servidor foi trocado sem alterar o `public/index.html` do RPG Forge anterior.
+Mesa virtual multiplayer para RPG com uma sala contendo vários mapas independentes.
 
-## Rodar localmente
+## Estrutura
+- `server.js`
+- `package.json`
+- `README.md`
+- `public/index.html`
+
+## Rodar
 ```bash
 npm install
 npm start
@@ -10,13 +16,13 @@ npm start
 Abra `http://localhost:3000`.
 
 ## Salas
-- O servidor gera um código único de 4 caracteres ao criar a sala.
-- Quem cria a sala é o Mestre por autoridade do servidor.
-- Participantes entram usando o código.
-- Todos ficam na mesma sala online.
-- O estado de cada cenário/aba é armazenado separadamente.
-- Alterações de mapa, tokens, objetos e neblina são distribuídas em tempo real para quem está na mesma aba.
+O botão **Criar sala** cria uma nova sala e define o criador como Mestre. Jogadores entram pelo código da sala. O servidor é a autoridade: jogadores não podem virar Mestre, criar mapas, travar/destravar mapas ou mudar sua própria atribuição alterando localStorage.
+
+## Mapas
+Todos os mapas ficam dentro da mesma sala. Cada mapa possui estado separado: tokens, objetos, posições, fundo/importação, névoa e demais elementos salvos no mapa. Criar ou trocar de mapa não cria outra sala.
 
 ## Render
 - Build Command: `npm install`
 - Start Command: `npm start`
+
+As salas ficam em memória e são perdidas se a instância do servidor reiniciar.
