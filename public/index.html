@@ -1423,6 +1423,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
 </script>
 
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
 (() => {
   const socket = io();
@@ -1454,6 +1455,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     if(b) b.textContent='👥 '+((room.players||[]).length)+' jogadores';
   }
   function createRoom() {
+    if(!socket.connected){ error('createError','Conectando ao servidor... tente novamente em alguns segundos.'); return; }
     const name = ($('gmName').value.trim() || 'Mestre').slice(0,32);
     error('createError','');
     socket.emit('criar-sala',{clientId,playerName:name},res=>{
@@ -1465,6 +1467,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     });
   }
   function joinRoom() {
+    if(!socket.connected){ error('joinError','Conectando ao servidor... tente novamente em alguns segundos.'); return; }
     const code = $('roomCodeInput').value.trim().toUpperCase();
     const name = ($('playerName').value.trim() || 'Jogador').slice(0,32);
     error('joinError','');
@@ -1483,7 +1486,10 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   $('copyRoomCode').onclick=()=>navigator.clipboard?.writeText(success.dataset.code||'');
   $('enterCreatedRoom').onclick=()=>lockOff();
   socket.on('sala-atualizada',room=>{ if(currentRoom && room.code===currentRoom.code){ currentRoom=room; window.rpgForgeRoom.players=room.players||[]; updateOnline(room); }});
-  socket.on('connect',()=>{});
+  let socketReady = false;
+  socket.on('connect',()=>{ socketReady=true; error('roomGateStartError',''); });
+  socket.on('disconnect',()=>{ socketReady=false; });
+  socket.on('connect_error',()=>{ socketReady=false; error('roomGateStartError','Servidor offline ou ainda iniciando. Tente novamente em alguns segundos.'); });
 
   const oldShare=document.querySelector('#share');
   if(oldShare) oldShare.onclick=()=>{
