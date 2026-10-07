@@ -1029,7 +1029,10 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
             if(isServerMode()&&roleIsMaster()){
               latestSyncEvent={action:'play',item,local:true};lastLocalPlayItemId=item.id;
               const ok=await postSync({action:'play',item:{id:item.id,name:item.name,url:item.url}});
-              if(!ok){localPlay(item,false);showSyncBanner(panel,null,'⚠️ O servidor não respondeu; este cliente está reproduzindo sozinho.')}
+              // O servidor também devolve o evento ao Mestre, mas ele é ignorado para evitar duplicação.
+              // Portanto, o Mestre precisa iniciar a reprodução localmente imediatamente.
+              localPlay(item,true);
+              if(!ok){showSyncBanner(panel,null,'⚠️ O servidor não respondeu; reproduzindo localmente.')}
               return;
             }
             localPlay(item,false);
