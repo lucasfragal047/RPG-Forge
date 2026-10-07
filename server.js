@@ -1,18 +1,1 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const PORT = process.env.PORT || 3000;
-const root = __dirname;
-const server = http.createServer((req,res)=>{
-  let file = req.url === '/' ? 'index.html' : req.url.replace(/^\//,'');
-  file = path.normalize(file);
-  if (file.includes('..')) { res.writeHead(403); return res.end('Forbidden'); }
-  const full = path.join(root,file);
-  fs.readFile(full,(err,data)=>{
-    if(err){res.writeHead(404,{'Content-Type':'text/plain; charset=utf-8'});return res.end('Arquivo não encontrado');}
-    const ext=path.extname(full).toLowerCase();
-    const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json'};
-    res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream'});res.end(data);
-  });
-});
-server.listen(PORT,()=>console.log(`RPG Forge rodando em http://localhost:${PORT}`));
+const http=require('http'),fs=require('fs'),path=require('path'); const {Server}=require('socket.io'); const port=process.env.PORT||3000; const pub=path.join(__dirname,'public'); const server=http.createServer((req,res)=>{let u=decodeURIComponent(req.url.split('?')[0]);if(u==='/')u='/index.html';const f=path.normalize(path.join(pub,u));if(!f.startsWith(pub)){res.writeHead(403);return res.end('Forbidden')}fs.readFile(f,(e,d)=>{if(e){res.writeHead(404);return res.end('Not found')}const t={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg'}[path.extname(f)]||'application/octet-stream';res.writeHead(200,{'Content-Type':t});res.end(d)})}); const io=new Server(server); io.on('connection',s=>s.on('entrar-sala',r=>r&&s.join(String(r)))); server.listen(port,()=>console.log('RPG Forge em http://localhost:'+port));

@@ -1,8 +1,1 @@
-{
-  "name": "rpg-forge",
-  "version": "1.0.0",
-  "description": "RPG Forge - mesa virtual",
-  "main": "server.js",
-  "scripts": { "start": "node server.js" },
-  "dependencies": {}
-}
+{"name":"rpg-forge","version":"1.0.0","main":"server.js","scripts":{"start":"node server.js"},"dependencies":{"socket.io":"^4.8.1"}}

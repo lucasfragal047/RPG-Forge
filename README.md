@@ -1,21 +1,12 @@
-# RPG Forge
+# RPG Forge — Mesa Virtual
 
-Mesa virtual de RPG com mapa, tokens, ferramentas, importação/exportação e inventário funcional.
+Estrutura para Render: `server.js`, `package.json`, `README.md` e `public/index.html`.
 
-## Como iniciar
+## Render
+Build Command: `npm install`
+Start Command: `npm start`
 
-1. Instale o Node.js.
-2. Abra o terminal nesta pasta.
-3. Execute:
+## Local
+`npm install` e depois `npm start`. Acesse `http://localhost:3000`.
 
-```bash
-npm start
-```
-
-4. Abra `http://localhost:3000` no navegador.
-
-## Arquivos
-
-- `index.html` — site principal.
-- `server.js` — servidor local.
-- `package.json` — configuração do projeto.
+O inventário permite adicionar, remover, alterar quantidade, excluir itens e criar itens personalizados. Os dados ficam salvos no navegador.
