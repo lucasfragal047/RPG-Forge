@@ -1426,95 +1426,91 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
 <script src="/socket.io/socket.io.js"></script>
 <script>
 (() => {
-  const socket = (typeof io === 'function') ? io({ transports: ['websocket', 'polling'] }) : null;
-  const gate = document.querySelector('#roomGate');
-  const start = document.querySelector('#roomGateStart');
-  const createForm = document.querySelector('#createRoomForm');
-  const joinForm = document.querySelector('#joinRoomForm');
-  const success = document.querySelector('#createdRoomSuccess');
+  const socket = typeof io === 'function' ? io() : null;
+  const $ = id => document.getElementById(id);
+  const gate = $('roomGate');
+  const start = $('roomGateStart');
+  const createForm = $('createRoomForm');
+  const joinForm = $('joinRoomForm');
+  const success = $('createdRoomSuccess');
+  if (!gate || !start || !createForm || !joinForm || !success) return;
+
   const clientKey = 'rpgForgeClientIdV1';
   let clientId = localStorage.getItem(clientKey);
-  if (!clientId) { clientId = (crypto.randomUUID ? crypto.randomUUID() : 'c-' + Date.now() + '-' + Math.random().toString(36).slice(2)); localStorage.setItem(clientKey, clientId); }
-  let currentRoom = null, currentRole = null;
-  const $ = id => document.getElementById(id);
-  const show = el => { [start,createForm,joinForm,success].forEach(x=>x.classList.remove('show')); el.classList.add('show'); };
-  const error = (id,msg) => $(id).textContent = msg || '';
-  const lockOff = () => { document.body.classList.remove('room-locked'); gate.classList.add('hidden'); };
+  if (!clientId) {
+    clientId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : 'c-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+    localStorage.setItem(clientKey, clientId);
+  }
+  let currentRoom = null;
+  let currentRole = null;
+
+  function show(el) {
+    [start, createForm, joinForm, success].forEach(x => x.classList.remove('show'));
+    el.classList.add('show');
+  }
+  function setError(id, msg) { const el=$(id); if(el) el.textContent=msg||''; }
+  function closeGate() { document.body.classList.remove('room-locked'); gate.classList.add('hidden'); }
   function applyRoom(room, role) {
-    currentRoom = room; currentRole = role || (room.ownerId === clientId ? 'gm' : 'player');
-    lockOff();
-    const session = document.querySelector('.session');
-    if (session) session.innerHTML = 'Campanha: <b>Ruínas de Arkhon</b> · Sala <b>'+room.code+'</b>';
-    const badge = document.querySelector('.pill.mode');
-    if (badge) badge.textContent = currentRole === 'gm' ? '● Mestre' : '● Jogador';
-    window.rpgForgeRoom = { code: room.code, role: currentRole, clientId, players: room.players || [] };
+    currentRoom=room; currentRole=role || (room.ownerId===clientId?'gm':'player');
+    const session=document.querySelector('.session');
+    if(session) session.innerHTML='Campanha: <b>Ruínas de Arkhon</b> · Sala <b>'+room.code+'</b>';
+    const badge=document.querySelector('.pill.mode');
+    if(badge) badge.textContent=currentRole==='gm'?'● Mestre':'● Jogador';
+    window.rpgForgeRoom={code:room.code,role:currentRole,clientId,players:room.players||[]};
     updateOnline(room);
+    closeGate();
   }
   function updateOnline(room) {
-    const b=document.querySelector('#online');
-    if(b) b.textContent='👥 '+((room.players||[]).length)+' jogadores';
+    const b=$('online'); if(b) b.textContent='👥 '+((room.players||[]).length)+' jogadores';
   }
   function createRoom() {
-    if(!socket){ error('createError','O servidor não está conectado. Abra o RPG Forge pelo endereço do servidor (ex.: http://localhost:3000) e não pelo arquivo HTML direto.'); return; }
-    if(!socket.connected){ error('createError','Conectando ao servidor... tente novamente em alguns segundos.'); return; }
-    const name = ($('gmName').value.trim() || 'Mestre').slice(0,32);
-    error('createError','');
+    if(!socket){ setError('createError','Servidor não conectado. Abra pelo endereço do servidor, como http://localhost:3000.'); return; }
+    if(!socket.connected){ setError('createError','Conectando ao servidor... aguarde um instante.'); return; }
+    const name=(($('gmName')&&$('gmName').value)||'Mestre').trim().slice(0,32)||'Mestre';
+    setError('createError','');
     socket.emit('criar-sala',{clientId,playerName:name},res=>{
-      if(!res?.ok){ error('createError',res?.error||'Não foi possível criar a sala.'); return; }
+      if(!res || !res.ok){ setError('createError',res && res.error ? res.error : 'Não foi possível criar a sala.'); return; }
       $('createdRoomCode').textContent=res.room.code;
       success.dataset.code=res.room.code;
-      applyRoom(res.room,'gm');
-      gate.classList.remove('hidden'); document.body.classList.add('room-locked'); show(success);
+      currentRoom=res.room; currentRole='gm';
+      const session=document.querySelector('.session'); if(session) session.innerHTML='Campanha: <b>Ruínas de Arkhon</b> · Sala <b>'+res.room.code+'</b>';
+      const badge=document.querySelector('.pill.mode'); if(badge) badge.textContent='● Mestre';
+      window.rpgForgeRoom={code:res.room.code,role:'gm',clientId,players:res.room.players||[]};
+      updateOnline(res.room);
+      show(success);
     });
   }
   function joinRoom() {
-    if(!socket){ error('joinError','O servidor não está conectado. Abra o RPG Forge pelo endereço do servidor (ex.: http://localhost:3000) e não pelo arquivo HTML direto.'); return; }
-    if(!socket.connected){ error('joinError','Conectando ao servidor... tente novamente em alguns segundos.'); return; }
-    const code = $('roomCodeInput').value.trim().toUpperCase();
-    const name = ($('playerName').value.trim() || 'Jogador').slice(0,32);
-    error('joinError','');
-    if(code.length!==4){ error('joinError','O código deve ter 4 caracteres.'); return; }
+    if(!socket){ setError('joinError','Servidor não conectado. Abra pelo endereço do servidor, como http://localhost:3000.'); return; }
+    if(!socket.connected){ setError('joinError','Conectando ao servidor... aguarde um instante.'); return; }
+    const code=(($('roomCodeInput')&&$('roomCodeInput').value)||'').trim().toUpperCase();
+    const name=(($('playerName')&&$('playerName').value)||'Jogador').trim().slice(0,32)||'Jogador';
+    setError('joinError','');
+    if(code.length!==4){ setError('joinError','O código deve ter 4 caracteres.'); return; }
     socket.emit('entrar-sala',{code,clientId,playerName:name},res=>{
-      if(!res?.ok){ error('joinError',res?.error||'Não foi possível entrar na sala.'); return; }
+      if(!res || !res.ok){ setError('joinError',res && res.error ? res.error : 'Não foi possível entrar na sala.'); return; }
       applyRoom(res.room,res.role);
     });
   }
-  $('createRoomBtn').onclick=()=>show(createForm);
-  $('joinRoomBtn').onclick=()=>show(joinForm);
+
+  $('createRoomBtn').onclick=()=>{ setError('roomGateStartError',''); show(createForm); };
+  $('joinRoomBtn').onclick=()=>{ setError('roomGateStartError',''); show(joinForm); };
   document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>show(start));
   $('confirmCreate').onclick=createRoom;
   $('confirmJoin').onclick=joinRoom;
   $('roomCodeInput').addEventListener('input',e=>e.target.value=e.target.value.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,4));
-  $('copyRoomCode').onclick=()=>navigator.clipboard?.writeText(success.dataset.code||'');
-  $('enterCreatedRoom').onclick=()=>lockOff();
-  if (!socket) { error('roomGateStartError','Servidor não conectado. Execute npm start e abra http://localhost:3000.'); return; }
-  socket.on('sala-atualizada',room=>{ if(currentRoom && room.code===currentRoom.code){ currentRoom=room; window.rpgForgeRoom.players=room.players||[]; updateOnline(room); }});
-  let socketReady = false;
-  socket.on('connect',()=>{ socketReady=true; error('roomGateStartError',''); });
-  socket.on('disconnect',()=>{ socketReady=false; });
-  socket.on('connect_error',()=>{ socketReady=false; error('roomGateStartError','Servidor offline ou ainda iniciando. Tente novamente em alguns segundos.'); });
+  $('copyRoomCode').onclick=()=>{ const code=success.dataset.code||''; if(navigator.clipboard) navigator.clipboard.writeText(code); };
+  $('enterCreatedRoom').onclick=()=>applyRoom(currentRoom,'gm');
 
-  const oldShare=document.querySelector('#share');
-  if(oldShare) oldShare.onclick=()=>{
-    const code=currentRoom?.code||'----';
-    navigator.clipboard?.writeText(code);
-    if(typeof window.logMsg==='function') window.logMsg('Código da sala '+code+' copiado.');
-    else alert('Código da sala: '+code);
-  };
-  const oldRoomBtn=document.querySelector('#roomBtn');
-  if(oldRoomBtn) oldRoomBtn.onclick=()=>{
-    const code=currentRoom?.code||'----';
-    const role=currentRole==='gm'?'Mestre':'Jogador';
-    const players=currentRoom?.players||[];
-    const list=players.map(p=>'<div>👤 '+String(p.name).replaceAll('<','&lt;')+' — '+(p.role==='gm'?'Mestre':'Jogador')+'</div>').join('')||'<div>Nenhum jogador conectado.</div>';
-    if(typeof window.panel==='function') window.panel('🔐 Sala '+code,'<div class="forgeGrid"><div class="forgeStat"><b>Código</b><div style="font-size:24px;margin-top:8px">'+code+'</div><small>Compartilhe este código com os jogadores.</small></div><div class="forgeStat"><b>Seu acesso</b><div style="margin-top:8px">'+role+'</div></div></div><h3 style="margin-top:16px">Jogadores</h3><div class="playerList">'+list+'</div><button class="btn" style="margin-top:12px" onclick="navigator.clipboard?.writeText(''+code+'')">📋 Copiar código</button>');
-  };
-  const oldOnline=document.querySelector('#online');
-  if(oldOnline) oldOnline.onclick=()=>{
-    const players=currentRoom?.players||[];
-    const list=players.map(p=>'<div>👤 '+String(p.name).replaceAll('<','&lt;')+' — '+(p.role==='gm'?'Mestre':'Jogador')+'</div>').join('')||'<div>Nenhum jogador conectado.</div>';
-    if(typeof window.panel==='function') window.panel('👥 Jogadores conectados','<div class="playerList">'+list+'</div>');
-  };
+  if(!socket){ setError('roomGateStartError','Servidor não conectado. Execute npm start e abra http://localhost:3000.'); return; }
+  socket.on('connect',()=>setError('roomGateStartError',''));
+  socket.on('connect_error',()=>setError('roomGateStartError','Não foi possível conectar ao servidor. Verifique se o RPG Forge está rodando.'));
+  socket.on('sala-atualizada',room=>{
+    if(currentRoom && room.code===currentRoom.code){ currentRoom=room; if(window.rpgForgeRoom) window.rpgForgeRoom.players=room.players||[]; updateOnline(room); }
+  });
+
+  const share=$('share');
+  if(share) share.onclick=()=>{ const code=currentRoom ? currentRoom.code : '----'; if(navigator.clipboard) navigator.clipboard.writeText(code); };
 })();
 </script>
 </body></html>
