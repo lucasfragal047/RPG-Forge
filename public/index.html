@@ -1426,7 +1426,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
 <script src="/socket.io/socket.io.js"></script>
 <script>
 (() => {
-  const socket = io();
+  const socket = (typeof io === 'function') ? io({ transports: ['websocket', 'polling'] }) : null;
   const gate = document.querySelector('#roomGate');
   const start = document.querySelector('#roomGateStart');
   const createForm = document.querySelector('#createRoomForm');
@@ -1455,6 +1455,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     if(b) b.textContent='👥 '+((room.players||[]).length)+' jogadores';
   }
   function createRoom() {
+    if(!socket){ error('createError','O servidor não está conectado. Abra o RPG Forge pelo endereço do servidor (ex.: http://localhost:3000) e não pelo arquivo HTML direto.'); return; }
     if(!socket.connected){ error('createError','Conectando ao servidor... tente novamente em alguns segundos.'); return; }
     const name = ($('gmName').value.trim() || 'Mestre').slice(0,32);
     error('createError','');
@@ -1467,6 +1468,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     });
   }
   function joinRoom() {
+    if(!socket){ error('joinError','O servidor não está conectado. Abra o RPG Forge pelo endereço do servidor (ex.: http://localhost:3000) e não pelo arquivo HTML direto.'); return; }
     if(!socket.connected){ error('joinError','Conectando ao servidor... tente novamente em alguns segundos.'); return; }
     const code = $('roomCodeInput').value.trim().toUpperCase();
     const name = ($('playerName').value.trim() || 'Jogador').slice(0,32);
@@ -1485,6 +1487,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   $('roomCodeInput').addEventListener('input',e=>e.target.value=e.target.value.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,4));
   $('copyRoomCode').onclick=()=>navigator.clipboard?.writeText(success.dataset.code||'');
   $('enterCreatedRoom').onclick=()=>lockOff();
+  if (!socket) { error('roomGateStartError','Servidor não conectado. Execute npm start e abra http://localhost:3000.'); return; }
   socket.on('sala-atualizada',room=>{ if(currentRoom && room.code===currentRoom.code){ currentRoom=room; window.rpgForgeRoom.players=room.players||[]; updateOnline(room); }});
   let socketReady = false;
   socket.on('connect',()=>{ socketReady=true; error('roomGateStartError',''); });
