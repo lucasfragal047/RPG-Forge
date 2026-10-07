@@ -49,8 +49,53 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
 .rpgPageStatus{font-size:10px;color:var(--muted);padding:2px 4px 5px 4px}
 .rpgPageNew{width:100%;padding:8px 9px;border:1px dashed #555e6d;border-radius:7px;background:#171a20;color:var(--text);cursor:pointer}
 .rpgPageNew:hover{border-color:var(--accent)}
-</style></head>
-<body><div class="app"><header><div class="logo">RPG <span>FORGE</span></div><div class="session">Campanha: <b>Ruínas de Arkhon</b> · Sala <b>KR7X</b></div><div class="spacer"></div><span class="pill mode">● Mestre</span><button class="btn" id="createRoomBtn">Criar sala</button><button class="btn" id="joinRoomBtn">Entrar</button><button class="btn" id="share">Compartilhar sala</button></header>
+</style>
+<style>
+#roomGate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 20%,rgba(86,61,125,.28),transparent 45%),#07080d;color:#eee;font-family:inherit;padding:20px}
+#roomGate.hidden{display:none}
+.roomGateCard{width:min(520px,100%);background:rgba(17,18,28,.96);border:1px solid #35374a;border-radius:22px;padding:30px;box-shadow:0 24px 80px rgba(0,0,0,.55);text-align:center}
+.roomGateCard h1{margin:0 0 8px;font-size:30px}.roomGateCard p{color:#aeb1c2;margin:0 0 24px}.roomGateActions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.roomGateBtn{border:1px solid #45485d;background:#202334;color:#fff;border-radius:14px;padding:18px 14px;font-size:16px;font-weight:700;cursor:pointer}.roomGateBtn:hover{background:#292d42}.roomGateBtn.primary{background:#6c4cff;border-color:#8168ff}.roomGateForm{display:none;text-align:left}.roomGateForm.show{display:block}.roomGateForm label{display:block;font-size:13px;color:#aeb1c2;margin:12px 0 6px}.roomGateForm input{width:100%;box-sizing:border-box;background:#0e1018;border:1px solid #3c3f52;color:#fff;border-radius:10px;padding:13px;font-size:16px;outline:none}.roomGateRow{display:flex;gap:10px;margin-top:16px}.roomGateRow button{flex:1}.roomGateBack{background:#151722}.roomGateError{min-height:20px;color:#ff7b88;font-size:13px;margin-top:12px}.roomGateCode{font-size:40px;letter-spacing:8px;font-weight:900;margin:12px 0 4px;color:#fff}.roomGateHint{color:#9ea3b8;font-size:13px}.roomGateSuccess{display:none}.roomGateSuccess.show{display:block}.roomGateForm input.code{text-transform:uppercase;letter-spacing:5px;text-align:center;font-weight:800}.roomGateStatus{margin-top:14px;color:#8ee0b4;font-size:13px}
+body.room-locked .app{visibility:hidden}
+</style>
+</head>
+<body class="room-locked">
+<div id="roomGate">
+  <div class="roomGateCard">
+    <div class="roomGateStart" id="roomGateStart">
+      <h1>⚔️ RPG Forge</h1>
+      <p>Entre em uma mesa online para começar.</p>
+      <div class="roomGateActions">
+        <button class="roomGateBtn primary" id="createRoomBtn">🎲 Criar sala</button>
+        <button class="roomGateBtn" id="joinRoomBtn">🔑 Participar de sala</button>
+      </div>
+      <div class="roomGateError" id="roomGateStartError"></div>
+    </div>
+
+    <div class="roomGateForm" id="createRoomForm">
+      <h2>🎲 Criar sala</h2><p>Você será o <b>Mestre</b> desta sala.</p>
+      <label>Seu nome</label><input id="gmName" maxlength="32" placeholder="Nome do Mestre" value="Mestre">
+      <div class="roomGateRow"><button class="roomGateBtn roomGateBack" data-back>Voltar</button><button class="roomGateBtn primary" id="confirmCreate">Criar e gerar código</button></div>
+      <div class="roomGateError" id="createError"></div>
+    </div>
+
+    <div class="roomGateForm" id="joinRoomForm">
+      <h2>🔑 Participar de sala</h2><p>Digite o código que o Mestre passou.</p>
+      <label>Seu nome</label><input id="playerName" maxlength="32" placeholder="Nome do jogador">
+      <label>Código da sala</label><input id="roomCodeInput" class="code" maxlength="4" placeholder="ABCD" autocomplete="off">
+      <div class="roomGateRow"><button class="roomGateBtn roomGateBack" data-back>Voltar</button><button class="roomGateBtn primary" id="confirmJoin">Entrar na sala</button></div>
+      <div class="roomGateError" id="joinError"></div>
+    </div>
+
+    <div class="roomGateForm roomGateSuccess" id="createdRoomSuccess">
+      <h2>✅ Sala criada!</h2><p>Compartilhe este código com os jogadores.</p>
+      <div class="roomGateCode" id="createdRoomCode">----</div>
+      <div class="roomGateHint">Este código vincula todos vocês à mesma sala online.</div>
+      <div class="roomGateRow"><button class="roomGateBtn" id="copyRoomCode">📋 Copiar código</button><button class="roomGateBtn primary" id="enterCreatedRoom">Entrar na mesa</button></div>
+      <div class="roomGateStatus">Você entrou como Mestre.</div>
+    </div>
+  </div>
+</div>
+<div class="app"><header><div class="logo">RPG <span>FORGE</span></div><div class="session">Campanha: <b>Ruínas de Arkhon</b> · Sala <b>KR7X</b></div><div class="spacer"></div><span class="pill mode">● Mestre</span><button class="btn" id="share">Compartilhar sala</button></header>
 <div class="main"><aside class="side"><div class="section"><h3>Ferramentas</h3><div class="toolgrid"><button class="tool active" data-tool="select">↖ Selecionar</button><button class="tool" data-tool="measure">⌁ Medir</button><button class="tool" data-tool="fog">☁ Névoa</button><button class="tool" data-tool="ping">⊙ Marcar</button><button class="tool" id="rpgPageTool" type="button">🗺️ Mudar aba</button></div><div id="rpgPagePanel" class="rpgPagePanel" hidden></div></div><div class="section"><h3>🌫️ Névoa</h3><div class="rpgFogControls">
   <button class="btn" id="rpgFogLock" style="width:100%">🔓 Travar névoa</button>
   <button class="btn" id="rpgFogToggle" style="width:100%">🌫️ Ativar fumaça</button>
@@ -61,105 +106,119 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   <div class="row2"><label class="small">Visão dos tokens</label><select id="rpgFogVisionRadius" style="width:86px"><option value="1">1 bloco</option><option value="2" selected>2 blocos</option><option value="3">3 blocos</option><option value="4">4 blocos</option><option value="5">5 blocos</option></select><span class="rpgFogValue" id="rpgFogVisionValue">2</span></div>
   <div class="small">Cada token revela automaticamente a área ao redor dele. A visão acompanha o token.</div>
 </div></div><div class="section"><h3>Mapa</h3><div class="card"><b>Ruínas — Salão Norte</b><div class="small">24 × 16 quadrados · 1 quadrado = 1,5 m</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="20">d20</button></div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
-<main class="canvasWrap" id="stage"><div class="toolbar"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomLabel" title="Clique para redefinir">100%</button><button class="btn" id="zoomIn">+</button><div class="mapToolsWrap" id="mapToolsWrap"><button class="btn mapToolsToggle" id="mapToolsToggle" title="Abrir ferramentas do mapa">⚙️</button><div class="mapToolsPanel" id="mapToolsPanel"><button class="btn" id="snap">Encaixar grade</button><button class="btn" id="importMap">📥 Importar mapa</button><button class="btn" id="exportMap">📤 Exportar mapa</button><input id="mapFile" type="file" accept="image/*,.json" class="hidden"></div></div><div class="spacer"></div><span class="pill">👥 3 conectados</span></div><div id="map"><div class="rpgFogLayer" id="rpgFogLayer"><div class="rpgFogCloud" id="rpgFogCloud"><div class="rpgFogCloudTools"><button id="rpgFogCenter" type="button">↺ Centro</button></div><div class="rpgFogResize" id="rpgFogResize" title="Arraste para redimensionar"></div></div></div><div class="grid"></div><div class="room" style="left:500px;top:230px;width:550px;height:300px">SALÃO PRINCIPAL</div><div class="room" style="left:1080px;top:230px;width:320px;height:300px">CRIPTA</div><div class="room" style="left:500px;top:590px;width:280px;height:250px">ALMOXARIFADO</div><div class="room" style="left:820px;top:590px;width:580px;height:250px">CORREDOR</div><div class="token player" id="laxus" style="left:650px;top:350px" title="Laxus">L</div><div class="token player" id="benzuke" style="left:750px;top:400px" title="Benzuke">B</div><div class="token monster" id="goblin" style="left:1120px;top:330px" title="Goblin">G</div></div><script src="/socket.io/socket.io.js"></script>
-<script>
-/* Páginas/mapas — servidor autoritativo dentro da mesma sala */
+<main class="canvasWrap" id="stage"><div class="toolbar"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomLabel" title="Clique para redefinir">100%</button><button class="btn" id="zoomIn">+</button><div class="mapToolsWrap" id="mapToolsWrap"><button class="btn mapToolsToggle" id="mapToolsToggle" title="Abrir ferramentas do mapa">⚙️</button><div class="mapToolsPanel" id="mapToolsPanel"><button class="btn" id="snap">Encaixar grade</button><button class="btn" id="importMap">📥 Importar mapa</button><button class="btn" id="exportMap">📤 Exportar mapa</button><input id="mapFile" type="file" accept="image/*,.json" class="hidden"></div></div><div class="spacer"></div><span class="pill">👥 3 conectados</span></div><div id="map"><div class="rpgFogLayer" id="rpgFogLayer"><div class="rpgFogCloud" id="rpgFogCloud"><div class="rpgFogCloudTools"><button id="rpgFogCenter" type="button">↺ Centro</button></div><div class="rpgFogResize" id="rpgFogResize" title="Arraste para redimensionar"></div></div></div><div class="grid"></div><div class="room" style="left:500px;top:230px;width:550px;height:300px">SALÃO PRINCIPAL</div><div class="room" style="left:1080px;top:230px;width:320px;height:300px">CRIPTA</div><div class="room" style="left:500px;top:590px;width:280px;height:250px">ALMOXARIFADO</div><div class="room" style="left:820px;top:590px;width:580px;height:250px">CORREDOR</div><div class="token player" id="laxus" style="left:650px;top:350px" title="Laxus">L</div><div class="token player" id="benzuke" style="left:750px;top:400px" title="Benzuke">B</div><div class="token monster" id="goblin" style="left:1120px;top:330px" title="Goblin">G</div></div><script>
+/* Páginas/mapas — controle pela barra lateral + bloqueio para jogadores */
 (function(){
   const map=document.getElementById('map'), toolBtn=document.getElementById('rpgPageTool'), panel=document.getElementById('rpgPagePanel');
   if(!map||!toolBtn||!panel)return;
-  const CLIENT_KEY='rpgForgeClientIdV1';
-  const PAGE_KEY='rpgForgeServerPageIdV1';
-  const CACHE_KEY='rpgForgeServerStateV1';
+  const KEY='rpgForgePagesV5', STATE='rpgForgePageStateV5_', IDX='rpgForgePageIndexV5';
+  let pages=[{name:'Mapa 1',locked:false}], index=0;
   const baseHTML=map.innerHTML;
-  let socket=null, role='player', pages=[], players=[], currentPageId=null, ready=false;
+  window.rpgForgePageSnapshot=null;
+  window.rpgForgePageCurrentIndex=0;
   const safeGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
   const safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
-  const ROOM=(safeGet('rpgForgeRoomV1')||new URLSearchParams(location.search).get('sala')||'KR7X').toUpperCase();
-  let clientId=safeGet(CLIENT_KEY); if(!clientId){clientId=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random());safeSet(CLIENT_KEY,clientId)}
-  function valid(s){return s&&typeof s.html==='string'&&s.html.includes('class="grid"')&&s.html.length>500}
-  function snapshot(){
+  try{
+    const p=JSON.parse(safeGet(KEY)||safeGet('rpgForgePagesV4')||'null');
+    if(Array.isArray(p)&&p.length) pages=p.map(pg=>Object.assign({locked:false},pg));
+  }catch(e){}
+  index=Math.max(0,Math.min(pages.length-1,Number(safeGet(IDX)||safeGet('rpgForgePageIndexV4')||0)||0));
+  function valid(html){return typeof html==='string'&&html.includes('class="grid"')&&html.includes('class="token')&&html.length>500}
+  function getSnapshot(){
     const fog=document.getElementById('rpgFogLayer'), color=document.getElementById('rpgFogColor'), vision=document.getElementById('rpgFogVisionRadius');
     let weather=null; try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
-    return {version:6,html:map.innerHTML,mapStyle:map.getAttribute('style')||'',weather,fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked}};
+    return {
+      version:5,
+      html:map.innerHTML,
+      mapStyle:map.getAttribute('style')||'',
+      weather,
+      fog:{
+        opacity:document.getElementById('rpgFogOpacity')?.value||'',
+        color:color?.value||'',
+        visionRadius:vision?.value||'',
+        active:!!fog?.classList.contains('active'),
+        locked:!!window.rpgForgeFogLocked
+      }
+    };
   }
-  function applySnapshot(s){
-    if(!valid(s)) { map.innerHTML=baseHTML; window.rpgForgePageSnapshot=null; return; }
-    map.innerHTML=s.html; if(typeof s.mapStyle==='string')map.setAttribute('style',s.mapStyle); window.rpgForgePageSnapshot=s;
+  function save(i){
+    const snap=getSnapshot();
+    if(valid(snap.html))safeSet(STATE+i,JSON.stringify(snap));
+    safeSet(KEY,JSON.stringify(pages));safeSet(IDX,String(i));
   }
-  function currentPage(){return pages.find(p=>p.id===currentPageId)||pages[0]}
-  function cache(){safeSet(CACHE_KEY,JSON.stringify({pages,players,role,currentPageId}))}
-  function goPage(id){
-    if(!socket||!ready)return;
-    if(id===currentPageId)return;
-    save();
-    socket.emit('pagina-trocar',{sala:ROOM,pageId:id});
-  }
-  let saveTimer=null;
-  function save(){if(socket&&ready&&currentPageId){clearTimeout(saveTimer);saveTimer=setTimeout(()=>socket.emit('pagina-salvar-estado',{sala:ROOM,pageId:currentPageId,state:snapshot()}),80)}}
-  window.rpgForgeSaveCurrentPage=save;
-  window.addEventListener('beforeunload',()=>{try{if(socket&&ready&&currentPageId)socket.emit('pagina-salvar-estado',{sala:ROOM,pageId:currentPageId,state:snapshot()})}catch(e){}});
-  function render(){
-    panel.innerHTML=''; const pg=currentPage();
-    const title=document.createElement('div');title.className='rpgPageStatus';title.innerHTML='<b>📍 '+(pg?.name||'Mapa')+'</b> · '+(role==='gm'?'Mestre':'Jogador');panel.appendChild(title);
-    if(role==='gm'){
-      pages.forEach(p=>{
-        const row=document.createElement('div');row.className='rpgPageRow';
-        const b=document.createElement('button');b.type='button';b.className='rpgPageChoice'+(p.id===currentPageId?' active':'');b.textContent=(p.locked?'🔒 ':'🗺️ ')+p.name;b.onclick=()=>goPage(p.id);row.appendChild(b);
-        const lock=document.createElement('button');lock.type='button';lock.className='rpgPageLock'+(p.locked?' locked':'');lock.textContent=p.locked?'🔒':'🔓';lock.title=p.locked?'Destravar':'Travar';lock.onclick=e=>{e.stopPropagation();socket.emit('pagina-travar',{sala:ROOM,pageId:p.id,locked:!p.locked})};row.appendChild(lock);
-        const ren=document.createElement('button');ren.type='button';ren.className='rpgPageLock';ren.textContent='✏️';ren.onclick=e=>{e.stopPropagation();const n=prompt('Nome do mapa:',p.name);if(n)socket.emit('pagina-renomear',{sala:ROOM,pageId:p.id,name:n})};row.appendChild(ren);
-        if(pages.length>1){const del=document.createElement('button');del.type='button';del.className='rpgPageLock';del.textContent='🗑️';del.onclick=e=>{e.stopPropagation();if(confirm('Excluir '+p.name+'?'))socket.emit('pagina-excluir',{sala:ROOM,pageId:p.id})};row.appendChild(del)}
-        panel.appendChild(row);
-      });
-      const add=document.createElement('button');add.type='button';add.className='rpgPageNew';add.textContent='＋ Novo mapa';add.onclick=()=>{const n=prompt('Nome do novo mapa:','Mapa '+(pages.length+1));if(n)socket.emit('pagina-criar',{sala:ROOM,name:n})};panel.appendChild(add);
-      const h=document.createElement('div');h.className='rpgPageStatus';h.textContent='👥 Controle de jogadores';panel.appendChild(h);
-      players.filter(x=>x.id!==clientId).forEach(pl=>{
-        const row=document.createElement('div');row.className='rpgPageRow';const label=document.createElement('span');label.textContent='👤 '+(pl.name||'Jogador');label.style.flex='1';row.appendChild(label);
-        const sel=document.createElement('select');pages.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name;o.selected=pl.pageId===p.id;sel.appendChild(o)});sel.onchange=()=>socket.emit('pagina-atribuir',{sala:ROOM,playerId:pl.id,pageId:sel.value});row.appendChild(sel);panel.appendChild(row);
-      });
-    } else {
-      const st=document.createElement('div');st.className='rpgPageStatus';st.textContent=pg?.locked?'🔒 Este mapa está bloqueado pelo Mestre.':'🔐 Seu mapa é controlado pelo Mestre. Você não pode trocar de mapa sozinho.';panel.appendChild(st);
+  function restore(i){
+    const raw=safeGet(STATE+i);
+    let snap=null;
+    try{snap=raw?JSON.parse(raw):null}catch(e){}
+    if(snap&&valid(snap.html)){
+      map.innerHTML=snap.html;
+      if(typeof snap.mapStyle==='string')map.setAttribute('style',snap.mapStyle);
+      window.rpgForgePageSnapshot=snap;
+    }else if(valid(raw)){
+      map.innerHTML=raw;
+      window.rpgForgePageSnapshot={version:4,html:raw,mapStyle:map.getAttribute('style')||'',weather:null,fog:null};
+    }else{
+      map.innerHTML=baseHTML;
+      window.rpgForgePageSnapshot=null;
     }
+    window.rpgForgePageCurrentIndex=i;
   }
-  function bootState(data){
-    role=data.role||'player'; pages=data.pages||[]; players=data.players||[]; currentPageId=data.currentPageId||pages[0]?.id; ready=true; cache();
-    const pg=currentPage(); if(pg?.state) applySnapshot(pg.state); else applySnapshot({html:baseHTML,mapStyle:''});
-    window.rpgForgePageCurrentId=currentPageId; window.rpgForgePageRole=role; render();
-  }
-  function connect(){
-    if(typeof io!=='function'){panel.hidden=false;panel.innerHTML='<div class="rpgPageStatus">⚠️ Servidor multiplayer indisponível.</div>';return}
-    socket=io();
-    socket.on('connect',()=>{
-      const mode=safeGet('rpgForgeRoomModeV1')||'join';
-      if(mode==='create'){socket.emit('criar-sala',{clientId,nome:safeGet('rpgForgePlayerNameV1')||'Mestre'});safeSet('rpgForgeRoomModeV1','join');}
-      else socket.emit('entrar-sala',{sala:ROOM,clientId,nome:safeGet('rpgForgePlayerNameV1')||'Jogador'});
+  function render(){
+    panel.innerHTML='';
+    const current=pages[index]||{name:'Mapa '+(index+1),locked:false};
+    const currentLock=document.createElement('button');
+    currentLock.type='button';
+    currentLock.className='rpgPageNew';
+    currentLock.style.borderStyle='solid';
+    currentLock.textContent=current.locked?'🔓 Destravar mapa atual':'🔒 Travar mapa atual';
+    currentLock.title=current.locked?'Permitir que jogadores possam entrar neste mapa':'Impedir jogadores de trocar para este mapa';
+    currentLock.onclick=()=>{ current.locked=!current.locked; safeSet(KEY,JSON.stringify(pages)); render(); };
+    panel.appendChild(currentLock);
+    const currentStatus=document.createElement('div');
+    currentStatus.className='rpgPageStatus';
+    currentStatus.textContent=current.locked?'🔒 Este mapa está travado para jogadores.':'🔓 Este mapa está liberado para jogadores.';
+    panel.appendChild(currentStatus);
+    pages.forEach((pg,i)=>{
+      const row=document.createElement('div');row.className='rpgPageRow';
+      const b=document.createElement('button');b.type='button';b.className='rpgPageChoice'+(i===index?' active':'');
+      const safeName=String(pg.name||('Mapa '+(i+1))).replace(/[<>&]/g,'');
+      b.innerHTML=(pg.locked?'🔒 ':'🗺️ ')+'<span>'+safeName+'</span>';
+      b.title=pg.locked?'Mapa bloqueado para jogadores — o Mestre ainda pode acessá-lo':safeName;
+      b.onclick=()=>{
+        if(i===index){panel.hidden=true;return;}
+        save(index);safeSet(IDX,String(i));location.reload();
+      };
+      const lock=document.createElement('button');lock.type='button';lock.className='rpgPageLock'+(pg.locked?' locked':'');
+      lock.textContent=pg.locked?'🔒':'🔓';lock.title=pg.locked?'Destravar para jogadores':'Travar para jogadores';
+      lock.onclick=e=>{
+        e.stopPropagation();
+        pg.locked=!pg.locked;
+        safeSet(KEY,JSON.stringify(pages));
+        render();
+      };
+      row.appendChild(b);row.appendChild(lock);panel.appendChild(row);
+      if(pg.locked){
+        const st=document.createElement('div');st.className='rpgPageStatus';st.textContent='🔒 Jogadores ficam presos neste mapa';panel.appendChild(st);
+      }
     });
-    socket.on('sala-criada',d=>{if(!d?.sala)return;safeSet('rpgForgeRoomV1',d.sala);history.replaceState(null,'','?sala='+encodeURIComponent(d.sala));location.reload()});
-    socket.on('sala-estado',bootState);
-    socket.on('pagina-estado',d=>{if(d.pageId===currentPageId){applySnapshot(d.state);window.rpgForgePageSnapshot=d.state;}});
-    socket.on('pagina-atualizada',d=>{pages=d.pages||pages;players=d.players||players;currentPageId=d.currentPageId||currentPageId;cache();render();});
-    socket.on('pagina-troca-confirmada',d=>{currentPageId=d.pageId;safeSet(PAGE_KEY,currentPageId);location.reload()});
-    socket.on('pagina-acesso-negado',m=>alert(m||'Acesso negado pelo Mestre.'));
-    socket.on('sala-erro',m=>alert(m||'Não foi possível acessar a sala.'));
-    socket.on('disconnect',()=>{ready=false;});
+    const add=document.createElement('button');add.type='button';add.className='rpgPageNew';add.textContent='＋ Nova aba';
+    add.onclick=()=>{
+      save(index);const i=pages.length;pages.push({name:'Mapa '+(i+1),locked:false});
+      safeSet(STATE+i,JSON.stringify({version:5,html:baseHTML,mapStyle:'',weather:null,fog:null}));safeSet(KEY,JSON.stringify(pages));safeSet(IDX,String(i));location.reload();
+    };
+    panel.appendChild(add);
   }
-  toolBtn.onclick=()=>{panel.hidden=!panel.hidden;document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));if(!panel.hidden)toolBtn.classList.add('active');render()};
-  window.rpgForgePageAccess={getPages:()=>pages,isLocked:id=>!!pages.find(p=>p.id===id)?.locked,canEnter:(id,r=role)=>r==='gm'||(!!pages.find(p=>p.id===id)&&!pages.find(p=>p.id===id).locked&&pages.find(p=>p.id===id).allowedPlayers?.includes(clientId))};
-  connect();
-  setInterval(()=>{if(ready&&!document.hidden)save()},1500);
+  toolBtn.onclick=()=>{panel.hidden=!panel.hidden;document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));if(!panel.hidden)toolBtn.classList.add('active')};
+  /* API de acesso para a futura sincronização multiplayer: Mestre ignora bloqueio; jogadores respeitam. */
+  window.rpgForgePageAccess={
+    getPages:()=>pages,
+    isLocked:i=>!!pages[i]?.locked,
+    canEnter:(i,role='player')=>role==='master'||!pages[i]?.locked
+  };
+  restore(index);render();
 })();
 </script></main>
 <aside class="side right"><div class="section"><h3>Selecionado</h3><div class="card" id="selected"><b>Laxus</b><div class="row"><span class="muted">PV</span><span>38 / 42</span></div><div class="hpbar"><i style="width:90%"></i></div><div class="row"><span class="muted">CA</span><span>21</span></div><div class="row"><span class="muted">Iniciativa</span><span>+7</span></div><button class="btn" style="width:100%;margin-top:7px" id="damage">Aplicar 5 dano</button></div></div><div class="section"><h3>Iniciativa</h3><div class="card init"><span class="dot player">L</span><span>Laxus</span><strong>18</strong></div><div class="card init"><span class="dot monster">G</span><span>Goblin</span><strong>14</strong></div><div class="card init"><span class="dot player">B</span><span>Benzuke</span><strong>11</strong></div><button class="btn" style="width:100%" id="next">Próximo turno →</button></div><div class="section"><h3>Chat da mesa</h3><div class="log" id="log"><div><b>Mestre:</b> Vocês entram no salão...</div><div><b>Benzuke:</b> Eu fico na frente.</div></div><div style="display:flex;gap:6px;margin-top:8px"><input id="chat" placeholder="Mensagem..."/><button class="btn" id="send">Enviar</button></div></div></aside></div></div>
-<script>
-(function(){
-  const create=document.getElementById('createRoomBtn'),join=document.getElementById('joinRoomBtn');
-  function val(){return (prompt('Código da sala:')||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'')}
-  create?.addEventListener('click',()=>{localStorage.setItem('rpgForgeRoomModeV1','create');location.reload()});
-  join?.addEventListener('click',()=>{const c=val();if(c){localStorage.setItem('rpgForgeRoomV1',c);localStorage.setItem('rpgForgeRoomModeV1','join');location.href='?sala='+encodeURIComponent(c)}});
-  const room=(localStorage.getItem('rpgForgeRoomV1')||new URLSearchParams(location.search).get('sala')||'KR7X').toUpperCase();
-  const session=document.querySelector('.session'); if(session) session.innerHTML='Campanha: <b>Ruínas de Arkhon</b> · Sala <b>'+room+'</b>';
-  const share=document.getElementById('share'); if(share) share.onclick=()=>{const u=location.origin+location.pathname+'?sala='+encodeURIComponent(room);navigator.clipboard?.writeText(u).then(()=>alert('Link da sala copiado!\n'+u)).catch(()=>alert('Sala: '+room+'\n'+u))};
-})();
-</script>
 <script>
 try{
 const map=document.querySelector('#map'),stage=document.querySelector('#stage');let scale=1,x=0,y=0,tool='select',dragging=null,offset=[0,0],pan=false,panStart=[0,0],origin=[0,0],effectColor='#7c4dff',fogColor='#050608',pingColor='#d6a85d',visionColor='#d6a85d',tokenColor='#536fd2';
@@ -306,7 +365,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     .mapImageObject{position:absolute;z-index:2;cursor:move;user-select:none;touch-action:none;box-shadow:0 0 0 2px transparent}
     .mapImageObject.selected{box-shadow:0 0 0 2px var(--accent),0 0 0 5px #d6a85d33}
     .mapImageObject img{display:block;width:100%;height:100%;object-fit:fill;pointer-events:none;user-select:none}
-    .imageEditor{position:fixed;z-index:30;min-width:190px;background:#151922ee;border:1px solid var(--line);border-radius:9px;padding:8px;box-shadow:0 10px 28px #000b;display:grid;gap:5px}
+    .imageEditor{position:absolute;z-index:30;min-width:190px;background:#151922ee;border:1px solid var(--line);border-radius:9px;padding:8px;box-shadow:0 10px 28px #000b;display:grid;gap:5px}
     .imageEditor .title{font-weight:700;font-size:12px;margin-bottom:3px}
     .imageEditor button{background:#242a33;border:1px solid var(--line);color:#fff;border-radius:6px;padding:6px;cursor:pointer;text-align:left}
     .imageEditor button:hover{border-color:var(--accent)}
@@ -322,64 +381,54 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     selectedImage=el; if(el) el.classList.add('selected');
   }
   function removeEditor(){document.querySelectorAll('.imageEditor').forEach(x=>x.remove());}
-  function currentScale(){ return (typeof scale==='number' && scale>0) ? scale : 1; }
   function editorFor(el){
     removeEditor();
-    if(!el || !el.isConnected) return;
-    const box=document.createElement('div'); box.className='imageEditor';
+    const box=document.createElement('div');box.className='imageEditor';
+    box.style.left=(parseFloat(el.style.left)+parseFloat(el.style.width)+12)+'px';
+    box.style.top=parseFloat(el.style.top)+'px';
     box.innerHTML='<div class="title">🖼️ Imagem selecionada</div>';
-    const add=(label,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=e=>{e.preventDefault();e.stopPropagation();fn();};box.appendChild(b)};
-    add('↑ Trazer para frente',()=>{
-      const vals=[...mapEl.querySelectorAll('.mapImageObject,.token,.room,.forgeObj,.magicEffect,.spellArea')].map(n=>parseInt(n.style.zIndex)||1);
-      const top=Math.max(10,...vals)+1; el.style.zIndex=String(top); zCounter=top; editorFor(el);
-    });
-    add('↓ Enviar para trás',()=>{
-      el.style.zIndex='1'; editorFor(el);
-    });
-    add('↔ Aumentar largura',()=>{el.style.width=(Math.max(30,parseFloat(el.style.width)||30)+25)+'px'; editorFor(el)});
-    add('↔ Diminuir largura',()=>{el.style.width=Math.max(30,(parseFloat(el.style.width)||30)-25)+'px'; editorFor(el)});
-    add('↕ Aumentar altura',()=>{el.style.height=(Math.max(30,parseFloat(el.style.height)||30)+25)+'px'; editorFor(el)});
-    add('↕ Diminuir altura',()=>{el.style.height=Math.max(30,(parseFloat(el.style.height)||30)-25)+'px'; editorFor(el)});
-    add('🗑 Remover imagem',()=>{el.remove();selectedImage=null;removeEditor();});
-    document.body.appendChild(box);
-    const r=el.getBoundingClientRect(), gap=10;
-    let left=r.right+gap, top=r.top;
-    if(left+205>window.innerWidth) left=Math.max(8,r.left-215);
-    if(top+300>window.innerHeight) top=Math.max(8,window.innerHeight-308);
-    box.style.left=left+'px'; box.style.top=top+'px';
+    const buttons=[
+      ['↑ Trazer para frente',()=>{el.style.zIndex=++zCounter;}],
+      ['↓ Enviar para trás',()=>{el.style.zIndex=1;}],
+      ['↔ Aumentar largura',()=>{el.style.width=(parseFloat(el.style.width)+25)+'px';}],
+      ['↔ Diminuir largura',()=>{el.style.width=Math.max(30,parseFloat(el.style.width)-25)+'px';}],
+      ['↕ Aumentar altura',()=>{el.style.height=(parseFloat(el.style.height)+25)+'px';}],
+      ['↕ Diminuir altura',()=>{el.style.height=Math.max(30,parseFloat(el.style.height)-25)+'px';}],
+      ['🗑 Remover imagem',()=>{el.remove();selectedImage=null;removeEditor();}]
+    ];
+    buttons.forEach(([label,fn])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=e=>{e.stopPropagation();fn();};box.appendChild(b)});
+    mapEl.appendChild(box);
   }
   function bindImage(el){
-    if(el.dataset.mapImageBound==='1') return;
-    el.dataset.mapImageBound='1'; el.style.pointerEvents='auto'; el.style.touchAction='none';
-    el.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();selectImage(el);editorFor(el);});
     el.addEventListener('pointerdown',e=>{
-      if(e.button!==0 || e.target.classList.contains('resizeHandle')) return;
-      e.preventDefault(); e.stopPropagation(); selectImage(el); removeEditor();
-      const sx=e.clientX, sy=e.clientY, ox=parseFloat(el.style.left)||0, oy=parseFloat(el.style.top)||0, sc=currentScale();
-      const move=ev=>{el.style.left=(ox+(ev.clientX-sx)/sc)+'px';el.style.top=(oy+(ev.clientY-sy)/sc)+'px';};
-      const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);editorFor(el);};
+      if(e.target.classList.contains('resizeHandle')) return;
+      e.stopPropagation();selectImage(el);
+      const rect=mapEl.getBoundingClientRect(), sx=e.clientX, sy=e.clientY, ox=parseFloat(el.style.left)||0, oy=parseFloat(el.style.top)||0;
+      const move=ev=>{el.style.left=(ox+(ev.clientX-sx)/scale)+'px';el.style.top=(oy+(ev.clientY-sy)/scale)+'px'};
+      const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);editorFor(el)};
       window.addEventListener('pointermove',move);window.addEventListener('pointerup',up,{once:true});
     });
+    el.addEventListener('click',e=>{e.stopPropagation();selectImage(el);editorFor(el)});
     ['nw','ne','sw','se'].forEach(c=>{
       const h=document.createElement('span');h.className='resizeHandle rh-'+c;el.appendChild(h);
       h.addEventListener('pointerdown',e=>{
-        e.preventDefault();e.stopPropagation();selectImage(el);removeEditor();
-        const sx=e.clientX,sy=e.clientY,ow=parseFloat(el.style.width)||100,oh=parseFloat(el.style.height)||100,ol=parseFloat(el.style.left)||0,ot=parseFloat(el.style.top)||0,sc=currentScale();
+        e.stopPropagation();e.preventDefault();selectImage(el);
+        const sx=e.clientX,sy=e.clientY,ow=parseFloat(el.style.width),oh=parseFloat(el.style.height),ol=parseFloat(el.style.left),ot=parseFloat(el.style.top);
         const move=ev=>{
-          let dx=(ev.clientX-sx)/sc,dy=(ev.clientY-sy)/sc,nw=ow,nh=oh,nl=ol,nt=ot;
-          if(c.includes('e')) nw=Math.max(30,ow+dx); if(c.includes('s')) nh=Math.max(30,oh+dy);
-          if(c.includes('w')){nw=Math.max(30,ow-dx);nl=ol+(ow-nw)} if(c.includes('n')){nh=Math.max(30,oh-dy);nt=ot+(oh-nh)}
+          let dx=(ev.clientX-sx)/scale,dy=(ev.clientY-sy)/scale,nw=ow,nh=oh,nl=ol,nt=ot;
+          if(c.includes('e'))nw=Math.max(30,ow+dx);if(c.includes('s'))nh=Math.max(30,oh+dy);
+          if(c.includes('w')){nw=Math.max(30,ow-dx);nl=ol+(ow-nw)}if(c.includes('n')){nh=Math.max(30,oh-dy);nt=ot+(oh-nh)}
           el.style.width=nw+'px';el.style.height=nh+'px';el.style.left=nl+'px';el.style.top=nt+'px';
         };
-        const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);editorFor(el);};
+        const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);editorFor(el)};
         window.addEventListener('pointermove',move);window.addEventListener('pointerup',up,{once:true});
       });
     });
   }
   function addImage(src,name,w,h,x,y,z){
-    const el=document.createElement('div'); el.className='mapImageObject'; el.dataset.imageObject='1'; el.dataset.name=name||'Imagem';
+    const el=document.createElement('div');el.className='mapImageObject';el.dataset.imageObject='1';el.dataset.name=name||'Imagem';
     el.style.left=(x??500)+'px';el.style.top=(y??250)+'px';el.style.width=(w??600)+'px';el.style.height=(h??400)+'px';el.style.zIndex=z||(++zCounter);
-    const img=document.createElement('img');img.src=src;img.alt=name||'Imagem do mapa';el.appendChild(img);mapEl.appendChild(el);bindImage(el);selectImage(el);return el;
+    const img=document.createElement('img');img.src=src;img.alt=name||'Imagem do mapa';el.appendChild(img);mapEl.appendChild(el);bindImage(el);selectImage(el);editorFor(el);return el;
   }
   document.querySelector('#importMap').onclick=()=>file.click();
   document.querySelector('#exportMap').onclick=()=>{
@@ -1370,63 +1419,93 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   window.rpgForgeUpdateFogVision=updateVision;
   window.addEventListener('resize',()=>{updateSizeLabel();updateVision()});
 })();
+
 </script>
 
-<style>.inventoryAddBox{display:grid;grid-template-columns:1fr 48px 58px auto;gap:6px;margin:12px 0}.inventoryAddBox input{box-sizing:border-box;min-width:0;background:#111419;color:#eee;border:1px solid #3b424d;border-radius:6px;padding:8px}.inventoryQuick{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px}.storedInvItem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px;margin:6px 0;background:#1d222a;border:1px solid #343b46;border-radius:8px}.storedInvMain{display:flex;align-items:center;gap:9px;min-width:0}.storedInvIcon{font-size:26px;width:34px;text-align:center}.storedInvActions{display:flex;gap:4px}.storedInvActions .btn{padding:5px 8px}.invEmpty{text-align:center;padding:26px 10px;border:1px dashed #4a5260;border-radius:8px;color:#c0c7d2}.invEmpty span{font-size:12px;color:#8f99a8}.inventoryStoragePanel .small{color:#aeb6c3}@media(max-width:600px){.inventoryAddBox{grid-template-columns:1fr 44px 54px}.inventoryAdd{grid-column:1/-1}.storedInvItem{align-items:flex-start}.storedInvActions{flex-wrap:wrap}}</style>
+
 <script>
-(function(){
-  // Inventário real: armazenamento independente do mapa, com adicionar/remover e quantidade.
-  const inventoryKey='rpgForgeInventory';
-  let storedInventory=[];
-  try{storedInventory=JSON.parse(localStorage.getItem(inventoryKey)||'[]');if(!Array.isArray(storedInventory))storedInventory=[];}catch(e){storedInventory=[]}
-  function saveInventory(){localStorage.setItem(inventoryKey,JSON.stringify(storedInventory));}
-  function addInventoryItem(name,icon='📦',qty=1){
-    name=String(name||'').trim(); if(!name)return; qty=Math.max(1,parseInt(qty)||1);
-    const found=storedInventory.find(i=>i.name.toLowerCase()===name.toLowerCase());
-    if(found)found.qty+=qty; else storedInventory.push({id:Date.now()+Math.random(),name,icon,qty});
-    saveInventory();
+(() => {
+  const socket = io();
+  const gate = document.querySelector('#roomGate');
+  const start = document.querySelector('#roomGateStart');
+  const createForm = document.querySelector('#createRoomForm');
+  const joinForm = document.querySelector('#joinRoomForm');
+  const success = document.querySelector('#createdRoomSuccess');
+  const clientKey = 'rpgForgeClientIdV1';
+  let clientId = localStorage.getItem(clientKey);
+  if (!clientId) { clientId = (crypto.randomUUID ? crypto.randomUUID() : 'c-' + Date.now() + '-' + Math.random().toString(36).slice(2)); localStorage.setItem(clientKey, clientId); }
+  let currentRoom = null, currentRole = null;
+  const $ = id => document.getElementById(id);
+  const show = el => { [start,createForm,joinForm,success].forEach(x=>x.classList.remove('show')); el.classList.add('show'); };
+  const error = (id,msg) => $(id).textContent = msg || '';
+  const lockOff = () => { document.body.classList.remove('room-locked'); gate.classList.add('hidden'); };
+  function applyRoom(room, role) {
+    currentRoom = room; currentRole = role || (room.ownerId === clientId ? 'gm' : 'player');
+    lockOff();
+    const session = document.querySelector('.session');
+    if (session) session.innerHTML = 'Campanha: <b>Ruínas de Arkhon</b> · Sala <b>'+room.code+'</b>';
+    const badge = document.querySelector('.pill.mode');
+    if (badge) badge.textContent = currentRole === 'gm' ? '● Mestre' : '● Jogador';
+    window.rpgForgeRoom = { code: room.code, role: currentRole, clientId, players: room.players || [] };
+    updateOnline(room);
   }
-  function removeInventoryItem(id,qty=1){
-    const item=storedInventory.find(i=>i.id===id); if(!item)return;
-    item.qty-=Math.max(1,parseInt(qty)||1); if(item.qty<=0)storedInventory=storedInventory.filter(i=>i.id!==id);
-    saveInventory();
+  function updateOnline(room) {
+    const b=document.querySelector('#online');
+    if(b) b.textContent='👥 '+((room.players||[]).length)+' jogadores';
   }
-  function renderInventory(list){
-    list.innerHTML='';
-    if(!storedInventory.length){list.innerHTML='<div class="invEmpty">🎒 Inventário vazio<br><span>Adicione uma espada, poção ou qualquer outro item.</span></div>';return;}
-    storedInventory.forEach(item=>{
-      const row=document.createElement('div');row.className='storedInvItem';
-      row.innerHTML='<div class="storedInvMain"><span class="storedInvIcon">'+item.icon+'</span><div><b>'+item.name.replaceAll('<','&lt;')+'</b><div class="small">Quantidade: <strong>'+item.qty+'</strong></div></div></div><div class="storedInvActions"><button class="btn invMinus">−</button><button class="btn invPlus">＋</button><button class="btn invRemove">🗑</button></div>';
-      row.querySelector('.invMinus').onclick=()=>{removeInventoryItem(item.id,1);renderInventory(list)};
-      row.querySelector('.invPlus').onclick=()=>{addInventoryItem(item.name,item.icon,1);renderInventory(list)};
-      row.querySelector('.invRemove').onclick=()=>{storedInventory=storedInventory.filter(i=>i.id!==item.id);saveInventory();renderInventory(list)};
-      list.appendChild(row);
+  function createRoom() {
+    const name = ($('gmName').value.trim() || 'Mestre').slice(0,32);
+    error('createError','');
+    socket.emit('criar-sala',{clientId,playerName:name},res=>{
+      if(!res?.ok){ error('createError',res?.error||'Não foi possível criar a sala.'); return; }
+      $('createdRoomCode').textContent=res.room.code;
+      success.dataset.code=res.room.code;
+      applyRoom(res.room,'gm');
+      gate.classList.remove('hidden'); document.body.classList.add('room-locked'); show(success);
     });
   }
-  const oldInv=document.querySelector('#inventory');
-  if(oldInv)oldInv.onclick=()=>{
-    document.querySelectorAll('.inventoryStoragePanel').forEach(q=>q.remove());
-    const p=document.createElement('div');p.className='forgePanel inventoryStoragePanel';
-    p.style.cssText='position:fixed;z-index:100;right:24px;top:90px;left:auto;transform:none;background:#171a20;border:1px solid #555e6d;border-radius:12px;padding:18px;width:min(440px,calc(100vw - 48px));max-height:78vh;overflow:auto;box-shadow:0 18px 55px #000b';
-    p.innerHTML='<button class="btn inventoryClose" style="float:right">✕</button><h2 style="margin:0 0 6px">📦 Inventário</h2><p class="small">Armazene os itens do personagem. A quantidade fica salva mesmo ao fechar o painel.</p><div class="inventoryAddBox"><input class="inventoryName" placeholder="Nome do item (ex.: Espada)"><input class="inventoryIcon" value="📦" maxlength="2" title="Ícone"><input class="inventoryQty" type="number" min="1" value="1" title="Quantidade"><button class="btn inventoryAdd">＋ Adicionar</button></div><div class="inventoryQuick"><button class="btn quickItem" data-name="Espada" data-icon="⚔️">⚔️ Espada</button><button class="btn quickItem" data-name="Poção" data-icon="🧪">🧪 Poção</button><button class="btn quickItem" data-name="Escudo" data-icon="🛡️">🛡️ Escudo</button><button class="btn quickItem" data-name="Moedas" data-icon="🪙">🪙 Moedas</button></div><div class="inventoryStorageList"></div>';
-    const list=p.querySelector('.inventoryStorageList');
-    const add=()=>{const name=p.querySelector('.inventoryName').value;const icon=p.querySelector('.inventoryIcon').value||'📦';const qty=p.querySelector('.inventoryQty').value;addInventoryItem(name,icon,qty);p.querySelector('.inventoryName').value='';p.querySelector('.inventoryQty').value=1;renderInventory(list)};
-    p.querySelector('.inventoryAdd').onclick=add;p.querySelector('.inventoryName').onkeydown=e=>{if(e.key==='Enter')add()};
-    p.querySelectorAll('.quickItem').forEach(b=>b.onclick=()=>{addInventoryItem(b.dataset.name,b.dataset.icon,1);renderInventory(list)});
-    p.querySelector('.inventoryClose').onclick=()=>p.remove();
-    document.body.appendChild(p);renderInventory(list);
-  };
-})();
-</script>
+  function joinRoom() {
+    const code = $('roomCodeInput').value.trim().toUpperCase();
+    const name = ($('playerName').value.trim() || 'Jogador').slice(0,32);
+    error('joinError','');
+    if(code.length!==4){ error('joinError','O código deve ter 4 caracteres.'); return; }
+    socket.emit('entrar-sala',{code,clientId,playerName:name},res=>{
+      if(!res?.ok){ error('joinError',res?.error||'Não foi possível entrar na sala.'); return; }
+      applyRoom(res.room,res.role);
+    });
+  }
+  $('createRoomBtn').onclick=()=>show(createForm);
+  $('joinRoomBtn').onclick=()=>show(joinForm);
+  document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>show(start));
+  $('confirmCreate').onclick=createRoom;
+  $('confirmJoin').onclick=joinRoom;
+  $('roomCodeInput').addEventListener('input',e=>e.target.value=e.target.value.replace(/[^a-z0-9]/gi,'').toUpperCase().slice(0,4));
+  $('copyRoomCode').onclick=()=>navigator.clipboard?.writeText(success.dataset.code||'');
+  $('enterCreatedRoom').onclick=()=>lockOff();
+  socket.on('sala-atualizada',room=>{ if(currentRoom && room.code===currentRoom.code){ currentRoom=room; window.rpgForgeRoom.players=room.players||[]; updateOnline(room); }});
+  socket.on('connect',()=>{});
 
-<script>
-(function(){
-  if(window.rpgForgePageAutosaveObserver)return; window.rpgForgePageAutosaveObserver=1;
-  const map=document.getElementById('map'); if(!map)return; let timer=0;
-  const queue=()=>{clearTimeout(timer);timer=setTimeout(()=>window.rpgForgeSaveCurrentPage?.(),350)};
-  new MutationObserver(m=>{if(m.some(x=>x.type==='childList'||x.type==='attributes'))queue()}).observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class','src','data-locked','data-item','data-obj']});
-  document.addEventListener('input',e=>{if(e.target.closest?.('#map,#rpgFogControls,.rpgFogControls'))queue()});
-  document.addEventListener('change',e=>{if(e.target.closest?.('#map,.rpgFogControls'))queue()});
+  const oldShare=document.querySelector('#share');
+  if(oldShare) oldShare.onclick=()=>{
+    const code=currentRoom?.code||'----';
+    navigator.clipboard?.writeText(code);
+    if(typeof window.logMsg==='function') window.logMsg('Código da sala '+code+' copiado.');
+    else alert('Código da sala: '+code);
+  };
+  const oldRoomBtn=document.querySelector('#roomBtn');
+  if(oldRoomBtn) oldRoomBtn.onclick=()=>{
+    const code=currentRoom?.code||'----';
+    const role=currentRole==='gm'?'Mestre':'Jogador';
+    const players=currentRoom?.players||[];
+    const list=players.map(p=>'<div>👤 '+String(p.name).replaceAll('<','&lt;')+' — '+(p.role==='gm'?'Mestre':'Jogador')+'</div>').join('')||'<div>Nenhum jogador conectado.</div>';
+    if(typeof window.panel==='function') window.panel('🔐 Sala '+code,'<div class="forgeGrid"><div class="forgeStat"><b>Código</b><div style="font-size:24px;margin-top:8px">'+code+'</div><small>Compartilhe este código com os jogadores.</small></div><div class="forgeStat"><b>Seu acesso</b><div style="margin-top:8px">'+role+'</div></div></div><h3 style="margin-top:16px">Jogadores</h3><div class="playerList">'+list+'</div><button class="btn" style="margin-top:12px" onclick="navigator.clipboard?.writeText(''+code+'')">📋 Copiar código</button>');
+  };
+  const oldOnline=document.querySelector('#online');
+  if(oldOnline) oldOnline.onclick=()=>{
+    const players=currentRoom?.players||[];
+    const list=players.map(p=>'<div>👤 '+String(p.name).replaceAll('<','&lt;')+' — '+(p.role==='gm'?'Mestre':'Jogador')+'</div>').join('')||'<div>Nenhum jogador conectado.</div>';
+    if(typeof window.panel==='function') window.panel('👥 Jogadores conectados','<div class="playerList">'+list+'</div>');
+  };
 })();
 </script>
 </body></html>
