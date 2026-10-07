@@ -1,166 +1,42 @@
-const express = require('express');
-const http = require('http');
-const path = require('path');
-const { Server } = require('socket.io');
-
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
-const PORT = process.env.PORT || 3000;
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
-
-const rooms = new Map();
-const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-
-function makeCode() {
-  let code;
-  do code = Array.from({length:4}, () => CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)]).join('');
-  while (rooms.has(code));
-  return code;
-}
-function cleanName(v, fallback) { return String(v || fallback).slice(0,32); }
-function publicRoom(room) {
-  return {
-    code: room.code,
-    ownerId: room.ownerClientId,
-    pages: [...room.pages.values()].map(p => ({ id:p.id, name:p.name, locked:!!p.locked })),
-    players: [...room.players.values()].map(p => ({ clientId:p.clientId, name:p.name, role:p.role, pageId:p.pageId }))
-  };
-}
-function publicPage(page) {
-  if (!page) return null;
-  return { id:page.id, name:page.name, locked:!!page.locked, state:page.state || null };
-}
-function roomOf(socket) { return socket.data.roomCode ? rooms.get(socket.data.roomCode) : null; }
-function isGM(socket, room) { return !!room && socket.data.clientId === room.ownerClientId; }
-function leaveSocketRoom(socket) {
-  const code = socket.data.roomCode;
-  if (!code) return;
-  const room = rooms.get(code);
-  if (!room) return;
-  const p = room.players.get(socket.data.clientId);
-  if (p && p.socketId === socket.id) room.players.delete(socket.data.clientId);
-  socket.leave(code);
-  socket.data.roomCode = null;
-  if (room.players.size === 0) rooms.delete(code);
-  else io.to(code).emit('sala-atualizada', publicRoom(room));
-}
-function sendRoomState(socket, room) {
-  const p = room.players.get(socket.data.clientId);
-  const page = room.pages.get(p?.pageId || room.defaultPageId) || [...room.pages.values()][0];
-  if (p && !p.pageId) p.pageId = page.id;
-  socket.emit('sala-estado', { room: publicRoom(room), role:isGM(socket,room)?'gm':'player', currentPageId:p?.pageId || page.id, page:publicPage(page) });
-}
-
-io.on('connection', socket => {
-  socket.on('criar-sala', ({clientId, playerName} = {}, ack = () => {}) => {
-    if (!clientId) return ack({ok:false,error:'Identificador do jogador ausente.'});
-    leaveSocketRoom(socket);
-    const code = makeCode();
-    const pageId = 'page-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,7);
-    const room = { code, ownerClientId:clientId, createdAt:Date.now(), defaultPageId:pageId, pages:new Map(), players:new Map() };
-    room.pages.set(pageId, {id:pageId,name:'Mapa 1',locked:false,state:null});
-    room.players.set(clientId, {clientId,socketId:socket.id,name:cleanName(playerName,'Mestre'),role:'gm',pageId});
-    rooms.set(code,room);
-    socket.data.clientId=clientId; socket.data.roomCode=code; socket.join(code);
-    ack({ok:true,room:publicRoom(room),role:'gm'});
-    sendRoomState(socket,room);
-  });
-
-  socket.on('entrar-sala', ({code, clientId, playerName} = {}, ack = () => {}) => {
-    const normalized=String(code||'').trim().toUpperCase();
-    if (!normalized || !clientId) return ack({ok:false,error:'Informe o código da sala.'});
-    const room=rooms.get(normalized);
-    if (!room) return ack({ok:false,error:'Sala não encontrada. Confira o código.'});
-    leaveSocketRoom(socket);
-    const old=room.players.get(clientId);
-    const role=clientId===room.ownerClientId?'gm':'player';
-    let pageId=old?.pageId || room.defaultPageId;
-    if (!room.pages.has(pageId) || (role!=='gm' && room.pages.get(pageId).locked)) pageId=room.defaultPageId;
-    room.players.set(clientId,{clientId,socketId:socket.id,name:cleanName(playerName,old?.name || 'Jogador'),role,pageId});
-    socket.data.clientId=clientId; socket.data.roomCode=normalized; socket.join(normalized);
-    ack({ok:true,room:publicRoom(room),role});
-    sendRoomState(socket,room);
-    io.to(normalized).emit('sala-atualizada',publicRoom(room));
-  });
-
-  socket.on('sala-pedir-estado', () => { const room=roomOf(socket); if(room) sendRoomState(socket,room); });
-
-  socket.on('pagina-criar', ({name}={}, ack=()=>{}) => {
-    const room=roomOf(socket); if(!room) return ack({ok:false,error:'Você não está em uma sala.'});
-    if(!isGM(socket,room)) return ack({ok:false,error:'Somente o Mestre pode criar abas.'});
-    const id='page-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);
-    const page={id,name:cleanName(name,'Mapa '+(room.pages.size+1)),locked:false,state:null};
-    room.pages.set(id,page);
-    io.to(room.code).emit('sala-atualizada',publicRoom(room));
-    ack({ok:true,page:publicPage(page)});
-  });
-
-  socket.on('pagina-renomear', ({pageId,name}={}, ack=()=>{}) => {
-    const room=roomOf(socket); if(!room) return ack({ok:false,error:'Você não está em uma sala.'});
-    if(!isGM(socket,room)) return ack({ok:false,error:'Somente o Mestre pode renomear abas.'});
-    const page=room.pages.get(pageId); if(!page) return ack({ok:false,error:'Aba não encontrada.'});
-    page.name=cleanName(name,page.name); io.to(room.code).emit('sala-atualizada',publicRoom(room)); ack({ok:true,page:publicPage(page)});
-  });
-
-  socket.on('pagina-excluir', ({pageId}={}, ack=()=>{}) => {
-    const room=roomOf(socket); if(!room) return ack({ok:false,error:'Você não está em uma sala.'});
-    if(!isGM(socket,room)) return ack({ok:false,error:'Somente o Mestre pode excluir abas.'});
-    if(room.pages.size<=1) return ack({ok:false,error:'A sala precisa manter pelo menos uma aba.'});
-    if(!room.pages.has(pageId)) return ack({ok:false,error:'Aba não encontrada.'});
-    room.pages.delete(pageId);
-    const fallback=room.defaultPageId===pageId ? [...room.pages.keys()][0] : room.defaultPageId;
-    room.defaultPageId=fallback;
-    for(const p of room.players.values()) if(p.pageId===pageId) p.pageId=fallback;
-    io.to(room.code).emit('sala-atualizada',publicRoom(room));
-    for(const s of io.sockets.sockets.values()) if(s.data.roomCode===room.code) sendRoomState(s,room);
-    ack({ok:true});
-  });
-
-  socket.on('pagina-travar', ({pageId,locked}={}, ack=()=>{}) => {
-    const room=roomOf(socket); if(!room) return ack({ok:false,error:'Você não está em uma sala.'});
-    if(!isGM(socket,room)) return ack({ok:false,error:'Somente o Mestre pode travar abas.'});
-    const page=room.pages.get(pageId); if(!page) return ack({ok:false,error:'Aba não encontrada.'});
-    page.locked=!!locked;
-    if(page.locked) for(const p of room.players.values()) if(p.role==='player' && p.pageId===page.id) p.pageId=room.defaultPageId===page.id ? [...room.pages.keys()].find(id=>id!==page.id) || page.id : room.defaultPageId;
-    io.to(room.code).emit('sala-atualizada',publicRoom(room));
-    for(const s of io.sockets.sockets.values()) if(s.data.roomCode===room.code) sendRoomState(s,room);
-    ack({ok:true,page:publicPage(page)});
-  });
-
-  socket.on('pagina-trocar', ({pageId}={}, ack=()=>{}) => {
-    const room=roomOf(socket); if(!room) return ack({ok:false,error:'Você não está em uma sala.'});
-    const page=room.pages.get(pageId); if(!page) return ack({ok:false,error:'Aba não encontrada.'});
-    if(page.locked && !isGM(socket,room)) return ack({ok:false,error:'Esta aba está bloqueada pelo Mestre.'});
-    const p=room.players.get(socket.data.clientId); if(!p) return ack({ok:false,error:'Jogador não encontrado.'});
-    p.pageId=pageId;
-    ack({ok:true,page:publicPage(page),currentPageId:pageId});
-    socket.emit('pagina-estado', {room:publicRoom(room),role:isGM(socket,room)?'gm':'player',currentPageId:pageId,page:publicPage(page)});
-    io.to(room.code).emit('sala-atualizada',publicRoom(room));
-  });
-
-  socket.on('pagina-salvar-estado', ({pageId,state}={}, ack=()=>{}) => {
-    const room=roomOf(socket); if(!room) return ack({ok:false});
-    const page=room.pages.get(pageId); if(!page) return ack({ok:false,error:'Aba não encontrada.'});
-    // O Mestre é a autoridade final da campanha; jogadores podem enviar somente o estado da própria aba.
-    const p=room.players.get(socket.data.clientId);
-    if(!p || (p.role!=='gm' && p.pageId!==pageId)) return ack({ok:false,error:'Sem permissão para salvar esta aba.'});
-    if(!state || typeof state.html!=='string') return ack({ok:false,error:'Estado inválido.'});
-    page.state={version:5,html:state.html,mapStyle:String(state.mapStyle||''),weather:state.weather||null,fog:state.fog||null,updatedAt:Date.now(),sourceClientId:socket.data.clientId};
-    // O estado é privado do cenário: só quem está vendo ESTA aba recebe a atualização.
-    for (const s of io.sockets.sockets.values()) {
-      if (s.id === socket.id) continue;
-      if (s.data.roomCode !== room.code) continue;
-      const viewer = room.players.get(s.data.clientId);
-      if (viewer?.pageId === pageId) s.emit('pagina-estado-atualizado',{page:publicPage(page),currentPageId:pageId});
-    }
-    ack({ok:true});
-  });
-
-  socket.on('sair-sala',()=>leaveSocketRoom(socket));
-  socket.on('disconnect',()=>{ const code=socket.data.roomCode; if(!code)return; const room=rooms.get(code); if(!room)return; const p=room.players.get(socket.data.clientId); if(p&&p.socketId===socket.id)room.players.delete(socket.data.clientId); if(room.players.size===0)rooms.delete(code); else io.to(code).emit('sala-atualizada',publicRoom(room)); });
+const http=require('http');
+const fs=require('fs');
+const path=require('path');
+const {Server}=require('socket.io');
+const PORT=process.env.PORT||3000;
+const publicDir=path.join(__dirname,'public');
+const rooms=new Map();
+const CODE='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function makeCode(){let c='';do{c='';for(let i=0;i<4;i++)c+=CODE[Math.floor(Math.random()*CODE.length)]}while(rooms.has(c));return c}
+function newPage(id,name){return{id,name,locked:false,allowedPlayers:[],state:null}}
+function cleanName(v){return String(v||'Jogador').trim().slice(0,40)||'Jogador'}
+function roomState(room,me){return{role:me?.role||'player',roomCode:room.code,currentPageId:me?.pageId||room.pages[0].id,pages:room.pages.map(p=>({id:p.id,name:p.name,locked:p.locked,allowedPlayers:p.allowedPlayers.slice()})),players:[...room.players.values()].map(p=>({id:p.clientId,name:p.name,role:p.role,pageId:p.pageId}))}}
+function broadcast(room){for(const p of room.players.values())io.to(p.socketId).emit('pagina-atualizada',roomState(room,p))}
+function gm(socket,room){const p=room.players.get(socket.id);return !!p&&p.role==='gm'&&room.ownerClientId===p.clientId}
+function defaultPage(room){return room.pages.find(p=>!p.locked)||room.pages[0]}
+const server=http.createServer((req,res)=>{let u=decodeURIComponent(req.url.split('?')[0]);if(u==='/')u='/index.html';const file=path.normalize(path.join(publicDir,u));if(!file.startsWith(publicDir))return res.writeHead(403).end();fs.readFile(file,(e,d)=>{if(e)return res.writeHead(404).end('Not found');const ext=path.extname(file);const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json'};res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream'});res.end(d)})});
+const io=new Server(server,{cors:{origin:true,credentials:true}});
+io.on('connection',socket=>{
+ socket.on('criar-sala',({clientId,nome}={})=>{
+   if(!clientId)return socket.emit('sala-erro','Identidade do Mestre inválida.');
+   const code=makeCode();const room={code,ownerClientId:clientId,pages:[newPage('page-1','Mapa 1')],players:new Map()};rooms.set(code,room);
+   const p={socketId:socket.id,clientId,name:cleanName(nome||'Mestre'),role:'gm',pageId:room.pages[0].id};room.players.set(socket.id,p);socket.data.room=code;socket.join(code);
+   socket.emit('sala-criada',{sala:code});socket.emit('sala-estado',roomState(room,p));
+ });
+ socket.on('entrar-sala',({sala,clientId,nome}={})=>{
+   sala=String(sala||'').toUpperCase();const room=rooms.get(sala);if(!room)return socket.emit('sala-erro','Sala não encontrada. O Mestre precisa criá-la primeiro.');
+   const existing=[...room.players.values()].find(p=>p.clientId===clientId);const page=existing?room.pages.find(p=>p.id===existing.pageId)||defaultPage(room):defaultPage(room);
+   const p={socketId:socket.id,clientId:clientId||socket.id,name:cleanName(nome),role:clientId===room.ownerClientId?'gm':'player',pageId:page.id};
+   if(p.role==='gm')room.ownerClientId=clientId;room.players.set(socket.id,p);if(p.role==='player'&&!page.allowedPlayers.includes(clientId))page.allowedPlayers.push(clientId);
+   socket.data.room=sala;socket.join(sala);socket.emit('sala-estado',roomState(room,p));
+   if(page.state)socket.emit('pagina-estado',{pageId:page.id,state:page.state});broadcast(room);
+ });
+ socket.on('pagina-trocar',({sala,pageId})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg)return;if(me.role!=='gm'&&(pg.locked||!pg.allowedPlayers.includes(me.clientId))){return socket.emit('pagina-acesso-negado','O Mestre não liberou este mapa para você.')}me.pageId=pg.id;socket.emit('pagina-troca-confirmada',{pageId:pg.id});if(pg.state)socket.emit('pagina-estado',{pageId:pg.id,state:pg.state});broadcast(room)});
+ socket.on('pagina-salvar-estado',({sala,pageId,state})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg||!state||typeof state.html!=='string')return;if(JSON.stringify(state).length>6000000)return;if(me.role!=='gm'&&(pg.locked||me.pageId!==pg.id))return;pg.state=state;for(const p of room.players.values())if(p.pageId===pg.id&&p.socketId!==socket.id)io.to(p.socketId).emit('pagina-estado',{pageId:pg.id,state})});
+ socket.on('pagina-criar',({sala,name}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return socket.emit('sala-erro','Apenas o Mestre pode criar mapas.');const id='page-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);room.pages.push(newPage(id,cleanName(name||`Mapa ${room.pages.length+1}`)));broadcast(room);socket.emit('pagina-troca-confirmada',{pageId:id})});
+ socket.on('pagina-renomear',({sala,pageId,name}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return;const p=room.pages.find(x=>x.id===pageId);if(p)p.name=cleanName(name||p.name);broadcast(room)});
+ socket.on('pagina-excluir',({sala,pageId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room)||room.pages.length<=1)return;const fallback=room.pages.find(p=>p.id!==pageId);room.pages=room.pages.filter(p=>p.id!==pageId);for(const p of room.players.values())if(p.pageId===pageId){p.pageId=fallback.id;io.to(p.socketId).emit('pagina-troca-confirmada',{pageId:fallback.id});if(fallback.state)io.to(p.socketId).emit('pagina-estado',{pageId:fallback.id,state:fallback.state})}broadcast(room)});
+ socket.on('pagina-travar',({sala,pageId,locked}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return socket.emit('sala-erro','Apenas o Mestre pode travar mapas.');const p=room.pages.find(x=>x.id===pageId);if(!p)return; p.locked=!!locked;if(p.locked){const fallback=defaultPage(room);for(const pl of room.players.values()){if(pl.role==='player'&&pl.pageId===p.id){pl.pageId=fallback.id;io.to(pl.socketId).emit('pagina-troca-confirmada',{pageId:fallback.id});if(fallback.state)io.to(pl.socketId).emit('pagina-estado',{pageId:fallback.id,state:fallback.state})}}}broadcast(room)});
+ socket.on('pagina-atribuir',({sala,pageId,playerId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return;const pg=room.pages.find(p=>p.id===pageId);const pl=[...room.players.values()].find(p=>p.clientId===playerId);if(!pg||!pl||pl.role==='gm'||pg.locked)return;for(const p of room.pages)p.allowedPlayers=p.allowedPlayers.filter(id=>id!==pl.clientId);pg.allowedPlayers.push(pl.clientId);pl.pageId=pg.id;io.to(pl.socketId).emit('pagina-troca-confirmada',{pageId:pg.id});if(pg.state)io.to(pl.socketId).emit('pagina-estado',{pageId:pg.id,state:pg.state});broadcast(room)});
+ socket.on('disconnect',()=>{const code=socket.data.room,room=rooms.get(code);if(!room)return;room.players.delete(socket.id);if(room.players.size===0)rooms.delete(code);else broadcast(room)});
 });
-
-server.listen(PORT,()=>console.log(`RPG Forge rodando na porta ${PORT}`));
+server.listen(PORT,()=>console.log(`RPG Forge em http://localhost:${PORT}`));
