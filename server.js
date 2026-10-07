@@ -12,7 +12,6 @@ const soundClients = new Set();
 let soundState = { seq: 0, action: 'stop', item: null, at: Date.now() };
 let soundLibrary = [];
 
-
 function broadcastPresence(){
   const payload={count:soundClients.size,at:Date.now()};
   const data='event: presence\ndata: '+JSON.stringify(payload)+'\n\n';
@@ -39,31 +38,41 @@ function broadcastSound(payload){
 }
 
 function broadcastLibrary(){
-  const data = 'event: sound-library\ndata: '+JSON.stringify({items:soundLibrary})+'\n\n';
+  const data = 'event: sound-library\ndata: '+JSON.stringify({sounds:soundLibrary,at:Date.now()})+'\n\n';
   for(const client of [...soundClients]){
     try{client.write(data)}catch(_){soundClients.delete(client)}
   }
 }
-function handleLibraryPost(req,res){
-  let body='';
-  req.on('data',chunk=>{
-    body+=chunk;
-    if(body.length>100000)req.destroy();
-  });
-  req.on('end',()=>{
-    try{
-      const msg=JSON.parse(body||'{}');
-      if(!Array.isArray(msg.items))return json(res,400,{ok:false,error:'Lista inválida.'});
-      soundLibrary=msg.items.slice(0,200).map(x=>({
-        id:String(x.id||''),
-        name:String(x.name||'Som do YouTube'),
-        url:String(x.url||''),
-        ytId:String(x.ytId||x.id||'')
-      })).filter(x=>x.id&&x.url);
-      broadcastLibrary();
-      return json(res,200,{ok:true,count:soundLibrary.length});
-    }catch(_){return json(res,400,{ok:false,error:'JSON inválido.'})}
-  });
+function validSoundItem(item){
+  return item && /^[A-Za-z0-9_-]{6,}$/.test(String(item.id||'')) &&
+    /^yt-[A-Za-z0-9-]+$/.test(String(item.libraryId||item.id||'')) &&
+    String(item.url||'').length<2000;
+}
+function handleSoundsCollection(req,res){
+  if(req.method==='GET') return json(res,200,{ok:true,sounds:soundLibrary});
+  if(req.method==='POST'){
+    let body=''; req.on('data',c=>{body+=c;if(body.length>10000)req.destroy()});
+    return req.on('end',()=>{
+      try{
+        const item=JSON.parse(body||'{}');
+        const ytId=String(item.id||'');
+        if(!ytId || !item.url || !String(item.url).toLowerCase().includes('youtu')) return json(res,400,{ok:false,error:'Som inválido.'});
+        const normalized={id:String(item.id),name:String(item.name||'Som do YouTube'),url:String(item.url)};
+        const idx=soundLibrary.findIndex(x=>x.id===normalized.id);
+        if(idx>=0)soundLibrary[idx]=normalized; else soundLibrary.push(normalized);
+        broadcastLibrary();
+        return json(res,200,{ok:true,sound:normalized});
+      }catch(e){return json(res,400,{ok:false,error:'JSON inválido.'})}
+    });
+  }
+  return json(res,405,{ok:false,error:'Método não suportado.'});
+}
+function handleSoundDelete(req,res,id){
+  const key=decodeURIComponent(String(id||''));
+  const before=soundLibrary.length;
+  soundLibrary=soundLibrary.filter(x=>x.id!==key);
+  broadcastLibrary();
+  return json(res,200,{ok:true,removed:before!==soundLibrary.length});
 }
 
 function handleSoundPost(req,res){
@@ -94,8 +103,8 @@ http.createServer((req,res)=>{
   if(req.method==='OPTIONS'){
     res.writeHead(204,{'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'Content-Type'});return res.end();
   }
-  if(req.url==='/api/sound/library' && req.method==='GET') return json(res,200,{ok:true,items:soundLibrary});
-  if(req.url==='/api/sound/catalog' && req.method==='POST') return handleLibraryPost(req,res);
+  if(req.url==='/api/sounds' && (req.method==='GET'||req.method==='POST')) return handleSoundsCollection(req,res);
+  if(req.url.startsWith('/api/sounds/') && req.method==='DELETE') return handleSoundDelete(req,res,req.url.slice('/api/sounds/'.length));
   if(req.url==='/api/sound/events' && req.method==='GET'){
     res.writeHead(200,{
       'Content-Type':'text/event-stream; charset=utf-8',
@@ -105,7 +114,7 @@ http.createServer((req,res)=>{
       'X-Accel-Buffering':'no'
     });
     soundClients.add(res);
-    res.write('event: sound-library\ndata: '+JSON.stringify({items:soundLibrary})+'\n\n');
+    res.write('event: sound-library\ndata: '+JSON.stringify({sounds:soundLibrary,at:Date.now()})+'\n\n');
     res.write('event: sound-sync\ndata: '+JSON.stringify(soundState)+'\n\n');
     broadcastPresence();
     const heartbeat=setInterval(()=>{try{res.write(': heartbeat\n\n')}catch(_){clearInterval(heartbeat)}},25000);
