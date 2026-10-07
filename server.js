@@ -11,6 +11,14 @@ const mime = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset
 const soundClients = new Set();
 let soundState = { seq: 0, action: 'stop', item: null, at: Date.now() };
 
+function broadcastPresence(){
+  const payload={count:soundClients.size,at:Date.now()};
+  const data='event: presence\ndata: '+JSON.stringify(payload)+'\n\n';
+  for(const client of [...soundClients]){
+    try{client.write(data)}catch(_){soundClients.delete(client)}
+  }
+}
+
 function json(res, status, body){
   const out = JSON.stringify(body);
   res.writeHead(status, {
@@ -65,8 +73,9 @@ http.createServer((req,res)=>{
     });
     soundClients.add(res);
     res.write('event: sound-sync\ndata: '+JSON.stringify(soundState)+'\n\n');
+    broadcastPresence();
     const heartbeat=setInterval(()=>{try{res.write(': heartbeat\n\n')}catch(_){clearInterval(heartbeat)}},25000);
-    req.on('close',()=>{clearInterval(heartbeat);soundClients.delete(res)});
+    req.on('close',()=>{clearInterval(heartbeat);soundClients.delete(res);broadcastPresence()});
     return;
   }
   if(req.url==='/api/sound/state' && req.method==='GET') return json(res,200,{ok:true,...soundState});

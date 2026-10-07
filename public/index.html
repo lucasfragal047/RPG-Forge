@@ -531,7 +531,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     addSideCollapse(side,false);
     addSideCollapse(r,true);
     const mk=(id,label,parent)=>{if(document.querySelector('#'+id))return;const b=document.createElement('button');b.id=id;b.className='btn';b.textContent=label;parent.appendChild(b)};
-    mk('roomBtn','🔐 Sala privada',h);mk('online','👥 3 jogadores',h);
+    mk('roomBtn','🔐 Sala privada',h);mk('online','👥 0 jogadores',h);
     mk('saveCampaign','💾 Salvar campanha',side);mk('newMap','🗺️ Mapas da campanha',side);
     mk('sheet','📜 Ficha completa',r);mk('inventory','📦 Inventário',r);mk('sound','🔊 Som / efeito',r);
     mk('turnBadge','⚔️ Turno: Laxus',tb);
@@ -767,7 +767,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
   function panel(title,body){const p=document.createElement('div');p.className='forgePanel';p.innerHTML='<button class="btn forgeClose">✕</button><h2>'+title+'</h2>'+body;document.body.appendChild(p);p.querySelector('.forgeClose').onclick=()=>p.remove();return p}
   document.querySelector('#roomBtn').onclick=()=>panel('🔐 Sala privada','<div class="forgeGrid"><div class="forgeStat"><b>Código</b><div style="font-size:24px;margin-top:8px">KR7X</div><small>Compartilhe somente com seus jogadores.</small></div><div class="forgeStat"><b>Permissão</b><div style="margin-top:8px">Mestre controla NPCs e monstros</div><div>Jogadores controlam seus personagens</div></div></div><button class="btn" style="margin-top:12px" onclick="navigator.clipboard?.writeText(location.href+\'#sala-KR7X\')">Copiar convite</button>');
   
-  document.querySelector('#online').onclick=()=>panel('👥 Jogadores conectados','<div class="playerList"><div>🧙 Lucas — Mestre</div><div>⚔️ Laxus — Jogador</div><div>🪓 Benzuke — Jogador</div><div>👹 Goblin — Mestre</div></div><p class="small">A sincronização online será feita pelo servidor quando a sala multiplayer estiver hospedada.</p>');
+  document.querySelector('#online').onclick=()=>{const badge=document.querySelector('#online')?.textContent||'👥 0 jogadores';panel('👥 Jogadores conectados','<div class="playerList"><div style="padding:10px;border:1px solid #303641;border-radius:8px;background:#1b2027"><b>'+badge.replace(/</g,'&lt;')+'</b><div class="small" style="margin-top:4px">Quantidade de pessoas conectadas a este servidor agora.</div></div></div><p class="small">A contagem é atualizada automaticamente quando alguém entra ou sai.</p>')};
   // Ficha completa PF2e: painel lateral editável, com campos removíveis e adicionáveis.
   function openCharacterSheet(){
     document.querySelector('.pf2eSheetPanel')?.remove();
@@ -976,11 +976,21 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       if(latestSyncEvent?.action==='play'&&latestSyncEvent.item&&syncEnabled)playEvent(latestSyncEvent,true);
       return panel;
     }
+    function updateOnlineCount(count){
+      const b=document.querySelector('#online');
+      if(!b)return;
+      const n=Math.max(0,Number(count)||0);
+      b.textContent='👥 '+n+' '+(n===1?'jogador':'jogadores');
+    }
+
     function connectSync(){
       if(!isServerMode()){syncConnected=false;return}
       try{syncSource=new EventSource(syncUrl('/api/sound/events'))}catch(e){syncConnected=false;return}
       syncSource.onopen=()=>{syncConnected=true;updateSyncStatus(activeSoundPanel);};
       syncSource.onerror=()=>{syncConnected=false;updateSyncStatus(activeSoundPanel)};
+      syncSource.addEventListener('presence',ev=>{
+        try{const data=JSON.parse(ev.data||'{}');updateOnlineCount(data.count)}catch(e){}
+      });
       syncSource.addEventListener('sound-sync',ev=>{
         try{
           const data=JSON.parse(ev.data||'{}');
