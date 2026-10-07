@@ -1,21 +1,5 @@
-# LuMaThHu — RPG Forge
+# RPG Forge
 
-Mesa virtual web com **sistema de cenários em abas**, sem sistema de salas.
+Versão com cenários independentes e correção da névoa.
 
-## Como funciona
-
-- Cada cenário é uma aba independente da mesma campanha.
-- Trocar de cenário restaura exatamente o estado daquele cenário.
-- Cada cenário pode ter seu próprio mapa, tokens, objetos, efeitos, clima, névoa, visão, zoom e posicionamento.
-- Inventário e fichas continuam integrados à campanha e ficam disponíveis independentemente do cenário aberto.
-- A névoa também é independente por cenário.
-- É possível criar, renomear, duplicar e fechar cenários pelo painel lateral.
-
-## Rodar
-
-```bash
-npm install
-npm start
-```
-
-Abra o endereço mostrado pelo servidor no navegador.
+A névoa mantém sua própria instância ao trocar de cenário, evitando perda dos controles e listeners quando o conteúdo do mapa é restaurado. O estado de cada cenário (ativação, cor, opacidade, tamanho/posição, travamento e visão) é reaplicado ao voltar para ele.
