@@ -343,7 +343,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   window.rpgForgeSendServerEffect=(event,data)=>{if(socket&&ready&&ROOM)socket.emit(event,{sala:ROOM,...(data||{})})};
   window.rpgForgeCurrentPageId=()=>currentPageId;
   function goPage(id){if(!socket||!ready||id===currentPageId)return;saveServer();socket.emit('pagina-trocar',{sala:ROOM,pageId:id})}
-  function bootState(d){ROOM=String(d.roomCode||ROOM||'').toUpperCase();try{window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:{code:ROOM}}))}catch(e){};if(!safeGet('rpgForgeLocalRoleV2')){role=d.role||'player';safeSet('rpgForgeLocalRoleV2',role)}pages=d.pages||[];players=d.players||[];currentPageId=d.currentPageId||pages[0]?.id;ready=true;safeSet(ROOM_KEY,d.roomCode||ROOM);safeSet(PAGE_KEY,currentPageId||'');const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});updateRoleUI();render()}
+  function bootState(d){ROOM=String(d.roomCode||ROOM||'').toUpperCase();try{window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:{code:ROOM}}))}catch(e){};role=d.role||'player';safeSet('rpgForgeLocalRoleV2',role);pages=d.pages||[];players=d.players||[];currentPageId=d.currentPageId||pages[0]?.id;ready=true;safeSet(ROOM_KEY,d.roomCode||ROOM);safeSet(PAGE_KEY,currentPageId||'');const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});updateRoleUI();render()}
   function updateRoleUI(){if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';if(roleDesc)roleDesc.textContent=role==='gm'?'Você é o Mestre desta sala.':'Você é Jogador. O papel é definido pelo servidor.';if(roleBtn){roleBtn.textContent=role==='gm'?'👑 Mestre da sala':'👑 Tornar-se Mestre';roleBtn.disabled=false;roleBtn.title=role==='gm'?'Você é o Mestre desta sala':'Somente o dono da sala pode assumir o papel de Mestre';}const gmView=document.getElementById('rpgFogGMView');if(gmView)gmView.disabled=role!=='gm';render()}
   roleBtn?.addEventListener('click',()=>{if(role!=='gm'&&socket&&ready&&ROOM)socket.emit('modo-role',{sala:ROOM,role:'gm'});});
   function addRoomButtons(){
@@ -2093,6 +2093,12 @@ window.tool = window.tool || 'select';
   const resize=document.getElementById('rpgFogResize'),center=document.getElementById('rpgFogCenter'),big=document.getElementById('rpgFogBig'),small=document.getElementById('rpgFogSmall'),lock=document.getElementById('rpgFogLock');
   const sizeValue=document.getElementById('rpgFogSizeValue'),visionRadius=document.getElementById('rpgFogVisionRadius'),visionValue=document.getElementById('rpgFogVisionValue');
   const gmView=document.getElementById('rpgFogGMView');
+  function centerFogCloud(targetCloud=cloud){
+    const g=gridSize();
+    if(!targetCloud||!g)return;
+    targetCloud.style.left=(g.left+(g.w-targetCloud.offsetWidth)/2)+'px';
+    targetCloud.style.top=(g.top+(g.h-targetCloud.offsetHeight)/2)+'px';
+  }
   function applyScenarioFogState(st){
     st=st||{};
     const currentFog=document.getElementById('rpgFogLayer'), currentCloud=document.getElementById('rpgFogCloud');
@@ -2104,6 +2110,7 @@ window.tool = window.tool || 'select';
     if(st.opacity!=='' && range) range.value=String(Math.max(0,Math.min(100,Number(st.opacity)||72)));
     if(st.visionRadius && visionRadius) visionRadius.value=String(st.visionRadius);
     currentFog.classList.toggle('active',!!st.active);
+    if(st.active) centerFogCloud(currentCloud);
     if(toggle){toggle.textContent=st.active?'☀️ Desativar fumaça':'🌫️ Ativar fumaça';toggle.classList.toggle('active',!!st.active);}
     window.rpgForgeFogLocked=!!st.locked;
     if(typeof setOpacity==='function') setOpacity(false);
@@ -2175,7 +2182,7 @@ window.tool = window.tool || 'select';
   applyGMView();
   function setColor(){cloud.style.setProperty('--fog-color',color.value);colorValue.textContent=color.value.toUpperCase()}
   color.addEventListener('input',setColor);setColor();
-  toggle.addEventListener('click',()=>{fog.classList.toggle('active');const on=fog.classList.contains('active');toggle.textContent=on?'☀️ Desativar fumaça':'🌫️ Ativar fumaça';toggle.classList.toggle('active',on);updateVision();window.rpgForgeSendServerEffect?.('rpg-efeito-fumaca',{active:on,opacity:range?.value||72,color:color?.value||'#dfe5ee',visionRadius:visionRadius?.value||2,locked:!!window.rpgForgeFogLocked,cloudStyle:cloud?.getAttribute('style')||'',gmSeeThrough:cloud?.classList.contains('gmSeeThrough'),pageId:window.rpgForgeCurrentPageId?.()});});
+  toggle.addEventListener('click',()=>{fog.classList.toggle('active');const on=fog.classList.contains('active');if(on) centerFogCloud(cloud);toggle.textContent=on?'☀️ Desativar fumaça':'🌫️ Ativar fumaça';toggle.classList.toggle('active',on);updateVision();window.rpgForgeSendServerEffect?.('rpg-efeito-fumaca',{active:on,opacity:range?.value||72,color:color?.value||'#dfe5ee',visionRadius:visionRadius?.value||2,locked:!!window.rpgForgeFogLocked,cloudStyle:cloud?.getAttribute('style')||'',gmSeeThrough:cloud?.classList.contains('gmSeeThrough'),pageId:window.rpgForgeCurrentPageId?.()});});
   const clearFog=document.getElementById('rpgFogClear');
   if(clearFog){
     clearFog.addEventListener('click',()=>{
