@@ -304,14 +304,14 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   let ROOM=urlRoom.toUpperCase();
   if(urlRoom)safeSet(ROOM_KEY,ROOM);
   let clientId=safeGet(CLIENT_KEY);if(!clientId){clientId=crypto.randomUUID?crypto.randomUUID():'client-'+Date.now()+'-'+Math.random().toString(36).slice(2);safeSet(CLIENT_KEY,clientId)}
-  let socket=null,role='player',isOwner=false,pages=[],players=[],currentPageId=null,ready=false,applying=false,saveTimer=null;
+  let socket=null,role=safeGet('rpgForgeLocalRoleV2')==='gm'?'gm':'player',pages=[],players=[],currentPageId=null,ready=false,applying=false,saveTimer=null;
   const baseHTML=map.innerHTML;
   function valid(s){return s&&typeof s.html==='string'&&s.html.includes('class="grid"')&&s.html.length>300}
   function snapshot(){
-    const clone=map.cloneNode(true);clone.querySelector('#weatherOverlay')?.remove();clone.querySelectorAll('.spellResizeHandle').forEach(x=>x.remove());clone.querySelectorAll('.spellArea').forEach(x=>x.classList.remove('spellEditing','spellMoving'));
+    const clone=map.cloneNode(true);clone.querySelectorAll('.spellResizeHandle').forEach(x=>x.remove());clone.querySelectorAll('.spellArea').forEach(x=>x.classList.remove('spellEditing','spellMoving'));
     const fog=document.getElementById('rpgFogLayer'),color=document.getElementById('rpgFogColor'),vision=document.getElementById('rpgFogVisionRadius');
     let weather=null;try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
-    const localGrid=clone.querySelector('.grid');if(localGrid)localGrid.removeAttribute('style');const mapDimensions=window.rpgForgeMapDimensions?.()||null;return {version:12,html:clone.innerHTML,mapDimensions,weather,fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked,cloudStyle:document.getElementById('rpgFogCloud')?.getAttribute('style')||'',gmSeeThrough:!!document.getElementById('rpgFogCloud')?.classList.contains('gmSeeThrough')}};
+    const localGrid=clone.querySelector('.grid');if(localGrid)localGrid.removeAttribute('style');return {version:11,html:clone.innerHTML,weather,fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked,cloudStyle:document.getElementById('rpgFogCloud')?.getAttribute('style')||'',gmSeeThrough:!!document.getElementById('rpgFogCloud')?.classList.contains('gmSeeThrough')}};
   }
   function applySnapshot(st){
     applying=true;window.rpgForgePageApplying=true;
@@ -319,7 +319,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
       const liveFog=document.getElementById('rpgFogLayer');
       if(!valid(st)){map.innerHTML=baseHTML}
       else{
-        if(liveFog)liveFog.remove();const holder=document.createElement('div');holder.innerHTML=st.html;holder.querySelector('#rpgFogLayer')?.remove();map.innerHTML=holder.innerHTML;if(liveFog)map.insertBefore(liveFog,map.firstChild);window.rpgForgeReapplyLocalMapView?.();window.rpgForgeSetMapDimensions?.(st?.mapDimensions);
+        if(liveFog)liveFog.remove();const holder=document.createElement('div');holder.innerHTML=st.html;holder.querySelector('#rpgFogLayer')?.remove();map.innerHTML=holder.innerHTML;if(liveFog)map.insertBefore(liveFog,map.firstChild);window.rpgForgeReapplyLocalMapView?.();
       }
       window.rpgForgePageSnapshot=st||null;
       window.dispatchEvent(new CustomEvent('rpgforge:apply-fog-state',{detail:st?.fog||null}));
@@ -339,9 +339,9 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   }
   function saveServer(){if(!socket||!ready||!currentPageId||applying)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>socket.emit('pagina-salvar-estado',{sala:ROOM,pageId:currentPageId,state:snapshot()}),120)}
   function goPage(id){if(!socket||!ready||id===currentPageId)return;saveServer();socket.emit('pagina-trocar',{sala:ROOM,pageId:id})}
-  function bootState(d){ROOM=String(d.roomCode||ROOM||'').toUpperCase();try{window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:{code:ROOM}}))}catch(e){};safeSet('rpgForgeLocalRoleV2',role);pages=d.pages||[];players=d.players||[];isOwner=!!d.isOwner;role=d.role==='gm'?'gm':'player';ready=true;safeSet(ROOM_KEY,d.roomCode||ROOM);safeSet(PAGE_KEY,currentPageId||'');const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});updateRoleUI();render()}
-  function updateRoleUI(){if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';if(roleDesc)roleDesc.textContent=role==='gm'?'Você está como Mestre. Você pode controlar mapas, névoa e ferramentas do Mestre.':'Você está como Jogador. Recursos exclusivos do Mestre ficam protegidos.';if(roleBtn){roleBtn.textContent=role==='gm'?'👑 Mestre':'🔒 Mestre da sala';roleBtn.disabled=!isOwner;roleBtn.title=isOwner?'Você é o dono da sala e controla o modo Mestre.':'Apenas o dono da sala pode ser Mestre.';}const gmView=document.getElementById('rpgFogGMView');if(gmView)gmView.disabled=role!=='gm';render();window.dispatchEvent(new Event('rpgforge-role-changed'))}
-  roleBtn?.addEventListener('click',()=>{if(!isOwner){alert('Apenas o dono da sala é o Mestre.');return;}socket?.emit('modo-role',{sala:ROOM,role:'gm'});});
+  function bootState(d){ROOM=String(d.roomCode||ROOM||'').toUpperCase();try{window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:{code:ROOM}}))}catch(e){};if(!safeGet('rpgForgeLocalRoleV2')){role=d.role||'player';safeSet('rpgForgeLocalRoleV2',role)}pages=d.pages||[];players=d.players||[];currentPageId=d.currentPageId||pages[0]?.id;ready=true;safeSet(ROOM_KEY,d.roomCode||ROOM);safeSet(PAGE_KEY,currentPageId||'');const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});updateRoleUI();render()}
+  function updateRoleUI(){if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';if(roleDesc)roleDesc.textContent=role==='gm'?'Você é o Mestre desta sala.':'Você é Jogador. O papel é definido pelo servidor.';if(roleBtn){roleBtn.textContent=role==='gm'?'👑 Mestre da sala':'🔒 Papel definido pelo servidor';roleBtn.disabled=true;roleBtn.title=role==='gm'?'O Mestre é definido pelo dono da sala':'Somente o dono da sala pode ser Mestre';}const gmView=document.getElementById('rpgFogGMView');if(gmView)gmView.disabled=role!=='gm';render()}
+  roleBtn?.addEventListener('click',()=>{});
   function addRoomButtons(){
     const h=document.querySelector('header');if(!h||document.getElementById('rpgServerRoomControls'))return;const wrap=document.createElement('div');wrap.id='rpgServerRoomControls';wrap.style.display='flex';wrap.style.gap='6px';
     const mk=(txt,fn)=>{const b=document.createElement('button');b.className='btn';b.textContent=txt;b.onclick=fn;return b};
@@ -350,7 +350,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   function connect(){
     addRoomButtons();if(typeof io!=='function'){if(roleDesc)roleDesc.textContent='⚠️ Servidor multiplayer não carregado.';return}socket=io();socket.on('connect',()=>{const mode=safeGet(MODE_KEY)||'join';if(mode==='create'){socket.emit('criar-sala',{clientId,nome:safeGet('rpgForgePlayerNameV1')||'Mestre'});safeSet(MODE_KEY,'join')}else if(urlRoom)socket.emit('entrar-sala',{sala:ROOM,clientId,nome:safeGet('rpgForgePlayerNameV1')||'Jogador'});else if(roleDesc)roleDesc.textContent='Crie uma sala ou entre com um código.'});
     socket.on('sala-criada',d=>{if(!d?.sala)return;ROOM=String(d.sala).toUpperCase();safeSet(ROOM_KEY,ROOM);safeSet(MODE_KEY,'join');history.replaceState(null,'',location.pathname+'?sala='+encodeURIComponent(d.sala));});
-    socket.on('sala-estado',bootState);socket.on('papel-confirmado',d=>{role=d?.role==='gm'?'gm':'player';safeSet('rpgForgeLocalRoleV2',role);updateRoleUI();window.dispatchEvent(new Event('rpgforge-role-changed'));});
+    socket.on('sala-estado',bootState);
     socket.on('pagina-estado',d=>{if(d.pageId===currentPageId)applySnapshot(d.state)});
     socket.on('pagina-atualizada',d=>{pages=d.pages||pages;players=d.players||players;const old=currentPageId;currentPageId=d.currentPageId||currentPageId;safeSet(PAGE_KEY,currentPageId||'');if(currentPageId!==old){const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''})}render()});
     socket.on('pagina-troca-confirmada',d=>{if(!d?.pageId)return;currentPageId=d.pageId;safeSet(PAGE_KEY,currentPageId);const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});render()});
@@ -389,8 +389,7 @@ stage.onpointerdown=e=>{if(e.target.closest('.token')||e.target.closest('.toolba
     gridEl.dataset.cols=dims.cols;gridEl.dataset.rows=dims.rows;
   }
   function save(){try{localStorage.setItem(KEY,JSON.stringify(dims))}catch(e){}}
-  function setDims(next){if(!next||!Number.isFinite(+next.cols)||!Number.isFinite(+next.rows))return;dims={cols:Math.max(1,Math.min(200,+next.cols)),rows:Math.max(1,Math.min(200,+next.rows))};save();apply()}
-  function open(){if(window.rpgForgeRole?.isGM&&!window.rpgForgeRole.isGM()){alert('Apenas o Mestre pode alterar o tamanho do mapa.');return;}
+  function open(){
     document.querySelector('.mapSizePanel')?.remove();
     const p=document.createElement('div');p.className='mapSizePanel';
     p.innerHTML=`<h2>📐 Tamanho total do mapa</h2><div class="mapSizeGrid"><label>Colunas<input id="mapCols" type="number" min="1" max="200" value="${dims.cols}"></label><label>Linhas<input id="mapRows" type="number" min="1" max="200" value="${dims.rows}"></label></div><div class="mapSizeActions"><button class="btn" id="mapSizeApply">Aplicar</button><button class="btn" id="mapSizeClose">✕</button></div><div class="mapSizeStatus">Área atual: <b>${dims.cols} × ${dims.rows}</b> quadrados</div><div class="mapSizeHint">A grade ocupa toda a área central da mesa. Ex.: 15 × 15 cria exatamente 225 quadrados nessa área.</div>`;
@@ -399,9 +398,8 @@ stage.onpointerdown=e=>{if(e.target.closest('.token')||e.target.closest('.toolba
     p.querySelector('#mapSizeClose').onclick=()=>p.remove();
   }
   btn.onclick=open;
-  const syncPermission=()=>{const gm=window.rpgForgeRole?.isGM?window.rpgForgeRole.isGM():false;btn.disabled=!gm;btn.title=gm?'Alterar tamanho do mapa':'Apenas o Mestre pode alterar o tamanho do mapa'};syncPermission();window.addEventListener('rpgforge-role-changed',syncPermission);
   apply();window.addEventListener('resize',apply);
-  window.rpgForgeMapDimensions=()=>({...dims});window.rpgForgeSetMapDimensions=setDims;window.rpgForgeReapplyLocalGrid=()=>{const g=document.querySelector('#map .grid');if(!g)return;const w=stageEl.clientWidth||1,h=stageEl.clientHeight||1;g.style.setProperty('--grid-cell-w',(w/dims.cols)+'px');g.style.setProperty('--grid-cell-h',(h/dims.rows)+'px');g.dataset.cols=dims.cols;g.dataset.rows=dims.rows};
+  window.rpgForgeMapDimensions=()=>({...dims});window.rpgForgeReapplyLocalGrid=()=>{const g=document.querySelector('#map .grid');if(!g)return;const w=stageEl.clientWidth||1,h=stageEl.clientHeight||1;g.style.setProperty('--grid-cell-w',(w/dims.cols)+'px');g.style.setProperty('--grid-cell-h',(h/dims.rows)+'px');g.dataset.cols=dims.cols;g.dataset.rows=dims.rows};
 })();
 window.rpgForgeReapplyLocalMapView=()=>{render();window.rpgForgeReapplyLocalGrid?.()};function zoom(z){scale=Math.max(.25,Math.min(3,z));render()}document.querySelector('#zoomIn').onclick=()=>zoom(scale+.1);document.querySelector('#zoomOut').onclick=()=>zoom(scale-.1);document.querySelector('#zoomLabel').onclick=()=>zoom(1);document.querySelector('#reset').onclick=()=>{scale=1;x=0;y=0;render()};document.querySelector('#snap').onclick=e=>e.currentTarget.classList.toggle('on');
 // Importar/exportar mapa funcional
@@ -1728,16 +1726,14 @@ window.tool = window.tool || 'select';
   if(!stage || document.querySelector('#weatherBtn')) return;
   const style=document.createElement('style');
   style.textContent=`
-    .weatherOverlay{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;display:none;isolation:isolate;clip-path:inset(0);contain:layout paint;transform:translateZ(0)}
+    .weatherOverlay{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;display:none;isolation:isolate}
     .weatherOverlay.active{display:block}
     .weatherShade{position:absolute;inset:0;background:rgba(20,25,35,var(--shade,.025));pointer-events:none;mix-blend-mode:soft-light;opacity:.9}
-    .weatherParticle{position:absolute;left:var(--px,50%);top:var(--py,50%);pointer-events:none;will-change:transform,opacity;mix-blend-mode:screen}
-    .weatherRain{width:var(--rw,1.4px);height:var(--rh,28px);border-radius:999px;background:linear-gradient(to bottom,transparent 0%,rgba(190,220,240,.18) 18%,rgba(220,240,255,.92) 72%,rgba(245,250,255,.55) 100%);filter:blur(var(--rb,.15px));box-shadow:0 0 2px rgba(205,235,255,.22);transform:rotate(var(--angle,11deg));animation:weatherRain var(--dur) linear infinite var(--delay,0s);opacity:var(--op,.58)}
-    .weatherSnow{width:var(--size,7px);height:var(--size,7px);border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0%,rgba(255,255,255,.96) 28%,rgba(225,240,248,.72) 58%,rgba(210,230,240,0) 78%);box-shadow:0 0 var(--glow,5px) rgba(235,248,255,.45);filter:blur(var(--blur,.1px));animation:weatherSnow var(--dur) ease-in-out infinite var(--delay,0s);opacity:var(--op,.78)}
-    .weatherAsh{width:var(--size,4px);height:var(--size,4px);border-radius:50%;background:rgba(150,145,135,.58);filter:blur(.25px);animation:weatherAsh var(--dur) ease-in-out infinite;opacity:.45;mix-blend-mode:normal}
-    .weatherDust{width:var(--dw,16px);height:var(--dh,3px);border-radius:999px;background:linear-gradient(90deg,transparent,rgba(205,177,125,.58),rgba(235,205,150,.30),transparent);filter:blur(var(--db,1.2px));animation:weatherDust var(--dur) linear infinite;opacity:var(--dop,.55);mix-blend-mode:normal}
-    .weatherGust{position:absolute;left:-45%;width:190%;height:20%;border-radius:50%;background:linear-gradient(90deg,transparent,rgba(245,250,255,.13),rgba(225,235,240,.22),transparent);filter:blur(8px);transform:rotate(-9deg);animation:weatherGust var(--gustdur,2.8s) linear infinite;mix-blend-mode:screen;opacity:.65}
-    .weatherSnow{will-change:transform,opacity}.weatherOverlay[data-weather="blizzard"] .weatherSnow{filter:blur(.2px);box-shadow:0 0 6px rgba(240,250,255,.5)}
+    .weatherParticle{position:absolute;pointer-events:none;will-change:transform,opacity;mix-blend-mode:screen}
+    .weatherRain{width:1.5px;height:20px;background:linear-gradient(transparent,rgba(185,215,235,.58),rgba(205,230,245,.86));filter:blur(.15px);transform:rotate(11deg);animation:weatherRain var(--dur) linear infinite;opacity:var(--op,.48)}
+    .weatherSnow{width:var(--size,7px);height:var(--size,7px);border-radius:55% 45% 60% 40%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.98),rgba(225,245,250,.62) 55%,transparent 76%);box-shadow:0 0 4px rgba(225,245,250,.38);filter:blur(.1px);animation:weatherSnow var(--dur) ease-in-out infinite;opacity:var(--op,.68)}
+    .weatherAsh{width:4px;height:4px;border-radius:50%;background:rgba(150,145,135,.58);filter:blur(.25px);animation:weatherAsh var(--dur) ease-in-out infinite;opacity:.45;mix-blend-mode:normal}
+    .weatherDust{width:12px;height:3px;border-radius:50%;background:rgba(185,157,105,.22);filter:blur(2px);animation:weatherDust var(--dur) ease-in-out infinite;opacity:.42;mix-blend-mode:normal}
     .weatherFogBank{position:absolute;left:-25%;width:150%;height:34%;background:radial-gradient(ellipse,rgba(210,220,225,.16),rgba(205,215,220,.06) 38%,transparent 72%);filter:blur(22px);animation:weatherFog 16s ease-in-out infinite alternate;mix-blend-mode:screen;opacity:.7}
     .weatherCloud{position:absolute;inset:-14%;background:radial-gradient(ellipse at 20% 12%,rgba(42,50,58,.18),transparent 46%),radial-gradient(ellipse at 72% 18%,rgba(32,39,48,.22),transparent 50%),radial-gradient(ellipse at 48% 42%,rgba(22,28,36,.12),transparent 58%);filter:blur(7px);animation:weatherCloud 24s ease-in-out infinite alternate;mix-blend-mode:multiply;opacity:.62}
     .weatherSun{position:absolute;right:10%;top:8%;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(255,246,194,.56) 0 12%,rgba(255,220,105,.22) 28%,rgba(255,220,105,.08) 48%,transparent 74%);filter:blur(3px);mix-blend-mode:screen;animation:weatherSun 7s ease-in-out infinite alternate}
@@ -1745,11 +1741,11 @@ window.tool = window.tool || 'select';
     .weatherLightning{position:absolute;inset:0;background:rgba(235,245,255,0);animation:weatherFlash var(--flash,9s) infinite;mix-blend-mode:screen}.weatherBolt{position:absolute;top:-8%;width:5px;height:125%;opacity:0;filter:drop-shadow(0 0 5px rgba(220,245,255,.7));clip-path:polygon(48% 0,70% 0,57% 28%,78% 28%,35% 64%,48% 64%,18% 100%,29% 61%,8% 61%,43% 27%,25% 27%);background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.82),rgba(180,225,255,.46));animation:weatherBolt var(--boltDur,850ms) ease-out forwards;z-index:3}.weatherGridFlash{position:absolute;inset:0;background:rgba(245,250,255,.38);opacity:0;z-index:2;pointer-events:none;animation:gridFlash 220ms ease-out forwards;mix-blend-mode:screen}
     .weatherPanel{position:fixed;right:18px;top:70px;width:min(330px,calc(100vw - 36px));z-index:120;background:#171a20ee;border:1px solid #444b57;border-radius:12px;padding:14px;box-shadow:0 18px 55px #000b;backdrop-filter:blur(8px)}
     .weatherPanel h2{margin:0 0 10px;font-size:17px}.weatherGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.weatherGrid label{font-size:11px;color:#aeb6c3}.weatherGrid select,.weatherGrid input{margin-top:4px}.weatherActions{display:flex;gap:7px;margin-top:10px}.weatherActions .btn{flex:1}.weatherStatus{margin-top:9px;color:#aeb6c3;font-size:12px}.weatherIntensity{display:flex;align-items:center;gap:8px}.weatherIntensity input{padding:0}
-    @keyframes weatherRain{0%{transform:translate3d(0,-90px,0) rotate(var(--angle,11deg));opacity:0}8%{opacity:var(--op,.58)}82%{opacity:var(--op,.58)}100%{transform:translate3d(var(--wind,90px),calc(var(--weather-height) + 140px),0) rotate(var(--angle,11deg));opacity:0}}
-    @keyframes weatherSnow{0%{transform:translate3d(0,-100px,0) rotate(0deg) scale(.9);opacity:0}10%{opacity:var(--op,.78)}48%{transform:translate3d(var(--sway,25px),48%,0) rotate(150deg) scale(1)}100%{transform:translate3d(var(--sway2,-10px),calc(var(--weather-height) + 120px),0) rotate(330deg) scale(.92);opacity:0}}
+    @keyframes weatherRain{0%{transform:translate3d(var(--x,0),-8%,0) rotate(11deg);opacity:0}10%{opacity:var(--op,.48)}55%{opacity:calc(var(--op,.48) + .08)}100%{transform:translate3d(calc(var(--x,0) + var(--wind,90px)),108%,0) rotate(11deg);opacity:0}}
+    @keyframes weatherSnow{0%{transform:translate3d(var(--x,0),-8%,0) rotate(0deg);opacity:0}12%{opacity:var(--op,.68)}50%{transform:translate3d(calc(var(--x,0) + var(--sway,25px)),52%,0) rotate(80deg)}100%{transform:translate3d(calc(var(--x,0) + var(--sway2,-10px)),108%,0) rotate(170deg);opacity:0}}
     @keyframes weatherAsh{0%{transform:translate3d(var(--x,0),108%,0) rotate(0);opacity:0}12%{opacity:.45}100%{transform:translate3d(calc(var(--x,0) + var(--wind,80px)),-8%,0) rotate(260deg);opacity:0}}
-    @keyframes weatherDust{0%{transform:translate3d(-35px,0,0) scale(.72);opacity:0}8%{opacity:var(--dop,.55)}48%{opacity:var(--dop,.55)}100%{transform:translate3d(var(--travel,520px),var(--rise,-30px),0) scale(1.15);opacity:0}}
-    @keyframes weatherFog{from{transform:translateX(-7%)}to{transform:translateX(7%)}}@keyframes weatherGust{0%{transform:translate3d(-45%,0,0) rotate(-9deg);opacity:0}18%{opacity:.75}100%{transform:translate3d(90%,12%,0) rotate(-9deg);opacity:0}}
+    @keyframes weatherDust{0%{transform:translate3d(-18%,var(--y,0),0);opacity:0}12%{opacity:.34}100%{transform:translate3d(118%,calc(var(--y,0) + var(--rise,-30px)),0);opacity:0}}
+    @keyframes weatherFog{from{transform:translateX(-7%)}to{transform:translateX(7%)}}
     @keyframes weatherCloud{from{transform:translate3d(-2%,-.5%,0) scale(1.02)}to{transform:translate3d(2%,.5%,0) scale(1.05)}}
     @keyframes weatherSun{from{transform:scale(.96);opacity:.72}to{transform:scale(1.08);opacity:.96}}
     @keyframes weatherFlash{0%,84%,100%{background:rgba(235,245,255,0)}85%{background:rgba(235,245,255,.28)}86%{background:rgba(235,245,255,.03)}87%{background:rgba(235,245,255,.38)}88%{background:rgba(235,245,255,0)}}
@@ -1763,18 +1759,9 @@ window.tool = window.tool || 'select';
   const toolsPanel=document.querySelector('#mapToolsPanel');
   if(toolsPanel) toolsPanel.appendChild(btn); else document.querySelector('.toolbar')?.appendChild(btn);
 
-  const map=document.querySelector('#map');
-  const grid=map?.querySelector('.grid');
-  if(!map || !grid) return;
   const overlay=document.createElement('div'); overlay.id='weatherOverlay'; overlay.className='weatherOverlay';
   overlay.innerHTML='<div class="weatherShade"></div><div id="weatherVisual"></div>';
-  map.appendChild(overlay);
-  function syncWeatherBounds(){
-    overlay.style.width='100%'; overlay.style.height='100%';
-  }
-  syncWeatherBounds();
-  window.addEventListener('resize',syncWeatherBounds);
-  if(window.ResizeObserver){new ResizeObserver(syncWeatherBounds).observe(map);}
+  stage.appendChild(overlay);
   const visual=overlay.querySelector('#weatherVisual');
   let state={type:'clear',intensity:55,wind:45,lightning:true};
   let lightningTimer=null;
@@ -1800,29 +1787,24 @@ window.tool = window.tool || 'select';
   }
 
   const weatherNames={clear:'Limpo',sun:'Sol forte',cloudy:'Nublado',rain:'Chuva',storm:'Tempestade',snow:'Neve',blizzard:'Nevasca',fog:'Névoa',sand:'Tempestade de areia',ash:'Cinzas vulcânicas',magic:'Chuva mágica'};
-  const particleCount=()=>Math.max(18,Math.min(260,Math.round(24+state.intensity*2.35)));
+  const particleCount=()=>Math.max(18,Math.min(180,Math.round(20+state.intensity*1.6)));
   function clearVisual(){visual.innerHTML='';}
   function particle(cls,props={}){const e=document.createElement('i');e.className='weatherParticle '+cls;Object.entries(props).forEach(([k,v])=>e.style.setProperty(k,v));visual.appendChild(e);}
   function build(){
     stopLightning();
-    clearVisual(); overlay.classList.toggle('active',state.type!=='clear'); overlay.dataset.weather=state.type;
-    overlay.style.setProperty('--weather-width',overlay.clientWidth+'px'); overlay.style.setProperty('--weather-height',overlay.clientHeight+'px');
+    clearVisual(); overlay.classList.toggle('active',state.type!=='clear');
     const shade=state.type==='storm'?.28:state.type==='blizzard'?.16:state.type==='fog'?.12:state.type==='cloudy'?.08:state.type==='ash'?.14:0;
     overlay.querySelector('.weatherShade').style.setProperty('--shade',shade);
     if(state.type==='clear') return;
     if(['rain','storm','snow','blizzard','fog','sand','ash','magic','cloudy'].includes(state.type)){const a=document.createElement('div');a.className='weatherAtmosphere';visual.appendChild(a);}
     if(state.type==='sun') {const s=document.createElement('div');s.className='weatherSun';visual.appendChild(s);}
     if(state.type==='cloudy'||state.type==='storm'||state.type==='rain'||state.type==='snow'||state.type==='blizzard'){const c=document.createElement('div');c.className='weatherCloud';visual.appendChild(c);}
-    if(state.type==='blizzard'){for(let i=0;i<6;i++){const g=document.createElement('div');g.className='weatherGust';g.style.top=(8+i*16)+'%';g.style.setProperty('--gustdur',(1.7+i*.28)+'s');g.style.animationDelay=(-Math.random()*3)+'s';visual.appendChild(g);}}
     if(state.type==='fog'){for(let i=0;i<3;i++){const f=document.createElement('div');f.className='weatherFogBank';f.style.top=(12+i*28)+'%';f.style.animationDelay=(-i*3)+'s';visual.appendChild(f);}}
     const n=particleCount();
-    if(['rain','storm'].includes(state.type)) for(let i=0;i<n*(state.type==='storm'?1.35:1);i++){const heavy=Math.random()>.72; particle('weatherRain',{'--wind':(35+state.wind*2.8)+'px','--dur':(heavy?.28:.42)+Math.random()*.5+'s','--op':(heavy?.62:.42)+state.intensity/180,'--delay':(-Math.random()*2)+'s','--rw':(heavy?1.8:0.8+Math.random()*1.1)+'px','--rh':(heavy?34:18+Math.random()*25)+'px','--angle':(8+state.wind*.08+Math.random()*7)+'deg','--rb':(heavy?.05:.18)+'px','left':(Math.random()*100)+'%','top':(Math.random()*100)+'%'});}
-    if(state.type==='blizzard'){
-      for(let i=0;i<5;i++){const f=document.createElement('div');f.className='weatherFogBank';f.style.top=(i*22-8)+'%';f.style.opacity=(.55+i*.06).toFixed(2);f.style.animationDuration=(10+i*2)+'s';visual.appendChild(f);}
-    }
-    if(['snow','blizzard'].includes(state.type)) for(let i=0;i<n*(state.type==='blizzard'?1.15:1);i++) particle('weatherSnow',{'--sway':(-35+Math.random()*70)+'px','--sway2':(-45+Math.random()*90)+'px','--dur':(state.type==='blizzard'?.75:2.1)+Math.random()*(state.type==='blizzard'?1.15:2.7)+'s','--size':(state.type==='blizzard'?2.5+Math.random()*9:3+Math.random()*7)+'px','--glow':(state.type==='blizzard'?2+Math.random()*6:3+Math.random()*4)+'px','--blur':(Math.random()>.78?.35:.08)+'px','--op':(state.type==='blizzard'?.55+Math.random()*.4:.58+Math.random()*.3),'--delay':(-Math.random()*3)+'s','left':(Math.random()*100)+'%','top':(Math.random()*100)+'%'});
-    if(state.type==='sand') for(let i=0;i<n*1.7;i++){const travel=220+state.wind*7+Math.random()*520; particle('weatherDust',{'--travel':travel+'px','--rise':(-70+Math.random()*140)+'px','--dur':(.65+Math.random()*1.5)+'s','--dw':(6+Math.random()*32)+'px','--dh':(.7+Math.random()*3.5)+'px','--db':(.35+Math.random()*1.5)+'px','--dop':(.24+Math.random()*.5),'left':(Math.random()*100)+'%','top':(Math.random()*100)+'%'});}
-    if(state.type==='ash') for(let i=0;i<n;i++) particle('weatherAsh',{'--px':(Math.random()*100)+'%' ,'--py':(Math.random()*100)+'%' ,'--x':0 ,'--wind':(-50+state.wind*3)+'px','--dur':(2+Math.random()*4)+'s'});
+    if(['rain','storm'].includes(state.type)) for(let i=0;i<n;i++) particle('weatherRain',{'--x':(Math.random()*100)+'%' ,'--wind':(30+state.wind*2)+'px','--dur':(0.38+Math.random()*0.55)+'s','--op':(.35+state.intensity/120)});
+    if(['snow','blizzard'].includes(state.type)) for(let i=0;i<n;i++) particle('weatherSnow',{'--x':(Math.random()*100)+'%' ,'--sway':(-30+Math.random()*60)+'px','--sway2':(-30+Math.random()*60)+'px','--dur':(state.type==='blizzard'?1.1:2.4)+Math.random()*2.5+'s','--size':(3+Math.random()*7)+'px'});
+    if(state.type==='sand') for(let i=0;i<n;i++) particle('weatherDust',{'--y':(Math.random()*100)+'%' ,'--wind':(80+state.wind*3)+'px','--rise':(-30+Math.random()*60)+'px','--dur':(1.3+Math.random()*1.7)+'s'});
+    if(state.type==='ash') for(let i=0;i<n;i++) particle('weatherAsh',{'--x':(Math.random()*100)+'%' ,'--wind':(-50+state.wind*3)+'px','--dur':(2+Math.random()*4)+'s'});
     if(state.type==='magic') for(let i=0;i<n;i++){const e=document.createElement('i');e.className='weatherParticle';e.textContent=Math.random()>.5?'✦':'✧';e.style.cssText=`left:${Math.random()*100}%;top:-20px;color:#c7a8ff;font-size:${10+Math.random()*14}px;text-shadow:0 0 10px #8f6bff;animation:weatherRain ${1.8+Math.random()*2.4}s linear infinite;animation-delay:${-Math.random()*3}s;`;visual.appendChild(e)}
     if(state.type==='storm' && state.lightning){const l=document.createElement('div');l.className='weatherLightning';l.style.setProperty('--flash',(5+Math.random()*5)+'s');visual.appendChild(l); startLightning();}
   }
@@ -1842,8 +1824,7 @@ window.tool = window.tool || 'select';
     p.querySelector('#weatherClear').onclick=()=>{state={...state,type:'clear'};build();p.querySelector('#weatherStatus').textContent='Clima atual: Limpo';logMsg('Clima removido do mapa.');};
     p.querySelector('#weatherClose').onclick=()=>p.remove();
   }
-  btn.onclick=()=>{if(window.rpgForgeRole?.isGM&&!window.rpgForgeRole.isGM()){alert('Apenas o Mestre pode alterar o clima.');return;}openPanel()};
-  const syncWeatherPermission=()=>{const gm=window.rpgForgeRole?.isGM?window.rpgForgeRole.isGM():false;btn.disabled=!gm;btn.title=gm?'Abrir sistema de clima':'Apenas o Mestre pode alterar o clima'};syncWeatherPermission();window.addEventListener('rpgforge-role-changed',syncWeatherPermission);
+  btn.onclick=openPanel;
   window.rpgForge=window.rpgForge||{}; window.rpgForge.weather=()=>({...state}); window.rpgForge.setWeather=(type)=>{if(weatherNames[type]){state.type=type;build();}};
   const savedWeather=window.rpgForgePageSnapshot?.weather;
   if(savedWeather&&weatherNames[savedWeather.type]){
