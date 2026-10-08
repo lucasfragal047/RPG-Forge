@@ -2094,27 +2094,22 @@ window.tool = window.tool || 'select';
   const sizeValue=document.getElementById('rpgFogSizeValue'),visionRadius=document.getElementById('rpgFogVisionRadius'),visionValue=document.getElementById('rpgFogVisionValue');
   const gmView=document.getElementById('rpgFogGMView');
   function centerFogCloud(targetCloud=cloud){
-    const g=gridSize();
     const grid=map&&map.querySelector('.grid');
-    if(!targetCloud||!g||!grid)return;
-    // O centro é calculado pela quantidade real de blocos configurada em
-    // "Tamanho total do mapa" (Colunas x Linhas), e não pelo tamanho
-    // visual da tela. Em mapas ímpares, isso coloca a fumaça no bloco
-    // central; em mapas pares, fica exatamente entre os dois blocos centrais.
-    const cols=Math.max(1,Number(grid.dataset.cols)||1);
-    const rows=Math.max(1,Number(grid.dataset.rows)||1);
-    const cellW=g.w/cols;
-    const cellH=g.h/rows;
-    const centerX=g.left+(cols/2)*cellW;
-    const centerY=g.top+(rows/2)*cellH;
-    // O cloud está dentro de #rpgFogLayer, que possui left/top próprios
-    // (-400/-300). Portanto o centro do grid precisa ser convertido para
-    // coordenadas relativas à camada da fumaça.
-    const fogLayer=targetCloud.parentElement;
-    const layerLeft=parseFloat(getComputedStyle(fogLayer).left)||0;
-    const layerTop=parseFloat(getComputedStyle(fogLayer).top)||0;
-    targetCloud.style.left=(centerX-layerLeft-targetCloud.offsetWidth/2)+'px';
-    targetCloud.style.top=(centerY-layerTop-targetCloud.offsetHeight/2)+'px';
+    if(!targetCloud||!grid)return;
+    // Centraliza pelo centro VISUAL da grade. Como a grade representa exatamente
+    // as Colunas x Linhas escolhidas em "Tamanho do mapa", o centro visual é
+    // também o centro matemático do conjunto de blocos. Usamos os rects para
+    // eliminar qualquer diferença causada pela camada da fumaça (-400/-300),
+    // zoom ou deslocamento do mapa.
+    const gr=grid.getBoundingClientRect();
+    const cr=targetCloud.getBoundingClientRect();
+    const scale=Math.abs(parseFloat(getComputedStyle(map).transform.match(/matrix\([^,]+/)?.[0]?.replace('matrix(','')||'1'))||1;
+    const dx=(gr.left+gr.width/2)-(cr.left+cr.width/2);
+    const dy=(gr.top+gr.height/2)-(cr.top+cr.height/2);
+    const left=parseFloat(targetCloud.style.left)||0;
+    const top=parseFloat(targetCloud.style.top)||0;
+    targetCloud.style.left=(left+dx/scale)+'px';
+    targetCloud.style.top=(top+dy/scale)+'px';
   }
   function applyScenarioFogState(st){
     st=st||{};
