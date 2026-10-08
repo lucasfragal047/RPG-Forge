@@ -1846,8 +1846,8 @@ window.tool = window.tool || 'select';
     document.body.appendChild(p);
     p.querySelector('#weatherType').value=state.type;
     p.querySelector('#weatherIntensity').oninput=e=>p.querySelector('#weatherIntensityVal').textContent=e.target.value+'%';
-    p.querySelector('#weatherApply').onclick=()=>{if(window.rpgForgeRole?.isGM && !window.rpgForgeRole.isGM()){p.querySelector('#weatherStatus').textContent='Somente o Mestre pode alterar o clima.';return;}state={type:p.querySelector('#weatherType').value,intensity:+p.querySelector('#weatherIntensity').value,wind:+p.querySelector('#weatherWind').value,lightning:p.querySelector('#weatherLightning').checked};build();p.querySelector('#weatherStatus').textContent='Clima atual: '+weatherNames[state.type];logMsg('Clima alterado para '+weatherNames[state.type]+'.');window.rpgForgeSaveCurrentPageNow?.();};
-    p.querySelector('#weatherClear').onclick=()=>{if(window.rpgForgeRole?.isGM && !window.rpgForgeRole.isGM()){p.querySelector('#weatherStatus').textContent='Somente o Mestre pode alterar o clima.';return;}state={...state,type:'clear'};build();p.querySelector('#weatherStatus').textContent='Clima atual: Limpo';logMsg('Clima removido do mapa.');window.rpgForgeSaveCurrentPageNow?.();};
+    p.querySelector('#weatherApply').onclick=()=>{state={type:p.querySelector('#weatherType').value,intensity:+p.querySelector('#weatherIntensity').value,wind:+p.querySelector('#weatherWind').value,lightning:p.querySelector('#weatherLightning').checked};build();p.querySelector('#weatherStatus').textContent='Clima atual: '+weatherNames[state.type];logMsg('Clima alterado para '+weatherNames[state.type]+'.');window.rpgForgeSaveCurrentPageNow?.();};
+    p.querySelector('#weatherClear').onclick=()=>{state={...state,type:'clear'};build();p.querySelector('#weatherStatus').textContent='Clima atual: Limpo';logMsg('Clima removido do mapa.');window.rpgForgeSaveCurrentPageNow?.();};
     p.querySelector('#weatherClose').onclick=()=>p.remove();
   }
   btn.onclick=openPanel;
