@@ -342,7 +342,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   function saveServer(){if(!socket||!ready||!currentPageId||applying)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>socket.emit('pagina-salvar-estado',{sala:ROOM,pageId:currentPageId,state:snapshot()}),120)}
   function goPage(id){if(!socket||!ready||id===currentPageId)return;saveServer();socket.emit('pagina-trocar',{sala:ROOM,pageId:id})}
   function bootState(d){ROOM=String(d.roomCode||ROOM||'').toUpperCase();try{window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:{code:ROOM}}))}catch(e){};if(!safeGet('rpgForgeLocalRoleV2')){role=d.role||'player';safeSet('rpgForgeLocalRoleV2',role)}pages=d.pages||[];players=d.players||[];currentPageId=d.currentPageId||pages[0]?.id;ready=true;safeSet(ROOM_KEY,d.roomCode||ROOM);safeSet(PAGE_KEY,currentPageId||'');const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});updateRoleUI();render()}
-  function updateRoleUI(){window.rpgForgeServerRole=role;window.rpgForgeServerRoom=!!ROOM;if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';if(roleDesc)roleDesc.textContent=role==='gm'?'Você é o Mestre desta sala.':'Você é Jogador. O papel é definido pelo servidor.';if(roleBtn){roleBtn.textContent=role==='gm'?'👑 Mestre da sala':'🔒 Papel definido pelo servidor';roleBtn.disabled=true;roleBtn.title=role==='gm'?'O Mestre é definido pelo dono da sala':'Somente o dono da sala pode ser Mestre';}const gmView=document.getElementById('rpgFogGMView');if(gmView)gmView.disabled=role!=='gm';try{window.dispatchEvent(new CustomEvent('rpgforge-role-updated',{detail:{role,room:!!ROOM}}))}catch(e){}render()}
+  function updateRoleUI(){if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';if(roleDesc)roleDesc.textContent=role==='gm'?'Você é o Mestre desta sala.':'Você é Jogador. O papel é definido pelo servidor.';if(roleBtn){roleBtn.textContent=role==='gm'?'👑 Mestre da sala':'🔒 Papel definido pelo servidor';roleBtn.disabled=true;roleBtn.title=role==='gm'?'O Mestre é definido pelo dono da sala':'Somente o dono da sala pode ser Mestre';}const gmView=document.getElementById('rpgFogGMView');if(gmView)gmView.disabled=role!=='gm';render()}
   roleBtn?.addEventListener('click',()=>{});
   function addRoomButtons(){
     const h=document.querySelector('header');if(!h||document.getElementById('rpgServerRoomControls'))return;const wrap=document.createElement('div');wrap.id='rpgServerRoomControls';wrap.style.display='flex';wrap.style.gap='6px';
@@ -1760,8 +1760,6 @@ window.tool = window.tool || 'select';
 
   const btn=document.createElement('button');
   btn.id='weatherBtn'; btn.className='btn'; btn.textContent='🌦️ Clima'; btn.title='Abrir sistema de clima';
-  function updateWeatherAccess(){const inRoom=!!window.rpgForgeServerRoom;const isGM=window.rpgForgeServerRole==='gm';btn.disabled=inRoom&&!isGM;btn.title=inRoom&&!isGM?'Somente o Mestre pode alterar o clima':'Abrir sistema de clima';if(inRoom&&!isGM)document.querySelector('.weatherPanel')?.remove();}
-  window.addEventListener('rpgforge-role-updated',updateWeatherAccess);setTimeout(updateWeatherAccess,0);
   const toolsPanel=document.querySelector('#mapToolsPanel');
   if(toolsPanel) toolsPanel.appendChild(btn); else document.querySelector('.toolbar')?.appendChild(btn);
 
@@ -1848,12 +1846,12 @@ window.tool = window.tool || 'select';
     document.body.appendChild(p);
     p.querySelector('#weatherType').value=state.type;
     p.querySelector('#weatherIntensity').oninput=e=>p.querySelector('#weatherIntensityVal').textContent=e.target.value+'%';
-    p.querySelector('#weatherApply').onclick=()=>{state={type:p.querySelector('#weatherType').value,intensity:+p.querySelector('#weatherIntensity').value,wind:+p.querySelector('#weatherWind').value,lightning:p.querySelector('#weatherLightning').checked};build();p.querySelector('#weatherStatus').textContent='Clima atual: '+weatherNames[state.type];logMsg('Clima alterado para '+weatherNames[state.type]+'.');setTimeout(()=>window.rpgForgeSaveCurrentPageNow?.(),0);};
-    p.querySelector('#weatherClear').onclick=()=>{state={...state,type:'clear'};build();p.querySelector('#weatherStatus').textContent='Clima atual: Limpo';logMsg('Clima removido do mapa.');setTimeout(()=>window.rpgForgeSaveCurrentPageNow?.(),0);};
+    p.querySelector('#weatherApply').onclick=()=>{if(window.rpgForgeRole?.isGM && !window.rpgForgeRole.isGM()){p.querySelector('#weatherStatus').textContent='Somente o Mestre pode alterar o clima.';return;}state={type:p.querySelector('#weatherType').value,intensity:+p.querySelector('#weatherIntensity').value,wind:+p.querySelector('#weatherWind').value,lightning:p.querySelector('#weatherLightning').checked};build();p.querySelector('#weatherStatus').textContent='Clima atual: '+weatherNames[state.type];logMsg('Clima alterado para '+weatherNames[state.type]+'.');window.rpgForgeSaveCurrentPageNow?.();};
+    p.querySelector('#weatherClear').onclick=()=>{if(window.rpgForgeRole?.isGM && !window.rpgForgeRole.isGM()){p.querySelector('#weatherStatus').textContent='Somente o Mestre pode alterar o clima.';return;}state={...state,type:'clear'};build();p.querySelector('#weatherStatus').textContent='Clima atual: Limpo';logMsg('Clima removido do mapa.');window.rpgForgeSaveCurrentPageNow?.();};
     p.querySelector('#weatherClose').onclick=()=>p.remove();
   }
   btn.onclick=openPanel;
-  window.rpgForge=window.rpgForge||{}; window.rpgForge.weather=()=>({...state}); window.rpgForge.setWeather=(type,opts)=>{if(!weatherNames[type])return;const next=opts&&typeof opts==='object'?opts:{};state={type,intensity:Number(next.intensity)||55,wind:Number(next.wind)||45,lightning:next.lightning===undefined?true:!!next.lightning};build();};
+  window.rpgForge=window.rpgForge||{}; window.rpgForge.weather=()=>({...state}); window.rpgForge.setWeather=(type,opts)=>{if(weatherNames[type]){const next=opts&&typeof opts==='object'?opts:{};state={type,intensity:Number(next.intensity)||55,wind:Number(next.wind)||45,lightning:next.lightning===undefined?true:!!next.lightning};build();}};
   const savedWeather=window.rpgForgePageSnapshot?.weather;
   if(savedWeather&&weatherNames[savedWeather.type]){
     state={type:savedWeather.type,intensity:Number(savedWeather.intensity)||55,wind:Number(savedWeather.wind)||45,lightning:!!savedWeather.lightning};
