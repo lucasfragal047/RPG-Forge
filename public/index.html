@@ -304,7 +304,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   let ROOM=urlRoom.toUpperCase();
   if(urlRoom)safeSet(ROOM_KEY,ROOM);
   let clientId=safeGet(CLIENT_KEY);if(!clientId){clientId=crypto.randomUUID?crypto.randomUUID():'client-'+Date.now()+'-'+Math.random().toString(36).slice(2);safeSet(CLIENT_KEY,clientId)}
-  let socket=null,role='player',pages=[],players=[],currentPageId=null,ready=false,applying=false,saveTimer=null;
+  let socket=null,role=safeGet('rpgForgeLocalRoleV2')==='gm'?'gm':'player',pages=[],players=[],currentPageId=null,ready=false,applying=false,saveTimer=null;
   const baseHTML=map.innerHTML;
   function valid(s){return s&&typeof s.html==='string'&&s.html.includes('class="grid"')&&s.html.length>300}
   function snapshot(){
@@ -339,8 +339,9 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   }
   function saveServer(){if(!socket||!ready||!currentPageId||applying)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>socket.emit('pagina-salvar-estado',{sala:ROOM,pageId:currentPageId,state:snapshot()}),120)}
   function goPage(id){if(!socket||!ready||id===currentPageId)return;saveServer();socket.emit('pagina-trocar',{sala:ROOM,pageId:id})}
-  function bootState(d){ROOM=String(d.roomCode||ROOM||'').toUpperCase();try{window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:{code:ROOM}}))}catch(e){};role=d.role||'player';pages=d.pages||[];players=d.players||[];currentPageId=d.currentPageId||pages[0]?.id;ready=true;safeSet(ROOM_KEY,d.roomCode||ROOM);safeSet(PAGE_KEY,currentPageId||'');const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});updateRoleUI();render()}
-  function updateRoleUI(){if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';if(roleDesc)roleDesc.textContent=role==='gm'?'Você é o Mestre desta sala.':'Você está como Jogador. O Mestre controla os cenários.';if(roleBtn){roleBtn.textContent=role==='gm'?'Mestre da sala':'Modo controlado pela sala';roleBtn.disabled=true;roleBtn.title='A função Mestre é definida pelo servidor.'}}
+  function bootState(d){ROOM=String(d.roomCode||ROOM||'').toUpperCase();try{window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:{code:ROOM}}))}catch(e){};if(!safeGet('rpgForgeLocalRoleV2')){role=d.role||'player';safeSet('rpgForgeLocalRoleV2',role)}pages=d.pages||[];players=d.players||[];currentPageId=d.currentPageId||pages[0]?.id;ready=true;safeSet(ROOM_KEY,d.roomCode||ROOM);safeSet(PAGE_KEY,currentPageId||'');const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});updateRoleUI();render()}
+  function updateRoleUI(){if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';if(roleDesc)roleDesc.textContent=role==='gm'?'Você está como Mestre. Você pode controlar mapas, névoa e ferramentas do Mestre.':'Você está como Jogador. Recursos exclusivos do Mestre ficam protegidos.';if(roleBtn){roleBtn.textContent=role==='gm'?'Voltar a ser Jogador':'Tornar-se Mestre';roleBtn.disabled=false;roleBtn.title=role==='gm'?'Voltar ao modo Jogador':'Ativar modo Mestre';}const gmView=document.getElementById('rpgFogGMView');if(gmView)gmView.disabled=role!=='gm';render()}
+  roleBtn?.addEventListener('click',()=>{role=role==='gm'?'player':'gm';safeSet('rpgForgeLocalRoleV2',role);socket?.emit('modo-role',{sala:ROOM,role});updateRoleUI();saveServer();});
   function addRoomButtons(){
     const h=document.querySelector('header');if(!h||document.getElementById('rpgServerRoomControls'))return;const wrap=document.createElement('div');wrap.id='rpgServerRoomControls';wrap.style.display='flex';wrap.style.gap='6px';
     const mk=(txt,fn)=>{const b=document.createElement('button');b.className='btn';b.textContent=txt;b.onclick=fn;return b};

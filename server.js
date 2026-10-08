@@ -5,15 +5,29 @@ const {Server}=require('socket.io');
 const PORT=process.env.PORT||3000;
 const publicDir=path.join(__dirname,'public');
 const rooms=new Map();
+const soundLibrary=new Map();
+const soundSse=new Set();
+let soundSeq=0;
+function sseSend(res,event,data){try{res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)}catch(e){}}
+function broadcastSound(event,data){for(const res of soundSse)sseSend(res,event,data)}
+function publicSounds(){return [...soundLibrary.values()]}
 const CODE='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeCode(){let c='';do{c='';for(let i=0;i<4;i++)c+=CODE[Math.floor(Math.random()*CODE.length)]}while(rooms.has(c));return c}
 function newPage(id,name){return{id,name,locked:false,allowedPlayers:[],state:null}}
 function cleanName(v){return String(v||'Jogador').trim().slice(0,40)||'Jogador'}
 function roomState(room,me){return{role:me?.role||'player',roomCode:room.code,currentPageId:me?.pageId||room.pages[0].id,pages:room.pages.map(p=>({id:p.id,name:p.name,locked:p.locked,allowedPlayers:p.allowedPlayers.slice()})),players:[...room.players.values()].map(p=>({id:p.clientId,name:p.name,role:p.role,pageId:p.pageId}))}}
 function broadcast(room){for(const p of room.players.values())io.to(p.socketId).emit('pagina-atualizada',roomState(room,p))}
-function gm(socket,room){const p=room.players.get(socket.id);return !!p&&p.role==='gm'&&room.ownerClientId===p.clientId}
+function gm(socket,room){const p=room.players.get(socket.id);return !!p&&p.role==='gm'}
 function defaultPage(room){return room.pages.find(p=>!p.locked)||room.pages[0]}
-const server=http.createServer((req,res)=>{let u=decodeURIComponent(req.url.split('?')[0]);if(u==='/')u='/index.html';const file=path.normalize(path.join(publicDir,u));if(!file.startsWith(publicDir))return res.writeHead(403).end();fs.readFile(file,(e,d)=>{if(e)return res.writeHead(404).end('Not found');const ext=path.extname(file);const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json'};res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream'});res.end(d)})});
+const server=http.createServer((req,res)=>{
+  const u=decodeURIComponent(req.url.split('?')[0]);
+  if(u==='/api/sounds'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({sounds:publicSounds()}))}
+  if(u==='/api/sound/events'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8','Cache-Control':'no-cache, no-store','Connection':'keep-alive','Access-Control-Allow-Origin':'*'});res.write(': connected\n\n');soundSse.add(res);sseSend(res,'presence',{count:soundSse.size});sseSend(res,'sound-library',{sounds:publicSounds()});req.on('close',()=>{soundSse.delete(res);broadcastSound('presence',{count:soundSse.size})});return}
+  if(u==='/api/sound'&&req.method==='POST'){let body='';req.on('data',c=>body+=c);req.on('end',()=>{try{const d=JSON.parse(body||'{}');soundSeq++;broadcastSound('sound-sync',{...d,seq:soundSeq});res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({ok:true,seq:soundSeq}))}catch(e){res.writeHead(400).end('JSON inválido')}});return}
+  if(u==='/api/sounds'&&req.method==='POST'){let body='';req.on('data',c=>body+=c);req.on('end',()=>{try{const item=JSON.parse(body||'{}');const id=String(item.id||('sound-'+Date.now()+'-'+Math.random().toString(36).slice(2,7)));const clean={id,name:String(item.name||'Som do YouTube').slice(0,120),url:String(item.url||'').slice(0,1000)};if(!clean.url)return res.writeHead(400).end('URL ausente');soundLibrary.set(id,clean);broadcastSound('sound-library',{sounds:publicSounds()});res.writeHead(200,{'Content-Type':'application/json'});res.end(JSON.stringify({ok:true,sound:clean}))}catch(e){res.writeHead(400).end('JSON inválido')}});return}
+  if(u.startsWith('/api/sounds/')&&req.method==='DELETE'){const id=decodeURIComponent(u.slice('/api/sounds/'.length));soundLibrary.delete(id);broadcastSound('sound-library',{sounds:publicSounds()});res.writeHead(200,{'Content-Type':'application/json'});return res.end(JSON.stringify({ok:true}))}
+  let fileUrl=u;if(fileUrl==='/')fileUrl='/index.html';const file=path.normalize(path.join(publicDir,fileUrl));if(!file.startsWith(publicDir))return res.writeHead(403).end();fs.readFile(file,(e,d)=>{if(e)return res.writeHead(404).end('Not found');const ext=path.extname(file);const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json'};res.writeHead(200,{'Content-Type':types[ext]||'application/octet-stream'});res.end(d)})
+});
 const io=new Server(server,{cors:{origin:true,credentials:true}});
 io.on('connection',socket=>{
  socket.on('criar-sala',({clientId,nome}={})=>{
@@ -37,6 +51,7 @@ io.on('connection',socket=>{
  socket.on('pagina-excluir',({sala,pageId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room)||room.pages.length<=1)return;const fallback=room.pages.find(p=>p.id!==pageId);room.pages=room.pages.filter(p=>p.id!==pageId);for(const p of room.players.values())if(p.pageId===pageId){p.pageId=fallback.id;io.to(p.socketId).emit('pagina-troca-confirmada',{pageId:fallback.id});if(fallback.state)io.to(p.socketId).emit('pagina-estado',{pageId:fallback.id,state:fallback.state})}broadcast(room)});
  socket.on('pagina-travar',({sala,pageId,locked}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return socket.emit('sala-erro','Apenas o Mestre pode travar mapas.');const p=room.pages.find(x=>x.id===pageId);if(!p)return; p.locked=!!locked;if(p.locked){const fallback=defaultPage(room);for(const pl of room.players.values()){if(pl.role==='player'&&pl.pageId===p.id){pl.pageId=fallback.id;io.to(pl.socketId).emit('pagina-troca-confirmada',{pageId:fallback.id});if(fallback.state)io.to(pl.socketId).emit('pagina-estado',{pageId:fallback.id,state:fallback.state})}}}broadcast(room)});
  socket.on('pagina-atribuir',({sala,pageId,playerId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return;const pg=room.pages.find(p=>p.id===pageId);const pl=[...room.players.values()].find(p=>p.clientId===playerId);if(!pg||!pl||pl.role==='gm'||pg.locked)return;for(const p of room.pages)p.allowedPlayers=p.allowedPlayers.filter(id=>id!==pl.clientId);pg.allowedPlayers.push(pl.clientId);pl.pageId=pg.id;io.to(pl.socketId).emit('pagina-troca-confirmada',{pageId:pg.id});if(pg.state)io.to(pl.socketId).emit('pagina-estado',{pageId:pg.id,state:pg.state});broadcast(room)});
- socket.on('disconnect',()=>{const code=socket.data.room,room=rooms.get(code);if(!room)return;room.players.delete(socket.id);if(room.players.size===0)rooms.delete(code);else broadcast(room)});
+ socket.on('modo-role',({sala,role}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);if(!room||!me)return;me.role=role==='gm'?'gm':'player';broadcast(room)});
+ socket.on('disconnect',()=>{const code=socket.data.room,room=rooms.get(code);if(!room)return;room.players.delete(socket.id);if(room.players.size>0)broadcast(room)});
 });
 server.listen(PORT,()=>console.log(`RPG Forge em http://localhost:${PORT}`));
