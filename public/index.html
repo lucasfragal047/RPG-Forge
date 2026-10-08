@@ -311,7 +311,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     const clone=map.cloneNode(true);clone.querySelectorAll('.spellResizeHandle').forEach(x=>x.remove());clone.querySelectorAll('.spellArea').forEach(x=>x.classList.remove('spellEditing','spellMoving'));
     const fog=document.getElementById('rpgFogLayer'),color=document.getElementById('rpgFogColor'),vision=document.getElementById('rpgFogVisionRadius');
     let weather=null;try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
-    return {version:10,html:clone.innerHTML,mapStyle:map.getAttribute('style')||'',weather,fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked,cloudStyle:document.getElementById('rpgFogCloud')?.getAttribute('style')||'',gmSeeThrough:!!document.getElementById('rpgFogCloud')?.classList.contains('gmSeeThrough')}};
+    const localGrid=clone.querySelector('.grid');if(localGrid)localGrid.removeAttribute('style');return {version:11,html:clone.innerHTML,weather,fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked,cloudStyle:document.getElementById('rpgFogCloud')?.getAttribute('style')||'',gmSeeThrough:!!document.getElementById('rpgFogCloud')?.classList.contains('gmSeeThrough')}};
   }
   function applySnapshot(st){
     applying=true;window.rpgForgePageApplying=true;
@@ -319,7 +319,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
       const liveFog=document.getElementById('rpgFogLayer');
       if(!valid(st)){map.innerHTML=baseHTML}
       else{
-        if(liveFog)liveFog.remove();const holder=document.createElement('div');holder.innerHTML=st.html;holder.querySelector('#rpgFogLayer')?.remove();map.innerHTML=holder.innerHTML;if(liveFog)map.insertBefore(liveFog,map.firstChild);if(typeof st.mapStyle==='string')map.setAttribute('style',st.mapStyle);
+        if(liveFog)liveFog.remove();const holder=document.createElement('div');holder.innerHTML=st.html;holder.querySelector('#rpgFogLayer')?.remove();map.innerHTML=holder.innerHTML;if(liveFog)map.insertBefore(liveFog,map.firstChild);window.rpgForgeReapplyLocalMapView?.();
       }
       window.rpgForgePageSnapshot=st||null;
       window.dispatchEvent(new CustomEvent('rpgforge:apply-fog-state',{detail:st?.fog||null}));
@@ -399,9 +399,9 @@ stage.onpointerdown=e=>{if(e.target.closest('.token')||e.target.closest('.toolba
   }
   btn.onclick=open;
   apply();window.addEventListener('resize',apply);
-  window.rpgForgeMapDimensions=()=>({...dims});
+  window.rpgForgeMapDimensions=()=>({...dims});window.rpgForgeReapplyLocalGrid=()=>{const g=document.querySelector('#map .grid');if(!g)return;const w=stageEl.clientWidth||1,h=stageEl.clientHeight||1;g.style.setProperty('--grid-cell-w',(w/dims.cols)+'px');g.style.setProperty('--grid-cell-h',(h/dims.rows)+'px');g.dataset.cols=dims.cols;g.dataset.rows=dims.rows};
 })();
-function zoom(z){scale=Math.max(.25,Math.min(3,z));render()}document.querySelector('#zoomIn').onclick=()=>zoom(scale+.1);document.querySelector('#zoomOut').onclick=()=>zoom(scale-.1);document.querySelector('#zoomLabel').onclick=()=>zoom(1);document.querySelector('#reset').onclick=()=>{scale=1;x=0;y=0;render()};document.querySelector('#snap').onclick=e=>e.currentTarget.classList.toggle('on');
+window.rpgForgeReapplyLocalMapView=()=>{render();window.rpgForgeReapplyLocalGrid?.()};function zoom(z){scale=Math.max(.25,Math.min(3,z));render()}document.querySelector('#zoomIn').onclick=()=>zoom(scale+.1);document.querySelector('#zoomOut').onclick=()=>zoom(scale-.1);document.querySelector('#zoomLabel').onclick=()=>zoom(1);document.querySelector('#reset').onclick=()=>{scale=1;x=0;y=0;render()};document.querySelector('#snap').onclick=e=>e.currentTarget.classList.toggle('on');
 // Importar/exportar mapa funcional
 (function(){
   const importBtn=document.querySelector('#importMap'), exportBtn=document.querySelector('#exportMap'), file=document.querySelector('#mapFile');
