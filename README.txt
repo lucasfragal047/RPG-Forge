@@ -1,12 +1,13 @@
-RPG Forge — versão multiplayer corrigida
+RPG Forge Multiplayer - Render
 
-1. npm install
-2. npm start
-3. Abra http://localhost:3000
+1. Suba estes arquivos mantendo a estrutura:
+   server.js
+   package.json
+   public/index.html
+2. Start command: npm start
+3. O servidor usa process.env.PORT e 0.0.0.0.
+4. O HTML se conecta automaticamente ao mesmo endereço do site, então não precisa colocar localhost nem URL manual.
+5. Para convidar: abra o site, clique Criar sala e envie o link Copiar convite.
+6. Para entrar: abra o link do convite ou informe o código de 4 caracteres.
 
-A sala agora é definida pela URL (?sala=XXXX) antes do localStorage.
-Criar/trocar mapas não recarrega a página e não cria outra sala.
-O estado de cada mapa continua separado dentro da mesma sala.
-O servidor usa Socket.IO e permanece autoritativo para salas/mapas.
-
-As salas ficam em memória e são perdidas se o servidor reiniciar.
+Importante: as salas ficam na memória do servidor e são perdidas se o serviço reiniciar/redeployar.
