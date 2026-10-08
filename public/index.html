@@ -56,7 +56,7 @@
 .spell-waterWall{background:linear-gradient(180deg,rgba(90,190,255,.14),rgba(45,145,220,.28),rgba(80,190,255,.1));border-color:#78d7ff;box-shadow:0 0 32px #4db9ff,inset 0 0 22px #9be6ff}
 .spell-waterWall .spellFx:before{inset:-10%;background:repeating-linear-gradient(90deg,transparent 0 16px,rgba(180,240,255,.42) 17px 22px,transparent 23px 38px);filter:blur(1px);animation:fxWaterSlide 1.15s linear infinite}
 .spell-waterWall .spellFx:after{left:0;right:0;bottom:-4%;height:42%;background:radial-gradient(ellipse at center,rgba(180,245,255,.65),transparent 70%);animation:fxWaterPulse .8s ease-in-out infinite alternate}
-.spellLabel{position:absolute;left:7px;bottom:5px;padding:2px 5px;border-radius:5px;background:#101216bb;color:#fff;font-size:10px;z-index:19}.measure{position:absolute;z-index:6;border-top:2px dashed var(--accent);transform-origin:left center;pointer-events:none}.badge{position:absolute;top:-18px;right:-8px;background:#111;color:#fff;border:1px solid var(--line);padding:2px 5px;border-radius:5px;font-size:10px}.card{background:#1b1f27;border:1px solid var(--line);border-radius:9px;padding:10px;margin-bottom:8px}.row{display:flex;justify-content:space-between;gap:8px;margin:6px 0}.muted{color:var(--muted)}.hpbar{height:7px;background:#333;border-radius:99px;overflow:hidden;margin-top:8px}.hpbar i{display:block;height:100%;background:var(--good)}.init{display:flex;align-items:center;gap:8px}.init strong{margin-left:auto}.small{font-size:11px;color:var(--muted)}input,select{background:#12151a;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:6px;width:100%}.dice{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.dice button{padding:9px 3px;background:#242a33;border:1px solid var(--line);border-radius:7px;color:#fff;cursor:pointer}.log{max-height:115px;overflow:auto;font-size:12px;color:var(--muted)}.mode{color:var(--good);font-weight:700}.hidden{display:none}@keyframes magicPulse{from{transform:scale(.96);opacity:.72}to{transform:scale(1.04);opacity:1}}@keyframes particleFall{from{transform:translateY(-15px) rotate(0deg);opacity:0}15%{opacity:1}to{transform:translateY(230px) rotate(260deg);opacity:0}}@keyframes flame{from{transform:scale(.85) rotate(var(--rot));opacity:.65}to{transform:scale(1.12) rotate(calc(var(--rot) + 4deg));opacity:1}}@keyframes fxBoomRing{0%{transform:scale(.35);opacity:0}20%{opacity:1}100%{transform:scale(1.8);opacity:0}}@keyframes fxBoomCore{from{transform:scale(.7);opacity:.65}to{transform:scale(1.2);opacity:1}}@keyframes fxBeamSweep{from{transform:translateX(-20%) rotate(-18deg)}to{transform:translateX(20%) rotate(-18deg)}}@keyframes fxIceSpin{to{transform:rotate(360deg)}}@keyframes fxLightning{0%,72%,100%{opacity:0}73%,79%,84%{opacity:1}77%,81%,88%{opacity:.2}}@keyframes fxLightningGlow{from{opacity:.12;transform:scale(.9)}to{opacity:.65;transform:scale(1.08)}}@keyframes fxArcaneSpin{to{transform:rotate(360deg)}}@keyframes fxArcaneSpinReverse{to{transform:rotate(-360deg)}}@keyframes fxPortalSpin{to{transform:rotate(360deg) scale(1.05)}}@keyframes fxPortalSpinReverse{to{transform:rotate(-360deg) scale(.92)}}@keyframes fxAuraPulse{from{transform:scale(.9);opacity:.4}to{transform:scale(1.08);opacity:1}}@keyframes fxAuraSpin{to{transform:rotate(360deg)}}@keyframes fxVortexSpin{to{transform:rotate(360deg) scale(.98)}}@keyframes fxVortexSpinReverse{to{transform:rotate(-360deg) scale(1.03)}}@keyframes fxCloudDrift{from{transform:translateX(-5%) scale(.95)}to{transform:translateX(6%) scale(1.05)}}@keyframes fxCloudPulse{from{transform:scale(.85);opacity:.25}to{transform:scale(1.15);opacity:.7}}@keyframes fxDarkSpin{to{transform:rotate(360deg)}}@keyframes fxDarkPulse{from{transform:scale(.9);opacity:.2}to{transform:scale(1.1);opacity:.7}}@keyframes fxShockWave{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.8);opacity:0}}@keyframes fxShockCore{from{transform:scale(.7);opacity:.4}to{transform:scale(1.15);opacity:1}}@keyframes fxSnowSpin{to{transform:rotate(360deg)}}@keyframes fxRainSweep{to{transform:translateX(28px) skewX(-8deg)}}@keyframes fxRipplePulse{from{transform:scale(.75);opacity:.15}to{transform:scale(1.3);opacity:.75}}@keyframes fxBubbles{0%{transform:translateY(14px);opacity:.2}45%{opacity:1}100%{transform:translateY(-40px);opacity:0}}@keyframes fxPoisonPulse{from{transform:scale(.86);opacity:.25}to{transform:scale(1.08);opacity:.72}}@keyframes fxHealCross{0%,100%{transform:translateY(9px) scale(.72);opacity:.3}50%{transform:translateY(-8px) scale(1.05);opacity:1}}@keyframes fxHealRing{from{transform:scale(.5);opacity:.9}to{transform:scale(1.25);opacity:0}}@keyframes fxWaterSlide{to{background-position:38px 0}}@keyframes fxWaterPulse{from{transform:scaleX(.82);opacity:.3}to{transform:scaleX(1.12);opacity:.85}}@media(max-width:900px){.main{grid-template-columns:190px 1fr}.right{display:none}}
+.spellLabel{position:absolute;left:7px;bottom:5px;padding:2px 5px;border-radius:5px;background:#101216bb;color:#fff;font-size:10px;z-index:19}.measure{position:absolute;z-index:6;border-top:2px dashed var(--accent);transform-origin:left center;pointer-events:none}.badge{position:absolute;top:-18px;right:-8px;background:#111;color:#fff;border:1px solid var(--line);padding:2px 5px;border-radius:5px;font-size:10px}.card{background:#1b1f27;border:1px solid var(--line);border-radius:9px;padding:10px;margin-bottom:8px}.row{display:flex;justify-content:space-between;gap:8px;margin:6px 0}.muted{color:var(--muted)}.hpbar{height:7px;background:#333;border-radius:99px;overflow:hidden;margin-top:8px}.hpbar i{display:block;height:100%;background:var(--good)}.init{display:flex;align-items:center;gap:8px}.init strong{margin-left:auto}.small{font-size:11px;color:var(--muted)}input,select{background:#12151a;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:6px;width:100%}.dice{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.dice button{padding:7px 3px;background:#242a33;border:1px solid var(--line);border-radius:8px;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:68px;transition:transform .12s,background .12s,border-color .12s}.dice button:hover{transform:translateY(-2px);background:#303744;border-color:#8d99ad}.diceIcon{width:36px;height:36px;display:block;filter:drop-shadow(0 2px 2px #0008)}.diceIcon *{vector-effect:non-scaling-stroke}.diceLabel{font-weight:800;font-size:12px}.diceRoller{position:fixed;inset:0;z-index:100000;pointer-events:none;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(0,0,0,.18),rgba(0,0,0,0) 42%);opacity:0}.diceRoller.show{animation:diceOverlay .95s ease-out forwards}.diceRollDie{width:105px;height:105px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 18px 15px #0009)}.diceRollDie svg{width:100%;height:100%;overflow:visible;animation:diceThrow .9s cubic-bezier(.18,.78,.22,1) forwards}.diceRollResult{position:absolute;margin-top:155px;font-size:28px;font-weight:900;text-shadow:0 3px 10px #000;background:#111c;padding:7px 14px;border-radius:10px;border:1px solid #ffffff44;animation:diceResult .95s ease-out forwards}.diceResultPop{animation:diceResultPop .35s ease-out}.diceButtonRolling{animation:diceButtonRoll .45s ease-in-out}.@keyframes diceOverlay{0%{opacity:0}12%{opacity:1}75%{opacity:1}100%{opacity:0}}@keyframes diceThrow{0%{transform:translate(-160px,-130px) rotate(-240deg) scale(.35)}45%{transform:translate(35px,-35px) rotate(260deg) scale(1.15)}70%{transform:translate(-12px,8px) rotate(480deg) scale(1)}100%{transform:translate(0,0) rotate(620deg) scale(.92)}}@keyframes diceResult{0%{opacity:0;transform:translateY(18px) scale(.6)}55%{opacity:1;transform:translateY(-2px) scale(1.05)}100%{opacity:1;transform:translateY(0) scale(1)}}@keyframes diceResultPop{from{transform:scale(.75);opacity:.3}to{transform:scale(1);opacity:1}}@keyframes diceButtonRoll{50%{transform:rotate(-5deg) scale(1.08)}100%{transform:rotate(0) scale(1)}}.log{max-height:115px;overflow:auto;font-size:12px;color:var(--muted)}.mode{color:var(--good);font-weight:700}.hidden{display:none}@keyframes magicPulse{from{transform:scale(.96);opacity:.72}to{transform:scale(1.04);opacity:1}}@keyframes particleFall{from{transform:translateY(-15px) rotate(0deg);opacity:0}15%{opacity:1}to{transform:translateY(230px) rotate(260deg);opacity:0}}@keyframes flame{from{transform:scale(.85) rotate(var(--rot));opacity:.65}to{transform:scale(1.12) rotate(calc(var(--rot) + 4deg));opacity:1}}@keyframes fxBoomRing{0%{transform:scale(.35);opacity:0}20%{opacity:1}100%{transform:scale(1.8);opacity:0}}@keyframes fxBoomCore{from{transform:scale(.7);opacity:.65}to{transform:scale(1.2);opacity:1}}@keyframes fxBeamSweep{from{transform:translateX(-20%) rotate(-18deg)}to{transform:translateX(20%) rotate(-18deg)}}@keyframes fxIceSpin{to{transform:rotate(360deg)}}@keyframes fxLightning{0%,72%,100%{opacity:0}73%,79%,84%{opacity:1}77%,81%,88%{opacity:.2}}@keyframes fxLightningGlow{from{opacity:.12;transform:scale(.9)}to{opacity:.65;transform:scale(1.08)}}@keyframes fxArcaneSpin{to{transform:rotate(360deg)}}@keyframes fxArcaneSpinReverse{to{transform:rotate(-360deg)}}@keyframes fxPortalSpin{to{transform:rotate(360deg) scale(1.05)}}@keyframes fxPortalSpinReverse{to{transform:rotate(-360deg) scale(.92)}}@keyframes fxAuraPulse{from{transform:scale(.9);opacity:.4}to{transform:scale(1.08);opacity:1}}@keyframes fxAuraSpin{to{transform:rotate(360deg)}}@keyframes fxVortexSpin{to{transform:rotate(360deg) scale(.98)}}@keyframes fxVortexSpinReverse{to{transform:rotate(-360deg) scale(1.03)}}@keyframes fxCloudDrift{from{transform:translateX(-5%) scale(.95)}to{transform:translateX(6%) scale(1.05)}}@keyframes fxCloudPulse{from{transform:scale(.85);opacity:.25}to{transform:scale(1.15);opacity:.7}}@keyframes fxDarkSpin{to{transform:rotate(360deg)}}@keyframes fxDarkPulse{from{transform:scale(.9);opacity:.2}to{transform:scale(1.1);opacity:.7}}@keyframes fxShockWave{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.8);opacity:0}}@keyframes fxShockCore{from{transform:scale(.7);opacity:.4}to{transform:scale(1.15);opacity:1}}@keyframes fxSnowSpin{to{transform:rotate(360deg)}}@keyframes fxRainSweep{to{transform:translateX(28px) skewX(-8deg)}}@keyframes fxRipplePulse{from{transform:scale(.75);opacity:.15}to{transform:scale(1.3);opacity:.75}}@keyframes fxBubbles{0%{transform:translateY(14px);opacity:.2}45%{opacity:1}100%{transform:translateY(-40px);opacity:0}}@keyframes fxPoisonPulse{from{transform:scale(.86);opacity:.25}to{transform:scale(1.08);opacity:.72}}@keyframes fxHealCross{0%,100%{transform:translateY(9px) scale(.72);opacity:.3}50%{transform:translateY(-8px) scale(1.05);opacity:1}}@keyframes fxHealRing{from{transform:scale(.5);opacity:.9}to{transform:scale(1.25);opacity:0}}@keyframes fxWaterSlide{to{background-position:38px 0}}@keyframes fxWaterPulse{from{transform:scaleX(.82);opacity:.3}to{transform:scaleX(1.12);opacity:.85}}@media(max-width:900px){.main{grid-template-columns:190px 1fr}.right{display:none}}
 /* Névoa animada — nuvem redimensionável */
 .rpgFogLayer{position:absolute;left:-400px;top:-300px;width:2400px;height:1600px;z-index:4;pointer-events:none;overflow:visible;display:none}
 .rpgFogLayer.active{display:block}
@@ -257,37 +257,30 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   .side,.spellEditor{transition:none}
 }
 
-</style></head>
-<body>
-<style id="rpgForgeStartMenuCSS">
-#rpgForgeStartMenu{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 25%,#27303d 0,#11151b 42%,#080a0e 100%);font-family:system-ui,Segoe UI,sans-serif;color:#eef1f5}
-#rpgForgeStartMenu.hidden{display:none}
-.rfgStartCard{width:min(620px,calc(100vw - 30px));max-height:calc(100vh - 30px);overflow:auto;padding:34px;border:1px solid #4a5361;border-radius:20px;background:linear-gradient(180deg,#1b212aee,#10141aF5);box-shadow:0 28px 100px #000b,0 0 0 1px #0005;backdrop-filter:blur(14px)}
-.rfgStartLogo{text-align:center;font-size:42px;font-weight:900;letter-spacing:3px;text-shadow:0 4px 20px #000}.rfgStartLogo span{color:#d6a85d}.rfgStartSub{text-align:center;color:#aeb7c5;margin:8px 0 28px;font-size:14px}.rfgStartActions{display:grid;grid-template-columns:1fr 1fr;gap:12px}.rfgStartAction{min-height:125px;padding:22px 18px;text-align:left;border:1px solid #39424f;border-radius:14px;background:#191e26;color:#eef1f5;cursor:pointer;transition:.16s}.rfgStartAction:hover{transform:translateY(-2px);border-color:#d6a85d;background:#202630}.rfgStartAction b{display:block;font-size:18px;margin-bottom:8px}.rfgStartAction small{display:block;color:#9fa9b7;line-height:1.45}.rfgStartRecent{margin-top:25px;border-top:1px solid #303743;padding-top:18px}.rfgStartRecent h3{margin:0 0 10px;color:#cbd2dc;font-size:13px;text-transform:none;letter-spacing:0}.rfgRecentEmpty{padding:14px;border:1px dashed #39424f;border-radius:10px;color:#7f8997;text-align:center}.rfgRecentRow{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:7px 0;border:1px solid #303743;border-radius:10px;background:#151a21}.rfgRecentCode{font-weight:800;letter-spacing:2px;flex:1}.rfgRecentDate{font-size:11px;color:#7f8997}.rfgRecentJoin{border:1px solid #4a5361;background:#222933;color:#fff;border-radius:7px;padding:7px 11px;cursor:pointer}.rfgStartStatus{min-height:20px;margin-top:16px;text-align:center;color:#d6a85d;font-size:12px}.rfgCodeBox{margin-top:18px;display:flex;gap:8px}.rfgCodeBox input{flex:1;font-size:18px;text-align:center;letter-spacing:4px;padding:12px;text-transform:uppercase}.rfgCodeBox button{padding:0 16px;border:1px solid #d6a85d;background:#d6a85d;color:#111;border-radius:8px;font-weight:800;cursor:pointer}.rfgBack{display:block;margin:10px auto 0;border:0;background:transparent;color:#8993a1;cursor:pointer}.rfgBack:hover{color:#fff}@media(max-width:620px){.rfgStartActions{grid-template-columns:1fr}.rfgStartCard{padding:24px}.rfgStartLogo{font-size:34px}}
-</style>
-<div id="rpgForgeStartMenu">
-  <div class="rfgStartCard">
-    <div class="rfgStartLogo">RPG <span>FORGE</span></div>
-    <div class="rfgStartSub">Sua mesa virtual para criar, mestrar e jogar aventuras.</div>
-    <div class="rfgStartActions">
-      <button class="rfgStartAction" id="rfgStartCreate"><b>⚔️ Criar uma sala</b><small>Crie uma nova mesa e entre automaticamente como Mestre.</small></button>
-      <button class="rfgStartAction" id="rfgStartJoin"><b>🚪 Participar de uma sala</b><small>Entre em uma mesa existente usando o código fornecido pelo Mestre.</small></button>
-    </div>
-    <div class="rfgStartRecent">
-      <h3>🕘 Últimas salas</h3>
-      <div id="rfgRecentList"></div>
-    </div>
-    <div id="rfgJoinBox" class="rfgCodeBox" style="display:none">
-      <input id="rfgRoomCodeInput" maxlength="4" placeholder="CÓDIGO" autocomplete="off">
-      <button id="rfgConfirmJoin">ENTRAR</button>
-    </div>
-    <button id="rfgBackMenu" class="rfgBack" style="display:none">← Voltar</button>
-    <div class="rfgStartStatus" id="rfgStartStatus"></div>
-  </div>
 
-<div id="rpgForgeMultiplayerHidden" style="display:none"><button id="rpgPageTool" type="button"></button><div id="rpgPagePanel"></div></div>
-<script src="/socket.io/socket.io.js"></script>
-<div class="app"><header><div class="logo">RPG <span>FORGE</span></div><div class="session">Campanha: <b>Ruínas de Arkhon</b></div><div class="spacer"></div><span class="pill mode" id="modeBadge">● Jogador</span></header>
+/* RPG Forge — tela inicial separada da mesa */
+body.rpgRoomHome .app{display:none!important}
+#rpgRoomStart{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(7,10,14,.97);backdrop-filter:blur(10px);font-family:system-ui,sans-serif;color:#e8edf4}
+#rpgRoomStart[hidden]{display:none}
+.rpgRoomCard{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;background:#151a20;border:1px solid #394250;border-radius:18px;box-shadow:0 24px 80px #000b;padding:28px}
+.rpgRoomBrand{font-size:32px;font-weight:900;letter-spacing:2px;text-align:center}.rpgRoomBrand span{opacity:.62}
+.rpgRoomSub{text-align:center;color:#9ca7b6;margin:8px 0 22px}.rpgRoomActions{display:grid;gap:10px}.rpgRoomAction{width:100%;padding:16px;text-align:left;border:1px solid #3b4655;border-radius:12px;background:#1b222b;color:#fff;cursor:pointer}.rpgRoomAction:hover{border-color:#657489;background:#222b36}.rpgRoomAction b{display:block;font-size:16px}.rpgRoomAction small{display:block;color:#9ca7b6;margin-top:4px}.rpgRoomJoin{display:flex;gap:8px;margin-top:10px}.rpgRoomJoin input{min-width:0;flex:1;border:1px solid #394250;border-radius:10px;background:#0f1419;color:#fff;padding:11px 12px;text-transform:uppercase;letter-spacing:2px;text-align:center}.rpgRoomRecent{margin-top:24px;border-top:1px solid #303844;padding-top:16px}.rpgRoomRecent h3{margin:0 0 10px;font-size:14px;color:#c7d0dc}.rpgRecentRow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #252c35}.rpgRecentCode{font-weight:800;letter-spacing:2px;flex:1}.rpgRecentWhen{font-size:11px;color:#7f8a99}.rpgRecentEnter{padding:6px 10px;border:1px solid #3d4857;border-radius:8px;background:#202832;color:#fff;cursor:pointer}.rpgRoomStatus{min-height:20px;margin-top:14px;text-align:center;color:#9ca7b6;font-size:12px}
+</style></head>
+<body class="rpgRoomHome"><div id="rpgRoomStart">
+  <div class="rpgRoomCard">
+    <div class="rpgRoomBrand">RPG <span>FORGE</span></div>
+    <div class="rpgRoomSub">Escolha uma sala para entrar na mesa.</div>
+    <div class="rpgRoomActions">
+      <button class="rpgRoomAction" id="rpgStartCreate"><b>➕ Criar sala</b><small>Criar uma nova sala e ser o Mestre.</small></button>
+    </div>
+    <div class="rpgRoomJoin">
+      <input id="rpgStartRoomCode" maxlength="4" autocomplete="off" placeholder="CÓDIGO DA SALA">
+      <button class="btn" id="rpgStartJoin">Participar</button>
+    </div>
+    <div class="rpgRoomRecent"><h3>🕘 Últimas salas</h3><div id="rpgRecentList"></div></div>
+    <div class="rpgRoomStatus" id="rpgRoomStartStatus"></div>
+  </div>
+</div><div class="app"><header><div class="logo">RPG <span>FORGE</span></div><div class="session">Campanha: <b>Ruínas de Arkhon</b></div><div class="spacer"></div><span class="pill mode" id="modeBadge">● Jogador</span></header>
 <div class="main"><aside class="side"><div class="section"><h3>Ferramentas</h3><div class="toolgrid"><button class="tool active" data-tool="select">↖ Selecionar</button><button class="tool" data-tool="measure">⌁ Medir</button><button class="tool" data-tool="fog">☁ Névoa</button><button class="tool" data-tool="ping">⊙ Marcar</button><button class="tool" id="rpgPageTool" type="button">🗺️ Cenários</button></div><div id="rpgPagePanel" class="rpgPagePanel" hidden></div></div><div class="section"><h3>🎭 Modo de jogo</h3><div class="card"><div class="small" id="roleDescription">Você está como Jogador.</div><button class="btn" id="toggleRole" style="width:100%;margin-top:8px">Tornar-se Mestre</button></div></div><div class="section"><h3>🌫️ Névoa</h3><div class="rpgFogControls">
   <button class="btn" id="rpgFogLock" style="width:100%">🔓 Travar névoa</button>
   <button class="btn" id="rpgFogToggle" style="width:100%">🌫️ Ativar fumaça</button>
@@ -298,171 +291,76 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   <div class="row2 rpgFogSizeRow"><label class="small">Tamanho</label><button class="btn" id="rpgFogSmall" type="button">− Diminuir</button><span class="rpgFogValue" id="rpgFogSizeValue">100%</span><button class="btn" id="rpgFogBig" type="button">＋ Aumentar</button></div>
   <div class="row2"><label class="small">Visão dos tokens</label><select id="rpgFogVisionRadius" style="width:86px"><option value="1">1 bloco</option><option value="2" selected>2 blocos</option><option value="3">3 blocos</option><option value="4">4 blocos</option><option value="5">5 blocos</option></select><span class="rpgFogValue" id="rpgFogVisionValue">2</span></div>
   <div class="small">Cada token revela automaticamente a área ao redor dele. A visão acompanha o token.</div>
-</div></div><div class="section"><h3>Mapa</h3><div class="card"><b>Mapa vazio</b><div class="small">Área livre para montar a cena</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button><button class="btn" id="clearGridContent" style="width:100%;margin-top:7px">🧹 Limpar grid</button><div class="small" style="margin-top:6px">Remove os elementos colocados no mapa.</div></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="20">d20</button></div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
-<main class="canvasWrap" id="stage"><div class="toolbar"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomLabel" title="Clique para redefinir">100%</button><button class="btn" id="zoomIn">+</button><div class="mapToolsWrap" id="mapToolsWrap"><button class="btn mapToolsToggle" id="mapToolsToggle" title="Abrir ferramentas do mapa">⚙️</button><div class="mapToolsPanel" id="mapToolsPanel"><button class="btn" id="snap">Encaixar grade</button><button class="btn" id="mapSizeBtn">📐 Tamanho do mapa</button><button class="btn" id="importMap">📥 Importar mapa</button><button class="btn" id="exportMap">📤 Exportar mapa</button><input id="mapFile" type="file" accept="image/*,.json" class="hidden"></div></div><div class="spacer"></div><span class="pill" id="roleHint">Modo local</span></div><div id="map"><div class="rpgFogLayer" id="rpgFogLayer"><div class="rpgFogCloud" id="rpgFogCloud"><div class="rpgFogCloudTools"><button id="rpgFogCenter" type="button">↺ Centro</button></div><div class="rpgFogResize" id="rpgFogResize" title="Arraste para redimensionar"></div></div></div><div class="grid"></div></div><script>
-/* Páginas/mapas locais — sem sistema de salas. O modo Mestre/Jogador é escolhido no botão lateral. */
+</div></div><div class="section"><h3>Mapa</h3><div class="card"><b>Ruínas — Salão Norte</b><div class="small">24 × 16 quadrados · 1 quadrado = 1,5 m</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button><button class="btn" id="clearGridContent" style="width:100%;margin-top:7px">🧹 Limpar grid</button><div class="small" style="margin-top:6px">Remove o que foi colocado no mapa, mantendo o cenário/base.</div></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4" title="Rolar d4"><svg class="diceIcon" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,3 36,34 4,34" fill="#7d8cff" stroke="#dce1ff" stroke-width="2"/><line x1="20" y1="3" x2="20" y2="34" stroke="#dce1ff" stroke-width="1.5"/><line x1="20" y1="34" x2="4" y2="34" stroke="#dce1ff" stroke-width="1.5"/></svg><span class="diceLabel">d4</span></button><button data-die="6" title="Rolar d6"><svg class="diceIcon" viewBox="0 0 40 40" aria-hidden="true"><polygon points="9,9 29,5 35,11 34,31 14,35 7,28" fill="#55b7ff" stroke="#dff5ff" stroke-width="2"/><polyline points="9,9 14,15 34,11" fill="none" stroke="#dff5ff" stroke-width="1.5"/><line x1="14" y1="15" x2="14" y2="35" stroke="#dff5ff" stroke-width="1.5"/><line x1="14" y1="15" x2="34" y2="11" stroke="#dff5ff" stroke-width="1.5"/></svg><span class="diceLabel">d6</span></button><button data-die="8" title="Rolar d8"><svg class="diceIcon" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,3 36,20 20,37 4,20" fill="#55d69a" stroke="#e0ffef" stroke-width="2"/><polygon points="20,3 20,37 4,20" fill="#42ad7e" opacity=".55"/><line x1="20" y1="3" x2="20" y2="37" stroke="#e0ffef" stroke-width="1.5"/><line x1="4" y1="20" x2="36" y2="20" stroke="#e0ffef" stroke-width="1.2"/></svg><span class="diceLabel">d8</span></button><button data-die="20" title="Rolar d20"><svg class="diceIcon" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,3 34,13 36,30 20,38 4,30 6,13" fill="#d46cff" stroke="#f7ddff" stroke-width="2"/><polygon points="20,3 20,38 34,13" fill="#9d45c2" opacity=".52"/><polygon points="20,3 6,13 20,38 34,13" fill="none" stroke="#f7ddff" stroke-width="1.2"/></svg><span class="diceLabel">d20</span></button></div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div><div id="diceRoller" class="diceRoller" aria-hidden="true"><div id="diceRollDie" class="diceRollDie"></div><div id="diceRollResult" class="diceRollResult"></div></div></div></aside>
+<main class="canvasWrap" id="stage"><div class="toolbar"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomLabel" title="Clique para redefinir">100%</button><button class="btn" id="zoomIn">+</button><div class="mapToolsWrap" id="mapToolsWrap"><button class="btn mapToolsToggle" id="mapToolsToggle" title="Abrir ferramentas do mapa">⚙️</button><div class="mapToolsPanel" id="mapToolsPanel"><button class="btn" id="snap">Encaixar grade</button><button class="btn" id="mapSizeBtn">📐 Tamanho do mapa</button><button class="btn" id="importMap">📥 Importar mapa</button><button class="btn" id="exportMap">📤 Exportar mapa</button><input id="mapFile" type="file" accept="image/*,.json" class="hidden"></div></div><div class="spacer"></div><span class="pill" id="roleHint">Modo local</span></div><div id="map"><div class="rpgFogLayer" id="rpgFogLayer"><div class="rpgFogCloud" id="rpgFogCloud"><div class="rpgFogCloudTools"><button id="rpgFogCenter" type="button">↺ Centro</button></div><div class="rpgFogResize" id="rpgFogResize" title="Arraste para redimensionar"></div></div></div><div class="grid"></div></div><script src="/socket.io/socket.io.js"></script>
+<script>
+/* Páginas/mapas — sala multiplayer autoritativa, mantendo o restante do sistema atual */
 (function(){
-  const map=document.getElementById('map'), toolBtn=document.getElementById('rpgPageTool'), panel=document.getElementById('rpgPagePanel');
-  const roleBtn=document.getElementById('toggleRole'), roleDesc=document.getElementById('roleDescription'), modeBadge=document.getElementById('modeBadge');
+  const map=document.getElementById('map'),toolBtn=document.getElementById('rpgPageTool'),panel=document.getElementById('rpgPagePanel');
+  const roleBtn=document.getElementById('toggleRole'),roleDesc=document.getElementById('roleDescription'),modeBadge=document.getElementById('modeBadge');
   if(!map||!toolBtn||!panel)return;
-  const PAGE_KEY='rpgForgeLocalPageIdV2', ROLE_KEY='rpgForgeLocalRoleV2', DATA_KEY='rpgForgeLocalPagesV2';
-  // O mapa começa propositalmente vazio: remove salas/cenários pré-criados
-  // tanto do HTML base quanto de estados antigos salvos no navegador.
-  function cleanPresetRooms(root){
-    if(!root)return;
-    root.querySelectorAll('.room,[data-room],[data-preset-room]').forEach(el=>el.remove());
-  }
-  cleanPresetRooms(map);
+  const CLIENT_KEY='rpgForgeClientIdV1',ROOM_KEY='rpgForgeRoomV1',MODE_KEY='rpgForgeRoomModeV1',PAGE_KEY='rpgForgeServerPageIdV1';
+  const safeGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}},safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+  const urlRoom=(new URLSearchParams(location.search).get('sala')||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const ROOM=(urlRoom||safeGet(ROOM_KEY)||'').toUpperCase();
+  if(urlRoom)safeSet(ROOM_KEY,ROOM);
+  let clientId=safeGet(CLIENT_KEY);if(!clientId){clientId=crypto.randomUUID?crypto.randomUUID():'client-'+Date.now()+'-'+Math.random().toString(36).slice(2);safeSet(CLIENT_KEY,clientId)}
+  let socket=null,role='player',pages=[],players=[],currentPageId=null,ready=false,applying=false,saveTimer=null;
   const baseHTML=map.innerHTML;
-  let role=localStorage.getItem(ROLE_KEY)==='gm'?'gm':'player';
-  let pages=[];
-  let currentPageId=localStorage.getItem(PAGE_KEY)||'page-1';
-  let saveTimer=null;
-  let applyingSnapshot=false;
-  function id(){return 'page-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
-  function valid(s){return s&&typeof s.html==='string'&&s.html.includes('class="grid"')&&s.html.length>500}
-  function cleanSnapshot(st){
-    if(!st||typeof st.html!=='string')return st;
-    const holder=document.createElement('div');
-    holder.innerHTML=st.html;
-    cleanPresetRooms(holder);
-    st.html=holder.innerHTML;
-    return st;
-  }
+  function valid(s){return s&&typeof s.html==='string'&&s.html.includes('class="grid"')&&s.html.length>300}
   function snapshot(){
-    const fog=document.getElementById('rpgFogLayer'), cloud=document.getElementById('rpgFogCloud'), color=document.getElementById('rpgFogColor'), vision=document.getElementById('rpgFogVisionRadius');
-    let weather=null; try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
-    const htmlClone=map.cloneNode(true); htmlClone.querySelectorAll('.spellResizeHandle').forEach(h=>h.remove()); htmlClone.querySelectorAll('.spellArea').forEach(el=>el.classList.remove('spellEditing','spellMoving')); return {version:8,html:htmlClone.innerHTML,mapStyle:map.getAttribute('style')||'',weather,fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked,cloudStyle:cloud?.getAttribute('style')||'',gmSeeThrough:!!cloud?.classList.contains('gmSeeThrough')}};
+    const clone=map.cloneNode(true);clone.querySelectorAll('.spellResizeHandle').forEach(x=>x.remove());clone.querySelectorAll('.spellArea').forEach(x=>x.classList.remove('spellEditing','spellMoving'));
+    const fog=document.getElementById('rpgFogLayer'),color=document.getElementById('rpgFogColor'),vision=document.getElementById('rpgFogVisionRadius');
+    let weather=null;try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
+    return {version:10,html:clone.innerHTML,mapStyle:map.getAttribute('style')||'',weather,fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked,cloudStyle:document.getElementById('rpgFogCloud')?.getAttribute('style')||'',gmSeeThrough:!!document.getElementById('rpgFogCloud')?.classList.contains('gmSeeThrough')}};
   }
   function applySnapshot(st){
-    st=cleanSnapshot(st);
-    cleanPresetRooms(map);
-    applyingSnapshot=true;
+    applying=true;window.rpgForgePageApplying=true;
     try{
       const liveFog=document.getElementById('rpgFogLayer');
-      if(!valid(st)){
-        if(liveFog)liveFog.remove();
-        map.innerHTML=baseHTML;
-        window.rpgForgePageSnapshot=st||null;
-      }else{
-        // A névoa possui listeners próprios; nunca a recriamos com innerHTML.
-        // Trocamos somente o restante do cenário e mantemos a mesma instância da névoa.
-        if(liveFog)liveFog.remove();
-        const holder=document.createElement('div');
-        holder.innerHTML=st.html;
-        holder.querySelector('#rpgFogLayer')?.remove();
-        map.innerHTML=holder.innerHTML;
-        if(liveFog)map.insertBefore(liveFog,map.firstChild);
-        if(typeof st.mapStyle==='string')map.setAttribute('style',st.mapStyle);
-        window.rpgForgePageSnapshot=st;
+      if(!valid(st)){map.innerHTML=baseHTML}
+      else{
+        if(liveFog)liveFog.remove();const holder=document.createElement('div');holder.innerHTML=st.html;holder.querySelector('#rpgFogLayer')?.remove();map.innerHTML=holder.innerHTML;if(liveFog)map.insertBefore(liveFog,map.firstChild);if(typeof st.mapStyle==='string')map.setAttribute('style',st.mapStyle);
       }
-      window.rpgForgePageApplying=true;
-      window.dispatchEvent(new CustomEvent('rpgforge:apply-fog-state',{detail:(st&&st.fog)||null}));
-      if(typeof window.rpgForgeRebindAfterRemoteState==='function')window.rpgForgeRebindAfterRemoteState();
-      if(typeof window.rpgForgeRebindObjects==='function')window.rpgForgeRebindObjects(); if(typeof window.rpgForgeRebindMagics==='function')window.rpgForgeRebindMagics();
-    }finally{
-      setTimeout(()=>{applyingSnapshot=false;window.rpgForgePageApplying=false},0);
-    }
+      window.rpgForgePageSnapshot=st||null;
+      window.dispatchEvent(new CustomEvent('rpgforge:apply-fog-state',{detail:st?.fog||null}));
+      window.rpgForgeRebindAfterRemoteState?.();window.rpgForgeRebindObjects?.();window.rpgForgeRebindMagics?.();
+    }finally{setTimeout(()=>{applying=false;window.rpgForgePageApplying=false},0)}
   }
-  function loadPages(){
-    try{pages=JSON.parse(localStorage.getItem(DATA_KEY)||'[]')}catch(e){pages=[]}
-    // Limpa automaticamente salas antigas (Salão, Almoxarifado, Cripta, Corredor etc.)
-    // dos mapas já salvos neste navegador.
-    if(Array.isArray(pages)){
-      pages.forEach(pg=>{if(pg?.state)cleanSnapshot(pg.state)});
-      try{localStorage.setItem(DATA_KEY,JSON.stringify(pages))}catch(e){}
-    }
-    if(!Array.isArray(pages)||!pages.length){
-      pages=[{id:'page-1',name:'Mapa 1',locked:false,state:null}];
-      localStorage.setItem(DATA_KEY,JSON.stringify(pages));
-    }
-    if(!pages.some(p=>p.id===currentPageId))currentPageId=pages[0].id;
-  }
-  function persist(){try{localStorage.setItem(DATA_KEY,JSON.stringify(pages));localStorage.setItem(PAGE_KEY,currentPageId);localStorage.setItem(ROLE_KEY,role)}catch(e){}}
   function currentPage(){return pages.find(p=>p.id===currentPageId)||pages[0]}
-  function updateRoleUI(){
-    if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';
-    if(roleDesc)roleDesc.textContent=role==='gm'?'Você está como Mestre. Você pode controlar mapas, névoa e ferramentas do Mestre.':'Você está como Jogador. Recursos exclusivos do Mestre ficam protegidos.';
-    if(roleBtn)roleBtn.textContent=role==='gm'?'Voltar para Jogador':'Tornar-se Mestre';
-    const gmView=document.getElementById('rpgFogGMView');
-    if(gmView)gmView.disabled=role!=='gm';
-    render();
-  }
-  function saveNow(){
-    const pg=currentPage(); if(!pg)return;
-    pg.state=snapshot();
-    persist();
-  }
-  function save(){
-    const pg=currentPage(); if(!pg)return;
-    clearTimeout(saveTimer);
-    saveTimer=setTimeout(()=>{
-      if(applyingSnapshot)return;
-      saveNow();
-    },100);
-  }
-  function openPage(id){
-    const pg=pages.find(p=>p.id===id); if(!pg||pg.id===currentPageId)return;
-    if(role!=='gm'&&pg.locked){alert('Este mapa está bloqueado pelo Mestre.');return;}
-    // Salva o cenário que está saindo de forma imediata.
-    clearTimeout(saveTimer);
-    saveNow();
-    currentPageId=id;
-    persist();
-    // Carrega somente o estado pertencente ao cenário escolhido.
-    if(pg.state)applySnapshot(pg.state);else applySnapshot(null);
-    render();
-  }
   function render(){
-    panel.innerHTML=''; const pg=currentPage();
+    panel.innerHTML='';const pg=currentPage();
     const title=document.createElement('div');title.className='rpgPageStatus';title.innerHTML='<b>📍 '+(pg?.name||'Mapa')+'</b> · '+(role==='gm'?'Mestre':'Jogador');panel.appendChild(title);
-    pages.forEach(p=>{
-      const row=document.createElement('div');row.className='rpgPageRow';
-      const b=document.createElement('button');b.type='button';b.className='rpgPageChoice'+(p.id===currentPageId?' active':'');b.textContent=(p.locked?'🔒 ':'🗺️ ')+p.name;b.onclick=()=>openPage(p.id);row.appendChild(b);
-      if(role==='gm'){
-        const lock=document.createElement('button');lock.type='button';lock.className='rpgPageLock'+(p.locked?' locked':'');lock.textContent=p.locked?'🔒':'🔓';lock.title=p.locked?'Destravar':'Travar';lock.onclick=e=>{e.stopPropagation();p.locked=!p.locked;persist();render()};row.appendChild(lock);
-        const ren=document.createElement('button');ren.type='button';ren.className='rpgPageLock';ren.textContent='✏️';ren.onclick=e=>{e.stopPropagation();const n=prompt('Nome do mapa:',p.name);if(n){p.name=n.slice(0,40);persist();render()}};row.appendChild(ren);
-        if(pages.length>1){const del=document.createElement('button');del.type='button';del.className='rpgPageLock';del.textContent='🗑️';del.onclick=e=>{e.stopPropagation();if(confirm('Excluir '+p.name+'?')){pages=pages.filter(x=>x.id!==p.id);if(currentPageId===p.id){currentPageId=pages[0].id;applySnapshot(pages[0].state)}persist();render()}};row.appendChild(del)}
-      }
-      panel.appendChild(row);
-    });
     if(role==='gm'){
-      const add=document.createElement('button');
-      add.type='button';
-      add.className='rpgPageNew';
-      add.textContent='＋ Novo cenário';
-      add.title='Criar outro cenário independente';
-      add.onclick=()=>{
-        // Não usa prompt: cria imediatamente e evita bloqueios do navegador/preview.
-        const current=currentPage();
-        if(current){ clearTimeout(saveTimer); current.state=snapshot(); }
-        const fresh={id:id(),name:'Cenário '+(pages.length+1),locked:false,state:null};
-        pages.push(fresh);
-        currentPageId=fresh.id;
-        persist();
-        applySnapshot(null);
-        render();
-      };
-      panel.appendChild(add);
-      const renameHint=document.createElement('div');
-      renameHint.className='rpgPageStatus';
-      renameHint.textContent='Use ✏️ para renomear cada cenário.';
-      panel.appendChild(renameHint);
-    }else{
-      const st=document.createElement('div');st.className='rpgPageStatus';st.textContent='Mapas desbloqueados podem ser escolhidos. Mapas bloqueados ficam sob controle do Mestre.';panel.appendChild(st);
-    }
+      pages.forEach(p=>{const row=document.createElement('div');row.className='rpgPageRow';const b=document.createElement('button');b.type='button';b.className='rpgPageChoice'+(p.id===currentPageId?' active':'');b.textContent=(p.locked?'🔒 ':'🗺️ ')+p.name;b.onclick=()=>goPage(p.id);row.appendChild(b);const lock=document.createElement('button');lock.type='button';lock.className='rpgPageLock'+(p.locked?' locked':'');lock.textContent=p.locked?'🔒':'🔓';lock.title=p.locked?'Destravar':'Travar';lock.onclick=e=>{e.stopPropagation();socket?.emit('pagina-travar',{sala:ROOM,pageId:p.id,locked:!p.locked})};row.appendChild(lock);const ren=document.createElement('button');ren.type='button';ren.className='rpgPageLock';ren.textContent='✏️';ren.onclick=e=>{e.stopPropagation();const n=prompt('Nome do mapa:',p.name);if(n)socket?.emit('pagina-renomear',{sala:ROOM,pageId:p.id,name:n})};row.appendChild(ren);if(pages.length>1){const del=document.createElement('button');del.type='button';del.className='rpgPageLock';del.textContent='🗑️';del.onclick=e=>{e.stopPropagation();if(confirm('Excluir '+p.name+'?'))socket?.emit('pagina-excluir',{sala:ROOM,pageId:p.id})};row.appendChild(del)}panel.appendChild(row)});
+      const add=document.createElement('button');add.type='button';add.className='rpgPageNew';add.textContent='＋ Novo cenário';add.onclick=()=>{const n=prompt('Nome do novo cenário:','Mapa '+(pages.length+1));if(n)socket?.emit('pagina-criar',{sala:ROOM,name:n})};panel.appendChild(add);
+      const h=document.createElement('div');h.className='rpgPageStatus';h.textContent='👥 Jogadores conectados: '+players.filter(p=>p.id!==clientId).length;panel.appendChild(h);
+      players.filter(p=>p.id!==clientId).forEach(pl=>{const row=document.createElement('div');row.className='rpgPageRow';const lab=document.createElement('span');lab.textContent='👤 '+(pl.name||'Jogador');lab.style.flex='1';row.appendChild(lab);const sel=document.createElement('select');pages.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name;o.selected=pl.pageId===p.id;sel.appendChild(o)});sel.onchange=()=>socket?.emit('pagina-atribuir',{sala:ROOM,pageId:sel.value,playerId:pl.id});row.appendChild(sel);panel.appendChild(row)});
+    }else{const st=document.createElement('div');st.className='rpgPageStatus';st.textContent=pg?.locked?'🔒 Este mapa está bloqueado pelo Mestre.':'🔐 O Mestre controla os cenários desta sala.';panel.appendChild(st)}
   }
-  roleBtn?.addEventListener('click',()=>{save();role=role==='gm'?'player':'gm';localStorage.setItem(ROLE_KEY,role);updateRoleUI()});
+  function saveServer(){if(!socket||!ready||!currentPageId||applying)return;clearTimeout(saveTimer);saveTimer=setTimeout(()=>socket.emit('pagina-salvar-estado',{sala:ROOM,pageId:currentPageId,state:snapshot()}),120)}
+  function goPage(id){if(!socket||!ready||id===currentPageId)return;saveServer();socket.emit('pagina-trocar',{sala:ROOM,pageId:id})}
+  function bootState(d){role=d.role||'player';pages=d.pages||[];players=d.players||[];currentPageId=d.currentPageId||pages[0]?.id;ready=true;safeSet(ROOM_KEY,d.roomCode||ROOM);safeSet(PAGE_KEY,currentPageId||'');const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});updateRoleUI();render();window.rpgForgeEnterGame?.(d.roomCode||ROOM)}
+  function updateRoleUI(){if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';if(roleDesc)roleDesc.textContent=role==='gm'?'Você é o Mestre desta sala.':'Você está como Jogador. O Mestre controla os cenários.';if(roleBtn){roleBtn.textContent=role==='gm'?'Mestre da sala':'Modo controlado pela sala';roleBtn.disabled=true;roleBtn.title='A função Mestre é definida pelo servidor.'}}
+  function addRoomButtons(){
+    const h=document.querySelector('header');if(!h||document.getElementById('rpgServerRoomControls'))return;const wrap=document.createElement('div');wrap.id='rpgServerRoomControls';wrap.style.display='flex';wrap.style.gap='6px';
+    const mk=(txt,fn)=>{const b=document.createElement('button');b.className='btn';b.textContent=txt;b.onclick=fn;return b};
+    wrap.append(mk('Criar sala',()=>{safeSet(MODE_KEY,'create');location.reload()}),mk('Entrar',()=>{const c=(prompt('Código da sala:')||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');if(c){safeSet(ROOM_KEY,c);safeSet(MODE_KEY,'join');location.href=location.pathname+'?sala='+encodeURIComponent(c)}}),mk('Compartilhar',()=>{if(!ROOM){alert('Crie ou entre em uma sala primeiro.');return}const u=location.origin+location.pathname+'?sala='+encodeURIComponent(ROOM);navigator.clipboard?.writeText(u).then(()=>alert('Link da sala copiado!')).catch(()=>alert(u))}));h.appendChild(wrap)
+  }
+  function connect(){
+    addRoomButtons();if(typeof io!=='function'){if(roleDesc)roleDesc.textContent='⚠️ Servidor multiplayer não carregado.';return}socket=io();socket.on('connect',()=>{const mode=safeGet(MODE_KEY)||'join';if(mode==='create'){socket.emit('criar-sala',{clientId,nome:safeGet('rpgForgePlayerNameV1')||'Mestre'});safeSet(MODE_KEY,'join')}else if(ROOM)socket.emit('entrar-sala',{sala:ROOM,clientId,nome:safeGet('rpgForgePlayerNameV1')||'Jogador'});else if(roleDesc)roleDesc.textContent='Crie uma sala ou entre com um código.'});
+    socket.on('sala-criada',d=>{if(!d?.sala)return;safeSet(ROOM_KEY,d.sala);safeSet(MODE_KEY,'join');history.replaceState(null,'',location.pathname+'?sala='+encodeURIComponent(d.sala));});
+    socket.on('sala-estado',bootState);
+    socket.on('pagina-estado',d=>{if(d.pageId===currentPageId)applySnapshot(d.state)});
+    socket.on('pagina-atualizada',d=>{pages=d.pages||pages;players=d.players||players;const old=currentPageId;currentPageId=d.currentPageId||currentPageId;safeSet(PAGE_KEY,currentPageId||'');if(currentPageId!==old){const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''})}render()});
+    socket.on('pagina-troca-confirmada',d=>{if(!d?.pageId)return;currentPageId=d.pageId;safeSet(PAGE_KEY,currentPageId);const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});render()});
+    socket.on('pagina-acesso-negado',m=>alert(m||'Acesso negado pelo Mestre.'));socket.on('sala-erro',m=>alert(m||'Não foi possível acessar a sala.'));socket.on('disconnect',()=>{ready=false});
+  }
+  const obs=new MutationObserver(()=>{if(!applying&&!window.rpgForgePageApplying)saveServer()});obs.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class','src','data-locked','data-item','data-obj']});
+  document.addEventListener('input',e=>{if(e.target.closest?.('#map,.rpgFogControls'))saveServer()});document.addEventListener('change',e=>{if(e.target.closest?.('#map,.rpgFogControls'))saveServer()});
   toolBtn.onclick=()=>{panel.hidden=!panel.hidden;document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));if(!panel.hidden)toolBtn.classList.add('active');render()};
-  window.rpgForgePageAccess={getPages:()=>pages,isLocked:id=>!!pages.find(p=>p.id===id)?.locked,canEnter:(id,r=role)=>r==='gm'||!!pages.find(p=>p.id===id&&!p.locked),getRole:()=>role};
-  window.rpgForgeRole={get:()=>role,isGM:()=>role==='gm',set:r=>{role=r==='gm'?'gm':'player';persist();updateRoleUI()}};
-  window.rpgForgeSaveCurrentPage=save;
-  window.rpgForgeSaveCurrentPageNow=saveNow;
-  window.addEventListener('beforeunload',()=>{try{save()}catch(e){}});
-  loadPages();
-  const pg=currentPage(); if(pg?.state)applySnapshot(pg.state);
-  updateRoleUI();
-  setInterval(()=>{if(!document.hidden)save()},1500);
+  window.rpgForgeSaveCurrentPage=saveServer;window.rpgForgeSaveCurrentPageNow=saveServer;window.rpgForgePageAccess={getPages:()=>pages,isLocked:id=>!!pages.find(p=>p.id===id)?.locked,canEnter:(id)=>role==='gm'||!!pages.find(p=>p.id===id&&!p.locked),getRole:()=>role};window.rpgForgeRole={get:()=>role,isGM:()=>role==='gm',set:()=>{alert('O Mestre é definido pela sala.')}};
+  window.addEventListener('beforeunload',()=>{try{saveServer()}catch(e){}});connect();setInterval(()=>{if(ready&&!document.hidden)saveServer()},1500);
 })();
 </script></main>
 <aside class="side right"><div class="section"><h3>Selecionado</h3><div class="card" id="selected"><b>Laxus</b><div class="row"><span class="muted">PV</span><span>38 / 42</span></div><div class="hpbar"><i style="width:90%"></i></div><div class="row"><span class="muted">CA</span><span>21</span></div><div class="row"><span class="muted">Iniciativa</span><span>+7</span></div><button class="btn" style="width:100%;margin-top:7px" id="damage">Aplicar 5 dano</button></div></div><div class="section"><h3>Iniciativa</h3><div class="card init"><span class="dot player">L</span><span>Laxus</span><strong>18</strong></div><div class="card init"><span class="dot monster">G</span><span>Goblin</span><strong>14</strong></div><div class="card init"><span class="dot player">B</span><span>Benzuke</span><strong>11</strong></div><button class="btn" style="width:100%" id="next">Próximo turno →</button></div><div class="section"><h3>Chat da mesa</h3><div class="log" id="log"><div><b>Mestre:</b> Vocês entram no salão...</div><div><b>Benzuke:</b> Eu fico na frente.</div></div><div style="display:flex;gap:6px;margin-top:8px"><input id="chat" placeholder="Mensagem..."/><button class="btn" id="send">Enviar</button></div></div></aside></div></div>
@@ -529,7 +427,9 @@ function zoom(z){scale=Math.max(.25,Math.min(3,z));render()}document.querySelect
     const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}), url=URL.createObjectURL(blob), a=document.createElement('a');a.href=url;a.download='rpg-forge-mapa.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);logMsg2('Mapa exportado para rpg-forge-mapa.json');
   };
 })();
-document.querySelectorAll('[data-die]').forEach(b=>b.onclick=()=>{let n=+b.dataset.die,r=Math.floor(Math.random()*n)+1;document.querySelector('#roll').textContent='d'+n+' → '+r});document.querySelector('#damage').onclick=()=>{let hp=document.querySelector('.hpbar i');hp.style.width=Math.max(0,parseFloat(hp.style.width)-12)+'%';};document.querySelector('#next').onclick=()=>{let log=document.querySelector('#log');log.innerHTML='<div><b>Sistema:</b> Turno avançou para Goblin.</div>'+log.innerHTML};
+const DICE_SVGS={4:'<svg viewBox="0 0 100 100"><polygon points="50,5 94,88 6,88" fill="#7d8cff" stroke="#fff" stroke-width="4"/><line x1="50" y1="5" x2="50" y2="88" stroke="#fff" stroke-width="3"/><text x="50" y="70" text-anchor="middle" font-size="24" font-weight="900" fill="#fff">4</text></svg>',6:'<svg viewBox="0 0 100 100"><polygon points="18,18 72,7 91,24 88,78 34,91 14,72" fill="#55b7ff" stroke="#fff" stroke-width="4"/><polyline points="18,18 34,34 88,24" fill="none" stroke="#fff" stroke-width="3"/><line x1="34" y1="34" x2="34" y2="91" stroke="#fff" stroke-width="3"/><text x="55" y="66" text-anchor="middle" font-size="25" font-weight="900" fill="#fff">6</text></svg>',8:'<svg viewBox="0 0 100 100"><polygon points="50,5 93,50 50,95 7,50" fill="#55d69a" stroke="#fff" stroke-width="4"/><line x1="50" y1="5" x2="50" y2="95" stroke="#fff" stroke-width="3"/><line x1="7" y1="50" x2="93" y2="50" stroke="#fff" stroke-width="2"/><text x="50" y="58" text-anchor="middle" font-size="24" font-weight="900" fill="#fff">8</text></svg>',20:'<svg viewBox="0 0 100 100"><polygon points="50,4 86,22 94,64 50,94 6,64 14,22" fill="#d46cff" stroke="#fff" stroke-width="4"/><polygon points="50,4 50,94 86,22" fill="#9d45c2" opacity=".55"/><polygon points="50,4 14,22 50,94 86,22" fill="none" stroke="#fff" stroke-width="2"/><text x="50" y="60" text-anchor="middle" font-size="23" font-weight="900" fill="#fff">20</text></svg>'};
+function rollDieAnimated(n,button){const r=Math.floor(Math.random()*n)+1;const roller=document.querySelector('#diceRoller'),die=document.querySelector('#diceRollDie'),res=document.querySelector('#diceRollResult');document.querySelector('#roll').textContent='d'+n+' → '+r;die.innerHTML=DICE_SVGS[n]||DICE_SVGS[20];res.textContent='d'+n+' → '+r;roller.classList.remove('show');void roller.offsetWidth;roller.classList.add('show');button.classList.remove('diceButtonRolling');void button.offsetWidth;button.classList.add('diceButtonRolling');setTimeout(()=>roller.classList.remove('show'),1000);}
+document.querySelectorAll('[data-die]').forEach(b=>b.onclick=()=>rollDieAnimated(+b.dataset.die,b));document.querySelector('#damage').onclick=()=>{let hp=document.querySelector('.hpbar i');hp.style.width=Math.max(0,parseFloat(hp.style.width)-12)+'%';};document.querySelector('#next').onclick=()=>{let log=document.querySelector('#log');log.innerHTML='<div><b>Sistema:</b> Turno avançou para Goblin.</div>'+log.innerHTML};
 function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)return;document.querySelector('#log').innerHTML+='<div><b>Você:</b> '+v.replaceAll('<','&lt;')+'</div>';i.value='';}document.querySelector('#send').onclick=send;document.querySelector('#chat').onkeydown=e=>{if(e.key==='Enter')send()};
 // drag from palette creates token
  document.querySelectorAll('.tokenItem').forEach(it=>it.ondblclick=()=>{let kind=it.dataset.kind,t=document.createElement('div');t.className='token '+kind;t.textContent=kind==='player'?'P':kind==='npc'?'N':'M';t.style.left=(600+Math.random()*300)+'px';t.style.top=(300+Math.random()*300)+'px';map.appendChild(t);location.reload()});
@@ -1189,7 +1089,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     }
     getSounds();connectSync();soundBtn.onclick=openSoundPanel;
   })();
-  document.querySelector('#saveCampaign').onclick=()=>{const save={campaign:'Ruínas de Arkhon',room:'KR7X',date:new Date().toISOString(),mapBackground:map.style.backgroundImage};localStorage.setItem('rpgForgeCampaign',JSON.stringify(save));logMsg('Campanha salva neste dispositivo.')};
+  document.querySelector('#saveCampaign').onclick=()=>{const save={campaign:'Ruínas de Arkhon',room:(new URLSearchParams(location.search).get('sala')||localStorage.getItem('rpgForgeRoomV1')||'').toUpperCase(),date:new Date().toISOString(),mapBackground:map.style.backgroundImage};localStorage.setItem('rpgForgeCampaign',JSON.stringify(save));logMsg('Campanha salva neste dispositivo.')};
   document.querySelector('#newMap').onclick=()=>panel('🗺️ Mapas da campanha','<div class="forgeGrid"><div class="forgeStat">🏚️ Salão Norte<br><small>Mapa ativo</small></div><div class="forgeStat">🕯️ Cripta<br><small>Mapa pronto</small></div><div class="forgeStat">🌲 Floresta<br><small>Mapa pronto</small></div><div class="forgeStat">➕ Novo mapa<br><small>Importe uma imagem para começar</small></div></div>');
   function closeVisionPicker(){document.querySelectorAll('.visionPicker').forEach(v=>v.remove());}
   function openVisionPicker(){
@@ -2649,113 +2549,6 @@ window.tool = window.tool || 'select';
   window.rpgForgeClearGrid=clearGrid;
   if(clearFogBtn)clearFogBtn.onclick=clearFog;
   if(clearGridBtn)clearGridBtn.onclick=(e)=>{e.preventDefault();e.stopPropagation();clearGrid();};
-})();
-</script>
-<script>
-(function(){
- const KEY='rpgForgeRecentRoomsV1',menu=document.getElementById('rpgForgeStartMenu'),list=document.getElementById('rfgRecentList'),status=document.getElementById('rfgStartStatus'),joinBox=document.getElementById('rfgJoinBox'),input=document.getElementById('rfgRoomCodeInput'),back=document.getElementById('rfgBackMenu');
- function get(){try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch(e){return[]}}
- function render(){if(!list)return;const a=get();list.innerHTML=a.length?a.map(x=>'<div class="rfgRecentRow"><span class="rfgRecentCode">'+x.code+'</span><span class="rfgRecentDate">'+new Date(x.when||Date.now()).toLocaleDateString('pt-BR')+'</span><button class="rfgRecentJoin" data-code="'+x.code+'">Entrar</button></div>').join(''):'<div class="rfgRecentEmpty">Nenhuma sala acessada ainda.</div>';list.querySelectorAll('button').forEach(b=>b.onclick=()=>enter(b.dataset.code))}
- function remember(code){code=String(code||'').toUpperCase();if(!code)return;const a=[{code,when:Date.now()},...get().filter(x=>x&&x.code!==code)].slice(0,8);try{localStorage.setItem(KEY,JSON.stringify(a))}catch(e){}render()}
- function enter(code){code=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(code.length<4){status.textContent='Digite um código de 4 caracteres.';return}localStorage.setItem('rpgForgeRoomV1',code);localStorage.setItem('rpgForgeRoomModeV1','join');location.href=location.pathname+'?sala='+encodeURIComponent(code)}
- document.getElementById('rfgStartCreate').onclick=()=>{localStorage.removeItem('rpgForgeRoomV1');localStorage.setItem('rpgForgeRoomModeV1','create');status.textContent='Criando sua sala…';if(window.socket?.connected){window.socket.emit('criar-sala',{clientId:localStorage.getItem('rpgForgeClientIdV1'),nome:localStorage.getItem('rpgForgePlayerNameV1')||'Mestre'})}};
- document.getElementById('rfgStartJoin').onclick=()=>{joinBox.style.display='flex';back.style.display='block';input.focus();status.textContent='Digite o código da sala.'};
- document.getElementById('rfgConfirmJoin').onclick=()=>enter(input.value);input.addEventListener('keydown',e=>{if(e.key==='Enter')enter(input.value)});back.onclick=()=>{joinBox.style.display='none';back.style.display='none';status.textContent=''};
- window.rememberRecent=remember;window.hideRpgStartMenu=()=>menu?.classList.add('hidden');window.showRpgStartMenu=()=>{menu?.classList.remove('hidden');render()};render();
-})();
-</script>
-<script>
-/* Páginas/mapas — servidor autoritativo dentro da mesma sala */
-(function(){
-  const map=document.getElementById('map'), toolBtn=document.getElementById('rpgPageTool'), panel=document.getElementById('rpgPagePanel');
-  if(!map||!toolBtn||!panel)return;
-  const CLIENT_KEY='rpgForgeClientIdV1';
-  const PAGE_KEY='rpgForgeServerPageIdV1';
-  const CACHE_KEY='rpgForgeServerStateV1';
-  const baseHTML=map.innerHTML;
-  let socket=null, role='player', pages=[], players=[], currentPageId=null, ready=false;
-  const safeGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
-  const safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
-  const ROOM=(safeGet('rpgForgeRoomV1')||new URLSearchParams(location.search).get('sala')||'').toUpperCase();
-  let clientId=safeGet(CLIENT_KEY); if(!clientId){clientId=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random());safeSet(CLIENT_KEY,clientId)}
-  function valid(s){return s&&typeof s.html==='string'&&s.html.includes('class="grid"')&&s.html.length>500}
-  function snapshot(){
-    const fog=document.getElementById('rpgFogLayer'), color=document.getElementById('rpgFogColor'), vision=document.getElementById('rpgFogVisionRadius');
-    let weather=null; try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
-    return {version:6,html:map.innerHTML,mapStyle:map.getAttribute('style')||'',weather,fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked}};
-  }
-  function applySnapshot(s){
-    if(!valid(s)) { map.innerHTML=baseHTML; window.rpgForgePageSnapshot=null; return; }
-    map.innerHTML=s.html; if(typeof s.mapStyle==='string')map.setAttribute('style',s.mapStyle); window.rpgForgePageSnapshot=s;
-  }
-  function currentPage(){return pages.find(p=>p.id===currentPageId)||pages[0]}
-  function cache(){safeSet(CACHE_KEY,JSON.stringify({pages,players,role,currentPageId}))}
-  function goPage(id){
-    if(!socket||!ready)return;
-    if(id===currentPageId)return;
-    save();
-    socket.emit('pagina-trocar',{sala:ROOM,pageId:id});
-  }
-  let saveTimer=null;
-  function save(){if(socket&&ready&&currentPageId){clearTimeout(saveTimer);saveTimer=setTimeout(()=>socket.emit('pagina-salvar-estado',{sala:ROOM,pageId:currentPageId,state:snapshot()}),80)}}
-  window.rpgForgeSaveCurrentPage=save;
-  window.addEventListener('beforeunload',()=>{try{if(socket&&ready&&currentPageId)socket.emit('pagina-salvar-estado',{sala:ROOM,pageId:currentPageId,state:snapshot()})}catch(e){}});
-  function render(){
-    panel.innerHTML=''; const pg=currentPage();
-    const title=document.createElement('div');title.className='rpgPageStatus';title.innerHTML='<b>📍 '+(pg?.name||'Mapa')+'</b> · '+(role==='gm'?'Mestre':'Jogador');panel.appendChild(title);
-    if(role==='gm'){
-      pages.forEach(p=>{
-        const row=document.createElement('div');row.className='rpgPageRow';
-        const b=document.createElement('button');b.type='button';b.className='rpgPageChoice'+(p.id===currentPageId?' active':'');b.textContent=(p.locked?'🔒 ':'🗺️ ')+p.name;b.onclick=()=>goPage(p.id);row.appendChild(b);
-        const lock=document.createElement('button');lock.type='button';lock.className='rpgPageLock'+(p.locked?' locked':'');lock.textContent=p.locked?'🔒':'🔓';lock.title=p.locked?'Destravar':'Travar';lock.onclick=e=>{e.stopPropagation();socket.emit('pagina-travar',{sala:ROOM,pageId:p.id,locked:!p.locked})};row.appendChild(lock);
-        const ren=document.createElement('button');ren.type='button';ren.className='rpgPageLock';ren.textContent='✏️';ren.onclick=e=>{e.stopPropagation();const n=prompt('Nome do mapa:',p.name);if(n)socket.emit('pagina-renomear',{sala:ROOM,pageId:p.id,name:n})};row.appendChild(ren);
-        if(pages.length>1){const del=document.createElement('button');del.type='button';del.className='rpgPageLock';del.textContent='🗑️';del.onclick=e=>{e.stopPropagation();if(confirm('Excluir '+p.name+'?'))socket.emit('pagina-excluir',{sala:ROOM,pageId:p.id})};row.appendChild(del)}
-        panel.appendChild(row);
-      });
-      const add=document.createElement('button');add.type='button';add.className='rpgPageNew';add.textContent='＋ Novo mapa';add.onclick=()=>{const n=prompt('Nome do novo mapa:','Mapa '+(pages.length+1));if(n)socket.emit('pagina-criar',{sala:ROOM,name:n})};panel.appendChild(add);
-      const h=document.createElement('div');h.className='rpgPageStatus';h.textContent='👥 Controle de jogadores';panel.appendChild(h);
-      players.filter(x=>x.id!==clientId).forEach(pl=>{
-        const row=document.createElement('div');row.className='rpgPageRow';const label=document.createElement('span');label.textContent='👤 '+(pl.name||'Jogador');label.style.flex='1';row.appendChild(label);
-        const sel=document.createElement('select');pages.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.name;o.selected=pl.pageId===p.id;sel.appendChild(o)});sel.onchange=()=>socket.emit('pagina-atribuir',{sala:ROOM,playerId:pl.id,pageId:sel.value});row.appendChild(sel);panel.appendChild(row);
-      });
-    } else {
-      const st=document.createElement('div');st.className='rpgPageStatus';st.textContent=pg?.locked?'🔒 Este mapa está bloqueado pelo Mestre.':'🔐 Seu mapa é controlado pelo Mestre. Você não pode trocar de mapa sozinho.';panel.appendChild(st);
-    }
-  }
-  function bootState(data){
-    role=data.role||'player'; pages=data.pages||[]; players=data.players||[]; currentPageId=data.currentPageId||pages[0]?.id; ready=true; cache(); try{rememberRecent(data.roomCode||ROOM)}catch(e){}; hideRpgStartMenu();
-    const pg=currentPage(); if(pg?.state){ applySnapshot(pg.state); try{if(pg.state.weather&&window.rpgForge?.setWeather) window.rpgForge.setWeather(pg.state.weather.type);}catch(e){} } else applySnapshot({html:baseHTML,mapStyle:''});
-    window.rpgForgePageCurrentId=currentPageId; window.rpgForgePageRole=role; render();
-  }
-  function connect(){
-    if(typeof io!=='function'){panel.hidden=false;panel.innerHTML='<div class="rpgPageStatus">⚠️ Servidor multiplayer indisponível.</div>';return}
-    socket=io(); window.socket=socket;
-    socket.on('connect',()=>{
-      const mode=safeGet('rpgForgeRoomModeV1')||'';
-      if(mode==='create'){
-        socket.emit('criar-sala',{clientId,nome:safeGet('rpgForgePlayerNameV1')||'Mestre'});
-      }else if(ROOM){
-        socket.emit('entrar-sala',{sala:ROOM,clientId,nome:safeGet('rpgForgePlayerNameV1')||'Jogador'});
-      }
-    });
-    socket.on('sala-criada',d=>{
-      if(!d?.sala)return;
-      safeSet('rpgForgeRoomV1',d.sala);
-      safeSet('rpgForgeRoomModeV1','join');
-      history.replaceState(null,'','?sala='+encodeURIComponent(d.sala));
-    });
-    socket.on('sala-estado',bootState);
-    socket.on('pagina-estado',d=>{if(d.pageId===currentPageId){applySnapshot(d.state);window.rpgForgePageSnapshot=d.state; try{if(d.state?.weather&&window.rpgForge?.setWeather) window.rpgForge.setWeather(d.state.weather.type);}catch(e){}}});
-    socket.on('pagina-atualizada',d=>{pages=d.pages||pages;players=d.players||players;currentPageId=d.currentPageId||currentPageId;cache();render();});
-    socket.on('pagina-troca-confirmada',d=>{currentPageId=d.pageId;safeSet(PAGE_KEY,currentPageId);location.reload()});
-    socket.on('pagina-acesso-negado',m=>alert(m||'Acesso negado pelo Mestre.'));
-    socket.on('sala-erro',m=>{const el=document.getElementById('rfgStartStatus');if(el)el.textContent=m||'Não foi possível acessar a sala.';alert(m||'Não foi possível acessar a sala.');safeSet('rpgForgeRoomModeV1','');});
-    socket.on('disconnect',()=>{ready=false;});
-  }
-  toolBtn.onclick=()=>{panel.hidden=!panel.hidden;document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));if(!panel.hidden)toolBtn.classList.add('active');render()};
-  window.rpgForgePageAccess={getPages:()=>pages,isLocked:id=>!!pages.find(p=>p.id===id)?.locked,canEnter:(id,r=role)=>r==='gm'||(!!pages.find(p=>p.id===id)&&!pages.find(p=>p.id===id).locked&&pages.find(p=>p.id===id).allowedPlayers?.includes(clientId))};
-  connect();
-  setInterval(()=>{if(ready&&!document.hidden)save()},1500);
 })();
 </script>
 </body></html>
