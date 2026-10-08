@@ -2095,9 +2095,20 @@ window.tool = window.tool || 'select';
   const gmView=document.getElementById('rpgFogGMView');
   function centerFogCloud(targetCloud=cloud){
     const g=gridSize();
-    if(!targetCloud||!g)return;
-    targetCloud.style.left=(g.left+(g.w-targetCloud.offsetWidth)/2)+'px';
-    targetCloud.style.top=(g.top+(g.h-targetCloud.offsetHeight)/2)+'px';
+    const grid=map&&map.querySelector('.grid');
+    if(!targetCloud||!g||!grid)return;
+    // O centro é calculado pela quantidade real de blocos configurada em
+    // "Tamanho total do mapa" (Colunas x Linhas), e não pelo tamanho
+    // visual da tela. Em mapas ímpares, isso coloca a fumaça no bloco
+    // central; em mapas pares, fica exatamente entre os dois blocos centrais.
+    const cols=Math.max(1,Number(grid.dataset.cols)||1);
+    const rows=Math.max(1,Number(grid.dataset.rows)||1);
+    const cellW=g.w/cols;
+    const cellH=g.h/rows;
+    const centerX=g.left+(cols/2)*cellW;
+    const centerY=g.top+(rows/2)*cellH;
+    targetCloud.style.left=(centerX-targetCloud.offsetWidth/2)+'px';
+    targetCloud.style.top=(centerY-targetCloud.offsetHeight/2)+'px';
   }
   function applyScenarioFogState(st){
     st=st||{};
