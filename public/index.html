@@ -2107,8 +2107,14 @@ window.tool = window.tool || 'select';
     const cellH=g.h/rows;
     const centerX=g.left+(cols/2)*cellW;
     const centerY=g.top+(rows/2)*cellH;
-    targetCloud.style.left=(centerX-targetCloud.offsetWidth/2)+'px';
-    targetCloud.style.top=(centerY-targetCloud.offsetHeight/2)+'px';
+    // O cloud está dentro de #rpgFogLayer, que possui left/top próprios
+    // (-400/-300). Portanto o centro do grid precisa ser convertido para
+    // coordenadas relativas à camada da fumaça.
+    const fogLayer=targetCloud.parentElement;
+    const layerLeft=parseFloat(getComputedStyle(fogLayer).left)||0;
+    const layerTop=parseFloat(getComputedStyle(fogLayer).top)||0;
+    targetCloud.style.left=(centerX-layerLeft-targetCloud.offsetWidth/2)+'px';
+    targetCloud.style.top=(centerY-layerTop-targetCloud.offsetHeight/2)+'px';
   }
   function applyScenarioFogState(st){
     st=st||{};
@@ -2221,7 +2227,7 @@ window.tool = window.tool || 'select';
   function scale(f){setSizePercent(currentSize()*f)}
   big.onclick=e=>{e.stopPropagation();scale(1.15)};
   small.onclick=e=>{e.stopPropagation();scale(.87)};
-  center.onclick=e=>{e.stopPropagation();const g=gridSize();cloud.style.left=(g.left+(g.w-cloud.offsetWidth)/2)+'px';cloud.style.top=(g.top+(g.h-cloud.offsetHeight)/2)+'px';updateVision()};
+  center.onclick=e=>{e.stopPropagation();centerFogCloud(cloud);updateVision()};
   let fogLocked=false;window.rpgForgeFogLocked=false;let drag=false,dx=0,dy=0,resizing=false,startX=0,startY=0,startW=0,startH=0, fogMoveMode=false;
   // Editor da névoa: abre com duplo clique, como o editor do mapa.
   let fogEditor=null;
@@ -2345,7 +2351,7 @@ window.tool = window.tool || 'select';
     cloud.style.maskSize=cloud.offsetWidth+'px '+cloud.offsetHeight+'px';
   }
   if(visionRadius)visionRadius.addEventListener('change',updateVision);
-  setSizePercent(100);const g=gridSize();cloud.style.left=g.left+'px';cloud.style.top=g.top+'px';if(!map.contains(fog))map.insertBefore(fog,map.firstChild);window.rpgForgeSetFogState=applyScenarioFogState;updateVision();
+  setSizePercent(100);centerFogCloud(cloud);if(!map.contains(fog))map.insertBefore(fog,map.firstChild);window.rpgForgeSetFogState=applyScenarioFogState;updateVision();
   // Atualiza a visão enquanto qualquer token existente ou criado é arrastado.
   // Observa apenas tokens. Nunca observe a própria máscara da névoa,
   // pois updateVision() altera a máscara e isso causaria um loop infinito.
