@@ -257,8 +257,15 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   .side,.spellEditor{transition:none}
 }
 
-</style></head>
-<body><div class="app"><header><div class="logo">RPG <span>FORGE</span></div><div class="session">Campanha: <b>Ruínas de Arkhon</b></div><div class="spacer"></div><span class="pill mode" id="modeBadge">● Jogador</span></header>
+</style>
+/* Menu inicial de salas */
+#rpgRoomStart{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(7,10,14,.94);backdrop-filter:blur(8px);font-family:system-ui,sans-serif;color:#e8edf4}
+#rpgRoomStart[hidden]{display:none}
+.rpgRoomCard{width:min(560px,calc(100vw - 32px));max-height:min(760px,calc(100vh - 32px));overflow:auto;background:#151a20;border:1px solid #394250;border-radius:18px;box-shadow:0 24px 80px #000b;padding:28px}
+.rpgRoomBrand{font-size:28px;font-weight:800;letter-spacing:.5px}.rpgRoomBrand span{color:#d6a85d}.rpgRoomSub{color:#9da7b4;margin:6px 0 24px}.rpgRoomActions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.rpgRoomAction{border:1px solid #4b5563;border-radius:12px;background:#1b2129;color:#eef2f7;padding:16px;cursor:pointer;text-align:left}.rpgRoomAction:hover{border-color:#d6a85d;background:#202832}.rpgRoomAction b{display:block;font-size:16px;margin-bottom:5px}.rpgRoomAction small{color:#9da7b4}.rpgRoomRecent{margin-top:22px;border-top:1px solid #303844;padding-top:18px}.rpgRoomRecent h3{font-size:14px;margin:0 0 10px}.rpgRecentEmpty{color:#7f8996;font-size:13px;padding:8px 0}.rpgRecentRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #252c35}.rpgRecentInfo{min-width:0}.rpgRecentCode{font-weight:700;letter-spacing:1px}.rpgRecentMeta{font-size:11px;color:#87919e;margin-top:2px}.rpgRecentJoin{border:1px solid #46505d;border-radius:8px;background:#1c232c;color:#e8edf4;padding:7px 10px;cursor:pointer}.rpgRecentJoin:hover{border-color:#d6a85d}.rpgRoomStatus{margin-top:14px;font-size:12px;color:#aab3bf;min-height:18px}
+@media(max-width:600px){.rpgRoomCard{padding:20px}.rpgRoomActions{grid-template-columns:1fr}.rpgRoomBrand{font-size:24px}}
+</head>
+<body><div id="rpgRoomStart" hidden><div class="rpgRoomCard"><div class="rpgRoomBrand">RPG <span>FORGE</span></div><div class="rpgRoomSub">Entre em uma mesa ou crie uma nova sala para começar.</div><div class="rpgRoomActions"><button class="rpgRoomAction" id="rpgStartCreate"><b>➕ Criar sala</b><small>Criar uma sala nova e ser o Mestre.</small></button><button class="rpgRoomAction" id="rpgStartJoin"><b>🔗 Participar</b><small>Entrar usando o código de uma sala.</small></button></div><div class="rpgRoomRecent"><h3>🕘 Últimas salas</h3><div id="rpgRecentList"></div></div><div class="rpgRoomStatus" id="rpgRoomStartStatus"></div></div></div><div class="app"><header><div class="logo">RPG <span>FORGE</span></div><div class="session">Campanha: <b>Ruínas de Arkhon</b></div><div class="spacer"></div><span class="pill mode" id="modeBadge">● Jogador</span></header>
 <div class="main"><aside class="side"><div class="section"><h3>Ferramentas</h3><div class="toolgrid"><button class="tool active" data-tool="select">↖ Selecionar</button><button class="tool" data-tool="measure">⌁ Medir</button><button class="tool" data-tool="fog">☁ Névoa</button><button class="tool" data-tool="ping">⊙ Marcar</button><button class="tool" id="rpgPageTool" type="button">🗺️ Cenários</button></div><div id="rpgPagePanel" class="rpgPagePanel" hidden></div></div><div class="section"><h3>🎭 Modo de jogo</h3><div class="card"><div class="small" id="roleDescription">Você está como Jogador.</div><button class="btn" id="toggleRole" style="width:100%;margin-top:8px">Tornar-se Mestre</button></div></div><div class="section"><h3>🌫️ Névoa</h3><div class="rpgFogControls">
   <button class="btn" id="rpgFogLock" style="width:100%">🔓 Travar névoa</button>
   <button class="btn" id="rpgFogToggle" style="width:100%">🌫️ Ativar fumaça</button>
@@ -336,13 +343,29 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     badge.textContent='🟢 '+(ROOM||'SALA')+' • '+n+' '+(n===1?'jogador':'jogadores');
     const controls=document.getElementById('rpgServerRoomControls');
     if(controls)controls.style.display='none';
+    const share=document.getElementById('rpgHeaderShare');if(share)share.style.display=ready?'inline-flex':'none';
   }
-  function bootState(d){role=d.role||'player';pages=d.pages||[];players=Array.isArray(d.players)?d.players:[];currentPageId=d.currentPageId||pages[0]?.id;ready=true;safeSet(ROOM_KEY,d.roomCode||ROOM);safeSet(PAGE_KEY,currentPageId||'');const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});updateRoleUI();render();updatePresenceUI()}
+  function rememberRecentRoom(code){try{code=String(code||'').toUpperCase();if(!code)return;let a=JSON.parse(safeGet('rpgForgeRecentRoomsV1')||'[]');if(!Array.isArray(a))a=[];a=[{code,when:Date.now()},...a.filter(x=>x&&x.code!==code)].slice(0,8);safeSet('rpgForgeRecentRoomsV1',JSON.stringify(a));renderStartMenu()}catch(e){}}
+  function hideStartMenu(){const m=document.getElementById('rpgRoomStart');if(m)m.hidden=true}
+  function bootState(d){role=d.role||'player';pages=d.pages||[];players=Array.isArray(d.players)?d.players:[];currentPageId=d.currentPageId||pages[0]?.id;ready=true;safeSet(ROOM_KEY,d.roomCode||ROOM);safeSet(PAGE_KEY,currentPageId||'');rememberRecentRoom(d.roomCode||ROOM);hideStartMenu();const pg=currentPage();if(pg?.state)applySnapshot(pg.state);else applySnapshot({html:baseHTML,mapStyle:''});updateRoleUI();render();updatePresenceUI()}
   function updateRoleUI(){if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';if(roleDesc)roleDesc.textContent=role==='gm'?'Você é o Mestre desta sala.':'Você está como Jogador. O Mestre controla os cenários.';if(roleBtn){roleBtn.textContent=role==='gm'?'Mestre da sala':'Modo controlado pela sala';roleBtn.disabled=true;roleBtn.title='A função Mestre é definida pelo servidor.'}}
+  function renderStartMenu(){
+    const m=document.getElementById('rpgRoomStart'),list=document.getElementById('rpgRecentList'),status=document.getElementById('rpgRoomStartStatus');
+    if(!m||!list)return;
+    let recent=[];try{recent=JSON.parse(safeGet('rpgForgeRecentRoomsV1')||'[]')}catch(e){recent=[]}
+    list.innerHTML='';
+    if(!recent.length){const e=document.createElement('div');e.className='rpgRecentEmpty';e.textContent='Você ainda não participou de nenhuma sala neste dispositivo.';list.appendChild(e)}
+    recent.forEach(r=>{if(!r?.code)return;const row=document.createElement('div');row.className='rpgRecentRow';const info=document.createElement('div');info.className='rpgRecentInfo';const c=document.createElement('div');c.className='rpgRecentCode';c.textContent=r.code;const meta=document.createElement('div');meta.className='rpgRecentMeta';meta.textContent=r.when?'Último acesso: '+new Date(r.when).toLocaleString('pt-BR'):'Sala salva';info.append(c,meta);const b=document.createElement('button');b.className='rpgRecentJoin';b.textContent='Entrar';b.onclick=()=>{safeSet(ROOM_KEY,r.code);safeSet(MODE_KEY,'join');location.href=location.pathname+'?sala='+encodeURIComponent(r.code)};row.append(info,b);list.appendChild(row)});
+    const mode=safeGet(MODE_KEY);if(status)status.textContent=mode==='create'?'Criando sua sala…':(ROOM?'Conectando à sala '+ROOM+'…':'');
+    if(!ROOM) m.hidden=false; else if(mode==='create'||ROOM) m.hidden=false;
+  }
   function addRoomButtons(){
-    const h=document.querySelector('header');if(!h||document.getElementById('rpgServerRoomControls'))return;const wrap=document.createElement('div');wrap.id='rpgServerRoomControls';wrap.style.display='flex';wrap.style.gap='6px';
-    const mk=(txt,fn)=>{const b=document.createElement('button');b.className='btn';b.textContent=txt;b.onclick=fn;return b};
-    wrap.append(mk('Criar sala',()=>{safeSet(MODE_KEY,'create');location.reload()}),mk('Entrar',()=>{const c=(prompt('Código da sala:')||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');if(c){safeSet(ROOM_KEY,c);safeSet(MODE_KEY,'join');location.href=location.pathname+'?sala='+encodeURIComponent(c)}}),mk('Compartilhar',()=>{if(!ROOM){alert('Crie ou entre em uma sala primeiro.');return}const u=location.origin+location.pathname+'?sala='+encodeURIComponent(ROOM);navigator.clipboard?.writeText(u).then(()=>alert('Link da sala copiado!')).catch(()=>alert(u))}));h.appendChild(wrap)
+    renderStartMenu();
+    const m=document.getElementById('rpgRoomStart'),create=document.getElementById('rpgStartCreate'),join=document.getElementById('rpgStartJoin');
+    create?.addEventListener('click',()=>{safeSet(MODE_KEY,'create');if(m)m.hidden=false;const st=document.getElementById('rpgRoomStartStatus');if(st)st.textContent='Criando sala…';if(socket?.connected){socket.emit('criar-sala',{clientId,nome:safeGet('rpgForgePlayerNameV1')||'Mestre'});safeSet(MODE_KEY,'join');}});
+    join?.addEventListener('click',()=>{const c=(prompt('Código da sala:')||'').trim().toUpperCase().replace(/[^A-Z0-9]/g,'');if(c){safeSet(ROOM_KEY,c);safeSet(MODE_KEY,'join');location.href=location.pathname+'?sala='+encodeURIComponent(c)}});
+    // Se clicar em criar, a conexão atual cria a sala sem recarregar.
+    const h=document.querySelector('header');if(h&&!document.getElementById('rpgHeaderShare')){const b=document.createElement('button');b.id='rpgHeaderShare';b.className='btn';b.textContent='Compartilhar sala';b.style.display='none';b.onclick=()=>{if(!ROOM){return}const u=location.origin+location.pathname+'?sala='+encodeURIComponent(ROOM);navigator.clipboard?.writeText(u).then(()=>alert('Link da sala copiado!')).catch(()=>alert(u))};h.appendChild(b)}
   }
   function connect(){
     addRoomButtons();if(typeof io!=='function'){if(roleDesc)roleDesc.textContent='⚠️ Servidor multiplayer não carregado.';return}socket=io();socket.on('connect',()=>{const mode=safeGet(MODE_KEY)||'join';if(mode==='create'){socket.emit('criar-sala',{clientId,nome:safeGet('rpgForgePlayerNameV1')||'Mestre'});safeSet(MODE_KEY,'join')}else if(ROOM)socket.emit('entrar-sala',{sala:ROOM,clientId,nome:safeGet('rpgForgePlayerNameV1')||'Jogador'});else if(roleDesc)roleDesc.textContent='Crie uma sala ou entre com um código.'});
