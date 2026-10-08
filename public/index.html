@@ -311,7 +311,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     const clone=map.cloneNode(true);clone.querySelectorAll('.spellResizeHandle').forEach(x=>x.remove());clone.querySelectorAll('.spellArea').forEach(x=>x.classList.remove('spellEditing','spellMoving'));
     const fog=document.getElementById('rpgFogLayer'),color=document.getElementById('rpgFogColor'),vision=document.getElementById('rpgFogVisionRadius');
     let weather=null;try{weather=window.rpgForge?.weather?window.rpgForge.weather():null}catch(e){}
-    const localGrid=clone.querySelector('.grid');if(localGrid)localGrid.removeAttribute('style');return {version:11,html:clone.innerHTML,weather,fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked,cloudStyle:document.getElementById('rpgFogCloud')?.getAttribute('style')||'',gmSeeThrough:!!document.getElementById('rpgFogCloud')?.classList.contains('gmSeeThrough')}};
+    const localGrid=clone.querySelector('.grid');if(localGrid)localGrid.removeAttribute('style');clone.querySelector('#weatherOverlay')?.remove();return {version:12,html:clone.innerHTML,weather,fog:{opacity:document.getElementById('rpgFogOpacity')?.value||'',color:color?.value||'',visionRadius:vision?.value||'',active:!!fog?.classList.contains('active'),locked:!!window.rpgForgeFogLocked,cloudStyle:document.getElementById('rpgFogCloud')?.getAttribute('style')||'',gmSeeThrough:!!document.getElementById('rpgFogCloud')?.classList.contains('gmSeeThrough')}};
   }
   function applySnapshot(st){
     applying=true;window.rpgForgePageApplying=true;
@@ -319,11 +319,13 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
       const liveFog=document.getElementById('rpgFogLayer');
       if(!valid(st)){map.innerHTML=baseHTML}
       else{
-        if(liveFog)liveFog.remove();const holder=document.createElement('div');holder.innerHTML=st.html;holder.querySelector('#rpgFogLayer')?.remove();map.innerHTML=holder.innerHTML;if(liveFog)map.insertBefore(liveFog,map.firstChild);window.rpgForgeReapplyLocalMapView?.();
+        if(liveFog)liveFog.remove();const holder=document.createElement('div');holder.innerHTML=st.html;holder.querySelector('#rpgFogLayer')?.remove();holder.querySelector('#weatherOverlay')?.remove();map.innerHTML=holder.innerHTML;if(liveFog)map.insertBefore(liveFog,map.firstChild);window.rpgForgeReapplyLocalMapView?.();
       }
       window.rpgForgePageSnapshot=st||null;
       window.dispatchEvent(new CustomEvent('rpgforge:apply-fog-state',{detail:st?.fog||null}));
       window.rpgForgeRebindAfterRemoteState?.();window.rpgForgeRebindObjects?.();window.rpgForgeRebindMagics?.();
+      if(st?.weather&&window.rpgForge?.setWeather){window.rpgForge.setWeather(st.weather.type||'clear',st.weather);}
+      else if(window.rpgForge?.setWeather){window.rpgForge.setWeather('clear');}
     }finally{setTimeout(()=>{applying=false;window.rpgForgePageApplying=false},0)}
   }
   function currentPage(){return pages.find(p=>p.id===currentPageId)||pages[0]}
@@ -1820,12 +1822,12 @@ window.tool = window.tool || 'select';
     document.body.appendChild(p);
     p.querySelector('#weatherType').value=state.type;
     p.querySelector('#weatherIntensity').oninput=e=>p.querySelector('#weatherIntensityVal').textContent=e.target.value+'%';
-    p.querySelector('#weatherApply').onclick=()=>{state={type:p.querySelector('#weatherType').value,intensity:+p.querySelector('#weatherIntensity').value,wind:+p.querySelector('#weatherWind').value,lightning:p.querySelector('#weatherLightning').checked};build();p.querySelector('#weatherStatus').textContent='Clima atual: '+weatherNames[state.type];logMsg('Clima alterado para '+weatherNames[state.type]+'.');};
-    p.querySelector('#weatherClear').onclick=()=>{state={...state,type:'clear'};build();p.querySelector('#weatherStatus').textContent='Clima atual: Limpo';logMsg('Clima removido do mapa.');};
+    p.querySelector('#weatherApply').onclick=()=>{state={type:p.querySelector('#weatherType').value,intensity:+p.querySelector('#weatherIntensity').value,wind:+p.querySelector('#weatherWind').value,lightning:p.querySelector('#weatherLightning').checked};build();p.querySelector('#weatherStatus').textContent='Clima atual: '+weatherNames[state.type];logMsg('Clima alterado para '+weatherNames[state.type]+'.');setTimeout(()=>window.rpgForgeSaveCurrentPageNow?.(),0);};
+    p.querySelector('#weatherClear').onclick=()=>{state={...state,type:'clear'};build();p.querySelector('#weatherStatus').textContent='Clima atual: Limpo';logMsg('Clima removido do mapa.');setTimeout(()=>window.rpgForgeSaveCurrentPageNow?.(),0);};
     p.querySelector('#weatherClose').onclick=()=>p.remove();
   }
   btn.onclick=openPanel;
-  window.rpgForge=window.rpgForge||{}; window.rpgForge.weather=()=>({...state}); window.rpgForge.setWeather=(type)=>{if(weatherNames[type]){state.type=type;build();}};
+  window.rpgForge=window.rpgForge||{}; window.rpgForge.weather=()=>({...state}); window.rpgForge.setWeather=(type,opts)=>{if(!weatherNames[type])return;const next=opts&&typeof opts==='object'?opts:{};state={type,intensity:Number(next.intensity)||55,wind:Number(next.wind)||45,lightning:next.lightning===undefined?true:!!next.lightning};build();};
   const savedWeather=window.rpgForgePageSnapshot?.weather;
   if(savedWeather&&weatherNames[savedWeather.type]){
     state={type:savedWeather.type,intensity:Number(savedWeather.intensity)||55,wind:Number(savedWeather.wind)||45,lightning:!!savedWeather.lightning};
