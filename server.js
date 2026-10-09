@@ -5,11 +5,6 @@ const {Server}=require('socket.io');
 const PORT=process.env.PORT||3000;
 const publicDir=path.join(__dirname,'public');
 const rooms=new Map();
-const roomHistory=[];
-const MAX_HISTORY=20;
-const MAX_STATE_BYTES=6_000_000;
-function rememberRoom(room){roomHistory.unshift({code:room.code,createdAt:room.createdAt,ownerName:room.ownerName});while(roomHistory.length>MAX_HISTORY)roomHistory.pop()}
-function recentRooms(){return roomHistory.filter(item=>rooms.has(item.code)).map(item=>({...item,players:rooms.get(item.code).players.size}))}
 const soundLibrary=new Map();
 const soundSse=new Set();
 let soundSeq=0;
@@ -24,10 +19,8 @@ function roomState(room,me){return{role:me?.role||'player',roomCode:room.code,cu
 function broadcast(room){for(const p of room.players.values())io.to(p.socketId).emit('pagina-atualizada',roomState(room,p))}
 function gm(socket,room){const p=room.players.get(socket.id);return !!p&&p.role==='gm'}
 function defaultPage(room){return room.pages.find(p=>!p.locked)||room.pages[0]}
-function mePage(room,socketId,pageId){const player=room.players.get(socketId);if(player)player.pageId=pageId}
 const server=http.createServer((req,res)=>{
   const u=decodeURIComponent(req.url.split('?')[0]);
-  if(u==='/api/rooms/recent'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({rooms:recentRooms()}))}
   if(u==='/api/health'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({ok:true,service:'rpg-forge',rooms:rooms.size,uptime:Math.floor(process.uptime())}))}
   if(u==='/api/sounds'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});return res.end(JSON.stringify({sounds:publicSounds()}))}
   if(u==='/api/sound/events'&&req.method==='GET'){res.writeHead(200,{'Content-Type':'text/event-stream; charset=utf-8','Cache-Control':'no-cache, no-store','Connection':'keep-alive','Access-Control-Allow-Origin':'*'});res.write(': connected\n\n');soundSse.add(res);sseSend(res,'presence',{count:soundSse.size});sseSend(res,'sound-library',{sounds:publicSounds()});req.on('close',()=>{soundSse.delete(res);broadcastSound('presence',{count:soundSse.size})});return}
@@ -40,28 +33,23 @@ const io=new Server(server,{cors:{origin:true,credentials:true}});
 io.on('connection',socket=>{
  socket.on('criar-sala',({clientId,nome}={})=>{
    if(!clientId)return socket.emit('sala-erro','Identidade do Mestre inválida.');
-   if(socket.data.room){const old=rooms.get(socket.data.room);if(old)old.players.delete(socket.id);socket.leave(socket.data.room);socket.data.room=null}
-   const code=makeCode();const room={code,ownerClientId:String(clientId),ownerName:cleanName(nome||'Mestre'),createdAt:new Date().toISOString(),pages:[newPage('page-1','Mapa 1')],players:new Map()};rooms.set(code,room);rememberRoom(room);
+   const code=makeCode();const room={code,ownerClientId:clientId,pages:[newPage('page-1','Mapa 1')],players:new Map()};rooms.set(code,room);
    const p={socketId:socket.id,clientId,name:cleanName(nome||'Mestre'),role:'gm',pageId:room.pages[0].id};room.players.set(socket.id,p);socket.data.room=code;socket.join(code);
-   socket.emit('sala-criada',{sala:code});socket.emit('sala-estado',roomState(room,p));io.emit('salas-recentes',recentRooms());
+   socket.emit('sala-criada',{sala:code});socket.emit('sala-estado',roomState(room,p));
  });
  socket.on('entrar-sala',({sala,clientId,nome}={})=>{
-   sala=String(sala||'').trim().toUpperCase();if(socket.data.room){const previous=rooms.get(socket.data.room);if(previous)previous.players.delete(socket.id);socket.leave(socket.data.room);socket.data.room=null}
-   const room=rooms.get(sala);if(!room)return socket.emit('sala-erro','Sala não encontrada. O Mestre precisa criá-la primeiro.');
-   if(!clientId)return socket.emit('sala-erro','Identidade do jogador inválida. Atualize a página e tente novamente.');
-   // Se o mesmo jogador reconectar, remove o socket antigo para evitar duplicatas.
-   for(const [oldSocketId,oldPlayer] of room.players){if(oldPlayer.clientId===String(clientId)){room.players.delete(oldSocketId);const oldSocket=io.sockets.sockets.get(oldSocketId);if(oldSocket){oldSocket.leave(sala);oldSocket.data.room=null}}}
-   const existing=null;const page=existing?room.pages.find(p=>p.id===existing.pageId)||defaultPage(room):defaultPage(room);
-   const p={socketId:socket.id,clientId:String(clientId),name:cleanName(nome),role:String(clientId)===room.ownerClientId?'gm':'player',pageId:page.id};
-   if(p.role==='gm')room.ownerClientId=String(clientId);room.players.set(socket.id,p);if(p.role==='player'&&!page.allowedPlayers.includes(clientId))page.allowedPlayers.push(clientId);
-   socket.data.room=sala;socket.join(sala);socket.emit('sala-estado',roomState(room,p));io.emit('salas-recentes',recentRooms());
+   sala=String(sala||'').toUpperCase();const room=rooms.get(sala);if(!room)return socket.emit('sala-erro','Sala não encontrada. O Mestre precisa criá-la primeiro.');
+   const safeClientId=String(clientId||socket.id).slice(0,160);const existing=[...room.players.values()].find(p=>p.clientId===safeClientId);const page=existing?room.pages.find(p=>p.id===existing.pageId)||defaultPage(room):defaultPage(room);for(const [oldSocketId,oldPlayer] of room.players){if(oldPlayer.clientId===safeClientId&&oldSocketId!==socket.id)room.players.delete(oldSocketId)}
+   const p={socketId:socket.id,clientId:safeClientId,name:cleanName(nome),role:safeClientId===room.ownerClientId?'gm':'player',pageId:page.id};
+   if(p.role==='gm')room.ownerClientId=safeClientId;room.players.set(socket.id,p);if(p.role==='player'&&!page.allowedPlayers.includes(clientId))page.allowedPlayers.push(clientId);
+   socket.data.room=sala;socket.join(sala);socket.emit('sala-estado',roomState(room,p));
    if(page.state)socket.emit('pagina-estado',{pageId:page.id,state:page.state});
    if(page.weatherEffect)socket.emit('rpg-efeito-clima',page.weatherEffect);
    if(page.fogEffect)socket.emit('rpg-efeito-fumaca',page.fogEffect);broadcast(room);
  });
  socket.on('pagina-trocar',({sala,pageId})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg)return;if(me.role!=='gm'&&(pg.locked||!pg.allowedPlayers.includes(me.clientId))){return socket.emit('pagina-acesso-negado','O Mestre não liberou este mapa para você.')}me.pageId=pg.id;socket.emit('pagina-troca-confirmada',{pageId:pg.id});if(pg.state)socket.emit('pagina-estado',{pageId:pg.id,state:pg.state});broadcast(room)});
- socket.on('pagina-salvar-estado',({sala,pageId,state})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg||!state||typeof state.html!=='string')return;if(JSON.stringify(state).length>MAX_STATE_BYTES)return socket.emit('sala-erro','O estado do mapa excedeu o limite permitido.');if(me.role!=='gm'&&(pg.locked||me.pageId!==pg.id))return;pg.state=state;for(const p of room.players.values())if(p.pageId===pg.id&&p.socketId!==socket.id)io.to(p.socketId).emit('pagina-estado',{pageId:pg.id,state})});
- socket.on('pagina-criar',({sala,name}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return socket.emit('sala-erro','Apenas o Mestre pode criar mapas.');const id='page-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);room.pages.push(newPage(id,cleanName(name||`Mapa ${room.pages.length+1}`)));mePage(room,socket.id,id);broadcast(room);socket.emit('pagina-troca-confirmada',{pageId:id})});
+ socket.on('pagina-salvar-estado',({sala,pageId,state})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg||!state||typeof state.html!=='string')return;if(JSON.stringify(state).length>6000000)return;if(me.role!=='gm'&&(pg.locked||me.pageId!==pg.id))return;pg.state=state;for(const p of room.players.values())if(p.pageId===pg.id&&p.socketId!==socket.id)io.to(p.socketId).emit('pagina-estado',{pageId:pg.id,state})});
+ socket.on('pagina-criar',({sala,name}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return socket.emit('sala-erro','Apenas o Mestre pode criar mapas.');const id='page-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);room.pages.push(newPage(id,cleanName(name||`Mapa ${room.pages.length+1}`)));broadcast(room);socket.emit('pagina-troca-confirmada',{pageId:id})});
  socket.on('pagina-renomear',({sala,pageId,name}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return;const p=room.pages.find(x=>x.id===pageId);if(p)p.name=cleanName(name||p.name);broadcast(room)});
  socket.on('pagina-excluir',({sala,pageId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room)||room.pages.length<=1)return;const fallback=room.pages.find(p=>p.id!==pageId);room.pages=room.pages.filter(p=>p.id!==pageId);for(const p of room.players.values())if(p.pageId===pageId){p.pageId=fallback.id;io.to(p.socketId).emit('pagina-troca-confirmada',{pageId:fallback.id});if(fallback.state)io.to(p.socketId).emit('pagina-estado',{pageId:fallback.id,state:fallback.state})}broadcast(room)});
  socket.on('pagina-travar',({sala,pageId,locked}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return socket.emit('sala-erro','Apenas o Mestre pode travar mapas.');const p=room.pages.find(x=>x.id===pageId);if(!p)return; p.locked=!!locked;if(p.locked){const fallback=defaultPage(room);for(const pl of room.players.values()){if(pl.role==='player'&&pl.pageId===p.id){pl.pageId=fallback.id;io.to(pl.socketId).emit('pagina-troca-confirmada',{pageId:fallback.id});if(fallback.state)io.to(pl.socketId).emit('pagina-estado',{pageId:fallback.id,state:fallback.state})}}}broadcast(room)});
@@ -70,6 +58,6 @@ io.on('connection',socket=>{
  socket.on('rpg-efeito-clima',({sala,type,intensity,wind,lightning,pageId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);if(!room||!me||me.role!=='gm')return socket.emit('sala-erro','Apenas o Mestre pode alterar o clima.');const pg=room.pages.find(p=>p.id===pageId)||room.pages.find(p=>p.id===me.pageId);if(!pg)return;const effect={type:type||'clear',intensity:Number(intensity)||55,wind:Number(wind)||45,lightning:lightning!==false,pageId:pg.id};pg.weatherEffect=effect;for(const p of room.players.values())if(p.pageId===pg.id)io.to(p.socketId).emit('rpg-efeito-clima',effect);});
  socket.on('rpg-efeito-fumaca',({sala,active,opacity,color,visionRadius,locked,cloudStyle,gmSeeThrough,pageId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);if(!room||!me||me.role!=='gm')return socket.emit('sala-erro','Apenas o Mestre pode alterar a fumaça.');const pg=room.pages.find(p=>p.id===pageId)||room.pages.find(p=>p.id===me.pageId);if(!pg)return;const effect={active:!!active,opacity:Number(opacity)||72,color:color||'#dfe5ee',visionRadius:Number(visionRadius)||2,locked:!!locked,cloudStyle:cloudStyle||'',gmSeeThrough:!!gmSeeThrough,pageId:pg.id};pg.fogEffect=effect;for(const p of room.players.values())if(p.pageId===pg.id)io.to(p.socketId).emit('rpg-efeito-fumaca',effect);});
  socket.on('rpg-dice-roll',(payload={})=>{const code=socket.data.room,room=rooms.get(code),me=room?.players.get(socket.id);if(!room||!me)return;const sides=Math.max(2,Math.min(1000,Number(payload.sides)||20));const result=Math.max(1,Math.min(sides,Number(payload.result)||1));const rollId=String(payload.rollId||('roll-'+Date.now()+'-'+Math.random().toString(36).slice(2,7))).slice(0,160);const results=Array.isArray(payload.results)?payload.results.slice(0,20).map(n=>Math.max(1,Math.min(sides,Number(n)||1))):[result];const event={action:'roll',type:'dice-roll',rollId,clientId:String(payload.clientId||me.clientId),roller:cleanName(payload.roller||me.name),sides,result,results,createdAt:new Date().toISOString()};io.to(code).emit('rpg-dice-roll',event)});
- socket.on('disconnect',()=>{const code=socket.data.room,room=rooms.get(code);if(!room)return;room.players.delete(socket.id);if(room.players.size>0)broadcast(room);else{rooms.delete(code)}});
+ socket.on('disconnect',()=>{const code=socket.data.room,room=rooms.get(code);if(!room)return;room.players.delete(socket.id);if(room.players.size>0)broadcast(room)});
 });
 server.listen(PORT,()=>console.log(`RPG Forge em http://localhost:${PORT}`));
