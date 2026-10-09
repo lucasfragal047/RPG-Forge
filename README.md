@@ -19,6 +19,7 @@ Pacote organizado para o RPG Forge multiplayer.
 - Tokens e objetos.
 - Magias e efeitos.
 - Sons sincronizados.
+- Rolagem de dados com animação 3D sincronizada em tempo real para todos os jogadores da mesma sala.
 - Importação/exportação do mapa.
 
 ## Rodar localmente
@@ -38,6 +39,10 @@ Abra `http://localhost:3000`.
 - Health Check Path: `/api/health`
 
 O servidor usa `PORT` e `0.0.0.0`, então funciona no ambiente do Render.
+
+## Dados 3D sincronizados
+
+Ao clicar em d4, d6, d8 ou d20, o resultado aparece em uma animação 3D. O servidor transmite o evento pela sala Socket.IO, para que todos os jogadores da mesma sala vejam o mesmo resultado. Não é necessário instalar extensão de navegador.
 
 ## Importante
 

@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RPG Forge — Mesa Virtual</title>
 <style>
-:root{color-scheme:dark;--bg:#101216;--panel:#171a20;--panel2:#1d2129;--line:#303641;--text:#eef1f5;--muted:#9ca5b3;--accent:#d6a85d;--good:#6dcc9b;--danger:#df7474}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,Segoe UI,sans-serif;overflow:hidden}.app{height:100vh;display:grid;grid-template-rows:58px 1fr;background:var(--bg)}header{display:flex;align-items:center;gap:18px;padding:0 18px;border-bottom:1px solid var(--line);background:#12151a}.logo{font-weight:800;letter-spacing:.4px}.logo span{color:var(--accent)}.session{color:var(--muted);font-size:12px}.spacer{flex:1}.pill,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:8px 11px}.btn{cursor:pointer}.btn:hover{border-color:#555e6d}.main{min-height:0;display:grid;grid-template-columns:250px 1fr 285px}.side{background:var(--panel);border-right:1px solid var(--line);overflow:auto;position:relative;min-width:0;transition:width .18s ease,opacity .18s ease}.right{border-left:1px solid var(--line);border-right:0}.main.leftCollapsed{grid-template-columns:44px 1fr 285px}.main.rightCollapsed{grid-template-columns:250px 1fr 44px}.main.leftCollapsed.rightCollapsed{grid-template-columns:44px 1fr 44px}.side.collapsed{overflow:hidden}.side.collapsed>*:not(.sideCollapse){display:none!important}.sideCollapse{position:sticky;top:8px;z-index:40;display:flex!important;align-items:center;justify-content:center;width:32px;height:32px;margin:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);cursor:pointer;font-size:18px;line-height:1}.sideCollapse:hover{border-color:#555e6d;color:var(--accent)}.side.right .sideCollapse{margin-left:auto}.section{padding:15px;border-bottom:1px solid var(--line)}h3{margin:0 0 11px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}.toolgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.tool{padding:9px;border:1px solid var(--line);border-radius:8px;background:#191d24;cursor:pointer}.tool.active{border-color:var(--accent);color:var(--accent)}.tokenItem{display:flex;align-items:center;gap:8px;padding:8px;border-radius:7px;cursor:pointer}.tokenItem:hover{background:#20252e}.dot{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;border:2px solid #fff}.player{background:#5774d9}.npc{background:#b25d65}.monster{background:#7a9a55}.canvasWrap{position:relative;overflow:hidden;background:#0c0f13}.toolbar{position:absolute;z-index:5;top:12px;left:12px;right:12px;display:flex;gap:7px;align-items:center}.toolbar .btn{background:#171b22dd;backdrop-filter:blur(5px)}.mapToolsWrap{position:relative;z-index:10;display:flex;align-items:flex-start}.mapToolsToggle{width:40px;height:40px;padding:0;font-size:18px}.mapToolsPanel{display:none;position:absolute;left:47px;top:0;gap:7px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:10px;background:#12151add;backdrop-filter:blur(7px);box-shadow:0 8px 24px #0008;white-space:nowrap}.mapToolsWrap.open .mapToolsPanel{display:flex}#map{position:absolute;inset:0;cursor:grab;transform-origin:0 0}.grid{position:absolute;width:2400px;height:1600px;left:-400px;top:-300px;background-color:#15191e;background-image:linear-gradient(#30353d 1px,transparent 1px),linear-gradient(90deg,#30353d 1px,transparent 1px);background-size:50px 50px;z-index:0!important}.room{position:absolute;border:2px solid #777f8d;background:#20252bcc;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#707887;font-size:13px}.token{position:absolute;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;border:3px solid #eee;box-shadow:0 5px 16px #0008;cursor:grab;user-select:none;z-index:3}.token.selected{outline:3px solid var(--accent);outline-offset:3px}.token.player{background:#536fd2}.token.npc{background:#a95d65}.token.monster{background:#718e50}.fog{position:absolute;background:#050608cc;z-index:4;pointer-events:none;mix-blend-mode:normal}.magicEffect{position:absolute;z-index:7;pointer-events:none;border:3px solid var(--effect-color,#7c4dff);background:color-mix(in srgb,var(--effect-color,#7c4dff) 22%,transparent);box-shadow:0 0 24px var(--effect-color,#7c4dff),inset 0 0 24px var(--effect-color,#7c4dff);animation:magicPulse 1.4s ease-in-out infinite alternate}.magicBeam{position:absolute;height:5px;transform-origin:left center;background:var(--effect-color,#7c4dff);box-shadow:0 0 16px var(--effect-color,#7c4dff);z-index:7;pointer-events:none}.spellArea{position:absolute;z-index:7;pointer-events:auto;overflow:hidden;border:2px solid var(--effect-color);box-shadow:0 0 28px var(--effect-color),inset 0 0 20px var(--effect-color);background:color-mix(in srgb,var(--effect-color) 18%,transparent)}
+:root{color-scheme:dark;--bg:#101216;--panel:#171a20;--panel2:#1d2129;--line:#303641;--text:#eef1f5;--muted:#9ca5b3;--accent:#d6a85d;--good:#6dcc9b;--danger:#df7474}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,Segoe UI,sans-serif;overflow:hidden}.app{height:100vh;display:grid;grid-template-rows:58px 1fr;background:var(--bg)}header{display:flex;align-items:center;gap:18px;padding:0 18px;border-bottom:1px solid var(--line);background:#12151a}.logo{font-weight:800;letter-spacing:.4px}.logo span{color:var(--accent)}.session{color:var(--muted);font-size:12px}.spacer{flex:1}.pill,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:8px 11px}.btn{cursor:pointer}.btn:hover{border-color:#555e6d}.main{min-height:0;display:grid;grid-template-columns:250px 1fr 285px}.side{background:var(--panel);border-right:1px solid var(--line);overflow:auto;position:relative;min-width:0;transition:width .18s ease,opacity .18s ease}.right{border-left:1px solid var(--line);border-right:0}.main.leftCollapsed{grid-template-columns:44px 1fr 285px}.main.rightCollapsed{grid-template-columns:250px 1fr 44px}.main.leftCollapsed.rightCollapsed{grid-template-columns:44px 1fr 44px}.side.collapsed{overflow:hidden}.side.collapsed>*:not(.sideCollapse){display:none!important}.sideCollapse{position:sticky;top:8px;z-index:40;display:flex!important;align-items:center;justify-content:center;width:32px;height:32px;margin:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);cursor:pointer;font-size:18px;line-height:1}.sideCollapse:hover{border-color:#555e6d;color:var(--accent)}.side.right .sideCollapse{margin-left:auto}.section{padding:15px;border-bottom:1px solid var(--line)}h3{margin:0 0 11px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}.toolgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.tool{padding:9px;border:1px solid var(--line);border-radius:8px;background:#191d24;cursor:pointer}.tool.active{border-color:var(--accent);color:var(--accent)}.tokenItem{display:flex;align-items:center;gap:8px;padding:8px;border-radius:7px;cursor:pointer}.tokenItem:hover{background:#20252e}.dot{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;border:2px solid #fff}.player{background:#5774d9}.npc{background:#b25d65}.monster{background:#7a9a55}.canvasWrap{position:relative;overflow:hidden;background:#0c0f13}.toolbar{position:absolute;z-index:5;top:12px;left:12px;right:12px;display:flex;gap:7px;align-items:center}.toolbar .btn{background:#171b22dd;backdrop-filter:blur(5px)}.mapToolsWrap{position:relative;z-index:10;display:flex;align-items:flex-start}.mapToolsToggle{width:40px;height:40px;padding:0;font-size:18px}.mapToolsPanel{display:none;position:absolute;left:47px;top:0;gap:7px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:10px;background:#12151add;backdrop-filter:blur(7px);box-shadow:0 8px 24px #0008;white-space:nowrap}.mapToolsWrap.open .mapToolsPanel{display:flex}#map{position:absolute;inset:0;cursor:grab;transform-origin:0 0}.grid{position:absolute;width:2400px;height:1600px;left:-400px;top:-300px;background-color:#15191e;background-image:linear-gradient(#30353d 1px,transparent 1px),linear-gradient(90deg,#30353d 1px,transparent 1px);background-size:50px 50px;z-index:0}.room{position:absolute;border:2px solid #777f8d;background:#20252bcc;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#707887;font-size:13px}.token{position:absolute;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;border:3px solid #eee;box-shadow:0 5px 16px #0008;cursor:grab;user-select:none;z-index:3}.token.selected{outline:3px solid var(--accent);outline-offset:3px}.token.player{background:#536fd2}.token.npc{background:#a95d65}.token.monster{background:#718e50}.fog{position:absolute;background:#050608cc;z-index:4;pointer-events:none;mix-blend-mode:normal}.magicEffect{position:absolute;z-index:7;pointer-events:none;border:3px solid var(--effect-color,#7c4dff);background:color-mix(in srgb,var(--effect-color,#7c4dff) 22%,transparent);box-shadow:0 0 24px var(--effect-color,#7c4dff),inset 0 0 24px var(--effect-color,#7c4dff);animation:magicPulse 1.4s ease-in-out infinite alternate}.magicBeam{position:absolute;height:5px;transform-origin:left center;background:var(--effect-color,#7c4dff);box-shadow:0 0 16px var(--effect-color,#7c4dff);z-index:7;pointer-events:none}.spellArea{position:absolute;z-index:7;pointer-events:auto;overflow:hidden;border:2px solid var(--effect-color);box-shadow:0 0 28px var(--effect-color),inset 0 0 20px var(--effect-color);background:color-mix(in srgb,var(--effect-color) 18%,transparent)}
 .spellArea .spellClose{position:absolute;right:3px;top:3px;z-index:20;background:#111b;border:1px solid #fff5;color:#fff;border-radius:5px;cursor:pointer}.spellVisual{position:absolute;inset:0;transform:rotate(var(--spell-rotation,0deg));transform-origin:center center}.spellArea.spellEditing{overflow:visible}.spellArea.spellEditing .spellResizeHandle{position:absolute;z-index:40;pointer-events:auto;background:transparent;border:0}.spellResizeHandle.n,.spellResizeHandle.s{left:12px;right:12px;height:16px}.spellResizeHandle.n{top:-8px;cursor:ns-resize!important}.spellResizeHandle.s{bottom:-8px;cursor:ns-resize!important}.spellResizeHandle.e,.spellResizeHandle.w{top:12px;bottom:12px;width:16px}.spellResizeHandle.e{right:-8px;cursor:ew-resize!important}.spellResizeHandle.w{left:-8px;cursor:ew-resize!important}.spellResizeHandle.nw,.spellResizeHandle.ne,.spellResizeHandle.sw,.spellResizeHandle.se{width:18px;height:18px}.spellResizeHandle.nw{left:-9px;top:-9px;cursor:nwse-resize!important}.spellResizeHandle.ne{right:-9px;top:-9px;cursor:nesw-resize!important}.spellResizeHandle.sw{left:-9px;bottom:-9px;cursor:nesw-resize!important}.spellResizeHandle.se{right:-9px;bottom:-9px;cursor:nwse-resize!important}.spellArea.spellEditing:after{content:'';position:absolute;inset:0;border:2px dashed #d6a85d;box-shadow:0 0 0 1px #0008;pointer-events:none;z-index:38}.spellEditor{position:fixed;z-index:1200;width:min(330px,90vw);background:#171a20;border:1px solid #555e6d;border-radius:10px;box-shadow:0 16px 45px #000d;color:#fff;overflow:hidden}.spellEditorHead{padding:9px 11px;background:#20252e;border-bottom:1px solid #343b47;font-weight:700;display:flex;align-items:center;gap:8px}.spellEditorHead span{flex:1}.spellEditorBody{padding:10px}.spellEditorGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.spellEditor label{display:block;font-size:11px;color:#aeb7c5}.spellEditor input{margin-top:4px}.spellEditorBtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.spellEditorRotate{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}.spellEditor .btn{width:100%}.spellEditorSave{margin-top:8px}.spellEditorHint{font-size:10px;color:#9ca5b3;margin-top:8px;line-height:1.35}.spellEditor.activeMove .moveSpellBtn{border-color:#d6a85d;color:#d6a85d}.spellArea.spellMoving{cursor:move!important}.spellArea.spellEditing .spellLabel{pointer-events:none}
 .spellParticles{position:absolute;inset:0;pointer-events:none}
 .spellParticle{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--effect-color);box-shadow:0 0 10px var(--effect-color);animation:particleFall var(--dur) linear infinite;left:var(--left);top:-10px}
@@ -58,7 +58,7 @@
 .spell-waterWall .spellFx:after{left:0;right:0;bottom:-4%;height:42%;background:radial-gradient(ellipse at center,rgba(180,245,255,.65),transparent 70%);animation:fxWaterPulse .8s ease-in-out infinite alternate}
 .spellLabel{position:absolute;left:7px;bottom:5px;padding:2px 5px;border-radius:5px;background:#101216bb;color:#fff;font-size:10px;z-index:19}.measure{position:absolute;z-index:6;border-top:2px dashed var(--accent);transform-origin:left center;pointer-events:none}.badge{position:absolute;top:-18px;right:-8px;background:#111;color:#fff;border:1px solid var(--line);padding:2px 5px;border-radius:5px;font-size:10px}.card{background:#1b1f27;border:1px solid var(--line);border-radius:9px;padding:10px;margin-bottom:8px}.row{display:flex;justify-content:space-between;gap:8px;margin:6px 0}.muted{color:var(--muted)}.hpbar{height:7px;background:#333;border-radius:99px;overflow:hidden;margin-top:8px}.hpbar i{display:block;height:100%;background:var(--good)}.init{display:flex;align-items:center;gap:8px}.init strong{margin-left:auto}.small{font-size:11px;color:var(--muted)}input,select{background:#12151a;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:6px;width:100%}.dice{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.dice button{padding:9px 3px;background:#242a33;border:1px solid var(--line);border-radius:7px;color:#fff;cursor:pointer}.log{max-height:115px;overflow:auto;font-size:12px;color:var(--muted)}.mode{color:var(--good);font-weight:700}.hidden{display:none}@keyframes magicPulse{from{transform:scale(.96);opacity:.72}to{transform:scale(1.04);opacity:1}}@keyframes particleFall{from{transform:translateY(-15px) rotate(0deg);opacity:0}15%{opacity:1}to{transform:translateY(230px) rotate(260deg);opacity:0}}@keyframes flame{from{transform:scale(.85) rotate(var(--rot));opacity:.65}to{transform:scale(1.12) rotate(calc(var(--rot) + 4deg));opacity:1}}@keyframes fxBoomRing{0%{transform:scale(.35);opacity:0}20%{opacity:1}100%{transform:scale(1.8);opacity:0}}@keyframes fxBoomCore{from{transform:scale(.7);opacity:.65}to{transform:scale(1.2);opacity:1}}@keyframes fxBeamSweep{from{transform:translateX(-20%) rotate(-18deg)}to{transform:translateX(20%) rotate(-18deg)}}@keyframes fxIceSpin{to{transform:rotate(360deg)}}@keyframes fxLightning{0%,72%,100%{opacity:0}73%,79%,84%{opacity:1}77%,81%,88%{opacity:.2}}@keyframes fxLightningGlow{from{opacity:.12;transform:scale(.9)}to{opacity:.65;transform:scale(1.08)}}@keyframes fxArcaneSpin{to{transform:rotate(360deg)}}@keyframes fxArcaneSpinReverse{to{transform:rotate(-360deg)}}@keyframes fxPortalSpin{to{transform:rotate(360deg) scale(1.05)}}@keyframes fxPortalSpinReverse{to{transform:rotate(-360deg) scale(.92)}}@keyframes fxAuraPulse{from{transform:scale(.9);opacity:.4}to{transform:scale(1.08);opacity:1}}@keyframes fxAuraSpin{to{transform:rotate(360deg)}}@keyframes fxVortexSpin{to{transform:rotate(360deg) scale(.98)}}@keyframes fxVortexSpinReverse{to{transform:rotate(-360deg) scale(1.03)}}@keyframes fxCloudDrift{from{transform:translateX(-5%) scale(.95)}to{transform:translateX(6%) scale(1.05)}}@keyframes fxCloudPulse{from{transform:scale(.85);opacity:.25}to{transform:scale(1.15);opacity:.7}}@keyframes fxDarkSpin{to{transform:rotate(360deg)}}@keyframes fxDarkPulse{from{transform:scale(.9);opacity:.2}to{transform:scale(1.1);opacity:.7}}@keyframes fxShockWave{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.8);opacity:0}}@keyframes fxShockCore{from{transform:scale(.7);opacity:.4}to{transform:scale(1.15);opacity:1}}@keyframes fxSnowSpin{to{transform:rotate(360deg)}}@keyframes fxRainSweep{to{transform:translateX(28px) skewX(-8deg)}}@keyframes fxRipplePulse{from{transform:scale(.75);opacity:.15}to{transform:scale(1.3);opacity:.75}}@keyframes fxBubbles{0%{transform:translateY(14px);opacity:.2}45%{opacity:1}100%{transform:translateY(-40px);opacity:0}}@keyframes fxPoisonPulse{from{transform:scale(.86);opacity:.25}to{transform:scale(1.08);opacity:.72}}@keyframes fxHealCross{0%,100%{transform:translateY(9px) scale(.72);opacity:.3}50%{transform:translateY(-8px) scale(1.05);opacity:1}}@keyframes fxHealRing{from{transform:scale(.5);opacity:.9}to{transform:scale(1.25);opacity:0}}@keyframes fxWaterSlide{to{background-position:38px 0}}@keyframes fxWaterPulse{from{transform:scaleX(.82);opacity:.3}to{transform:scaleX(1.12);opacity:.85}}@media(max-width:900px){.main{grid-template-columns:190px 1fr}.right{display:none}}
 /* Névoa animada — nuvem redimensionável */
-.rpgFogLayer{position:absolute;left:-400px;top:-300px;width:2400px;height:1600px;z-index:20!important;pointer-events:none;overflow:visible;display:none}
+.rpgFogLayer{position:absolute;left:-400px;top:-300px;width:2400px;height:1600px;z-index:1000000!important;pointer-events:none;overflow:visible;display:none}
 .rpgFogLayer.active{display:block}
 .rpgFogCloud{--fog-color:#dfe5ee;position:absolute;left:0;top:0;width:100%;height:100%;min-width:260px;min-height:180px;pointer-events:auto;cursor:grab;overflow:visible;filter:blur(.2px);transform-origin:center center;background:var(--fog-color)}
 .rpgFogCloud:active{cursor:grabbing}
@@ -284,7 +284,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     <div class="row2"><label class="small" for="rpgFogPosY">Névoa Y</label><input id="rpgFogPosY" type="range" min="-900" max="900" step="5" value="0"><span class="rpgFogValue" id="rpgFogPosYValue">0 px</span></div>
     <button class="btn" id="rpgGridFogReset" type="button">↺ Restaurar proporções e posição</button>
   </div>
-</div><div class="section"><h3>Mapa</h3><div class="card"><b>Ruínas — Salão Norte</b><div class="small">24 × 16 quadrados · 1 quadrado = 1,5 m</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button><button class="btn" id="clearGridContent" style="width:100%;margin-top:7px">🧹 Limpar grid</button><div class="small" style="margin-top:6px">Remove o que foi colocado no mapa, mantendo o cenário/base.</div></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="20">d20</button></div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
+</div><div class="section"><h3>Mapa</h3><div class="card"><b>Ruínas — Salão Norte</b><div class="small">24 × 16 quadrados · 1 quadrado = 1,5 m</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button><button class="btn" id="clearGridContent" style="width:100%;margin-top:7px">🧹 Limpar grid</button><div class="small" style="margin-top:6px">Remove o que foi colocado no mapa, mantendo o cenário/base.</div></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="20">d20</button></div><div style="display:flex;align-items:center;gap:8px;margin-top:8px"><label for="rpgForgeDiceCount" class="small">Quantidade de dados</label><input id="rpgForgeDiceCount" type="number" min="1" max="20" value="1" style="width:68px;background:#171b22;color:#fff;border:1px solid #4a5260;border-radius:7px;padding:7px"></div><div class="small" style="margin-top:4px">Exemplo: escolha 3 e clique em d6 para rolar 3d6.</div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
 <main class="canvasWrap" id="stage"><div class="toolbar"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomLabel" title="Clique para redefinir">100%</button><button class="btn" id="zoomIn">+</button><div class="mapToolsWrap" id="mapToolsWrap"><button class="btn mapToolsToggle" id="mapToolsToggle" title="Abrir ferramentas do mapa">⚙️</button><div class="mapToolsPanel" id="mapToolsPanel"><button class="btn" id="snap">Encaixar grade</button><button class="btn" id="importMap">📥 Importar mapa</button><button class="btn" id="exportMap">📤 Exportar mapa</button><input id="mapFile" type="file" accept="image/*,.json" class="hidden"></div></div><div class="spacer"></div><span class="pill" id="roleHint">Modo local</span></div><div id="map"><div class="grid"></div><div class="rpgFogLayer" id="rpgFogLayer"><div class="rpgFogCloud" id="rpgFogCloud"><div class="rpgFogCloudTools"><button id="rpgFogCenter" type="button">↺ Centro</button></div><div class="rpgFogResize" id="rpgFogResize" title="Arraste para redimensionar"></div></div></div><div class="room" style="left:500px;top:230px;width:550px;height:300px">SALÃO PRINCIPAL</div><div class="room" style="left:1080px;top:230px;width:320px;height:300px">CRIPTA</div><div class="room" style="left:500px;top:590px;width:280px;height:250px">ALMOXARIFADO</div><div class="room" style="left:820px;top:590px;width:580px;height:250px">CORREDOR</div><div class="token player" id="laxus" style="left:650px;top:350px" title="Laxus">L</div><div class="token player" id="benzuke" style="left:750px;top:400px" title="Benzuke">B</div><div class="token monster" id="goblin" style="left:1120px;top:330px" title="Goblin">G</div></div><script>
 /* Páginas/mapas locais — sem sistema de salas. O modo Mestre/Jogador é escolhido no botão lateral. */
 (function(){
@@ -293,9 +293,9 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   if(!map||!toolBtn||!panel)return;
   const PAGE_KEY='rpgForgePreviewLocalPageIdV2', ROLE_KEY='rpgForgePreviewLocalRoleV2', DATA_KEY='rpgForgePreviewLocalPagesV2';
   const baseHTML=map.innerHTML;
-  let role=localStorage.getItem(ROLE_KEY)==='gm'?'gm':'player';
+  let role='player'; // PREVIA DE TESTE: não restaura o modo salvo
   let pages=[];
-  let currentPageId=localStorage.getItem(PAGE_KEY)||'page-1';
+  let currentPageId='page-1'; // PREVIA DE TESTE: sempre começa limpa
   let saveTimer=null;
   let applyingSnapshot=false;
   function id(){return 'page-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7)}
@@ -334,14 +334,13 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     }
   }
   function loadPages(){
-    try{pages=JSON.parse(localStorage.getItem(DATA_KEY)||'[]')}catch(e){pages=[]}
-    if(!Array.isArray(pages)||!pages.length){
-      pages=[{id:'page-1',name:'Mapa 1',locked:false,state:null}];
-      localStorage.setItem(DATA_KEY,JSON.stringify(pages));
-    }
-    if(!pages.some(p=>p.id===currentPageId))currentPageId=pages[0].id;
+    // Prévia segura: ignora mapas antigos do navegador para evitar restaurar um cenário pesado/travado.
+    pages=[{id:'page-1',name:'Mapa 1',locked:false,state:null}];
+    currentPageId='page-1';
   }
-  function persist(){try{localStorage.setItem(DATA_KEY,JSON.stringify(pages));localStorage.setItem(PAGE_KEY,currentPageId);localStorage.setItem(ROLE_KEY,role)}catch(e){}}
+  // Nesta prévia, mapas e alterações ficam apenas na memória desta sessão.
+  // Isso impede que um estado antigo volte a ser carregado na próxima abertura.
+  function persist(){}
   function currentPage(){return pages.find(p=>p.id===currentPageId)||pages[0]}
   function updateRoleUI(){
     if(modeBadge)modeBadge.textContent=role==='gm'?'● Mestre':'● Jogador';
@@ -421,11 +420,11 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
   window.rpgForgeRole={get:()=>role,isGM:()=>role==='gm',set:r=>{role=r==='gm'?'gm':'player';persist();updateRoleUI()}};
   window.rpgForgeSaveCurrentPage=save;
   window.rpgForgeSaveCurrentPageNow=saveNow;
-  window.addEventListener('beforeunload',()=>{try{save()}catch(e){}});
+  // Prévia: não serializa o mapa inteiro ao fechar o navegador.
   loadPages();
   const pg=currentPage(); if(pg?.state)applySnapshot(pg.state);
   updateRoleUI();
-  setInterval(()=>{if(!document.hidden)save()},1500);
+  // Prévia: removido o salvamento automático a cada 1,5 s, que podia congelar o navegador.
 })();
 </script></main>
 <aside class="side right"><div class="section"><h3>Selecionado</h3><div class="card" id="selected"><b>Laxus</b><div class="row"><span class="muted">PV</span><span>38 / 42</span></div><div class="hpbar"><i style="width:90%"></i></div><div class="row"><span class="muted">CA</span><span>21</span></div><div class="row"><span class="muted">Iniciativa</span><span>+7</span></div><button class="btn" style="width:100%;margin-top:7px" id="damage">Aplicar 5 dano</button></div></div><div class="section"><h3>Iniciativa</h3><div class="card init"><span class="dot player">L</span><span>Laxus</span><strong>18</strong></div><div class="card init"><span class="dot monster">G</span><span>Goblin</span><strong>14</strong></div><div class="card init"><span class="dot player">B</span><span>Benzuke</span><strong>11</strong></div><button class="btn" style="width:100%" id="next">Próximo turno →</button></div><div class="section"><h3>Chat da mesa</h3><div class="log" id="log"><div><b>Mestre:</b> Vocês entram no salão...</div><div><b>Benzuke:</b> Eu fico na frente.</div></div><div style="display:flex;gap:6px;margin-top:8px"><input id="chat" placeholder="Mensagem..."/><button class="btn" id="send">Enviar</button></div></div></aside></div></div>
@@ -510,15 +509,15 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     const add=(label,fn)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=e=>{e.preventDefault();e.stopPropagation();fn();};box.appendChild(b)};
     add('↑ Trazer para frente',()=>{
       const vals=[...mapEl.querySelectorAll('.mapImageObject,.token,.room,.forgeObj,.magicEffect,.spellArea')].map(n=>parseInt(n.style.zIndex)||1);
-      const top=Math.max(10,...vals)+1; el.style.zIndex=String(top); zCounter=top; editorFor(el);
+      const top=Math.max(10,...vals)+1; el.style.zIndex=String(top); zCounter=top; removeEditor();
     });
     add('↓ Enviar para trás',()=>{
-      el.style.zIndex='1'; editorFor(el);
+      el.style.zIndex='1'; removeEditor();
     });
-    add('↔ Aumentar largura',()=>{el.style.width=(Math.max(30,parseFloat(el.style.width)||30)+25)+'px'; editorFor(el)});
-    add('↔ Diminuir largura',()=>{el.style.width=Math.max(30,(parseFloat(el.style.width)||30)-25)+'px'; editorFor(el)});
-    add('↕ Aumentar altura',()=>{el.style.height=(Math.max(30,parseFloat(el.style.height)||30)+25)+'px'; editorFor(el)});
-    add('↕ Diminuir altura',()=>{el.style.height=Math.max(30,(parseFloat(el.style.height)||30)-25)+'px'; editorFor(el)});
+    add('↔ Aumentar largura',()=>{el.style.width=(Math.max(30,parseFloat(el.style.width)||30)+25)+'px'; removeEditor()});
+    add('↔ Diminuir largura',()=>{el.style.width=Math.max(30,(parseFloat(el.style.width)||30)-25)+'px'; removeEditor()});
+    add('↕ Aumentar altura',()=>{el.style.height=(Math.max(30,parseFloat(el.style.height)||30)+25)+'px'; removeEditor()});
+    add('↕ Diminuir altura',()=>{el.style.height=Math.max(30,(parseFloat(el.style.height)||30)-25)+'px'; removeEditor()});
     add('🗑 Remover imagem',()=>{el.remove();selectedImage=null;removeEditor();});
     document.body.appendChild(box);
     const r=el.getBoundingClientRect(), gap=10;
@@ -589,6 +588,12 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     }file.value='';
   };
   mapEl.addEventListener('click',e=>{if(e.target===mapEl||e.target.classList.contains('grid')){selectImage(null);removeEditor()}});
+  // Clique na imagem abre seu editor; clique em qualquer outro lugar fecha a aba.
+  document.addEventListener('pointerdown',e=>{
+    if(e.target.closest('.mapImageObject,.imageEditor')) return;
+    removeEditor();
+    if(!e.target.closest('.mapImageObject')) selectImage(null);
+  });
 })();
 </script><script>
 // Central de campanha: salas, jogadores, fichas, inventário, mapas, combate, visão e efeitos
@@ -1216,7 +1221,7 @@ window.tool = window.tool || 'select';
   overlayBtn.className='btn';overlayBtn.id='gridOverlayToggle';
   function updateGridOverlay(){
     const on=grid.dataset.overlay==='1';
-    grid.style.zIndex=on?'8':'0';
+    grid.style.zIndex=on?'999999':'0';
     grid.style.pointerEvents='none';
     // No modo sobrepor, somente as linhas da grade ficam sobre o cenário.
     // O fundo da grade precisa ficar transparente para não cobrir o mapa.
@@ -1936,7 +1941,7 @@ window.tool = window.tool || 'select';
       const b=document.createElement('button');
       b.type='button'; b.className='btn'; b.textContent=label;
       b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault()});
-      b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();action();});
+      b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();try{action()}finally{menu.remove()}});
       menu.appendChild(b); return b;
     }
     menuButton('✏️ Editar nome e foto',()=>{openTokenEditor(t,e.clientX,e.clientY);menu.remove()});
@@ -2002,6 +2007,9 @@ window.tool = window.tool || 'select';
       closeEditor();
     };
     panel.appendChild(save);
+    const remove=document.createElement('button'); remove.type='button'; remove.className='btn'; remove.style.cssText='width:100%;margin-top:7px;border-color:#8c4141;color:#ffb5b5'; remove.textContent='🗑️ Remover token do mapa';
+    remove.onclick=e=>{e.preventDefault();e.stopPropagation();closeMenus();if(imageTarget&&imageTarget.token===t)imageTarget=null;t.remove();closeEditor();window.rpgForgeSaveCurrentPageNow?.();if(typeof logMsg==='function')logMsg('Token removido do mapa.')};
+    panel.appendChild(remove);
     const close=document.createElement('button'); close.type='button'; close.className='btn'; close.style.width='100%'; close.style.marginTop='7px'; close.textContent='Fechar'; close.onclick=e=>{e.preventDefault();e.stopPropagation();closeEditor()}; panel.appendChild(close);
     document.body.appendChild(panel);
     name.focus(); name.select();
@@ -2060,6 +2068,25 @@ window.tool = window.tool || 'select';
     if(t.dataset.tokenHeight)t.style.height=t.dataset.tokenHeight+'px';
     applyTokenTransform(t);
     t.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();openTokenEditor(t,e.clientX,e.clientY)});
+    // Imagem/token com imagem: clique esquerdo abre o menu; clicar fora fecha.
+    t.addEventListener('click',e=>{
+      if(!t.classList.contains('hasImage'))return;
+      e.preventDefault();e.stopPropagation();
+      showMenu(t,e);
+    });
+    t.addEventListener('contextmenu',e=>{
+      e.preventDefault();e.stopPropagation();
+      const now=Date.now(), last=Number(t.dataset.lastRightClick)||0;
+      if(now-last<650){
+        t.dataset.lastRightClick='0';closeMenus();
+        document.querySelectorAll('.tokenEditPanel').forEach(p=>p.remove());
+        if(imageTarget&&(imageTarget===t||imageTarget.token===t))imageTarget=null;
+        t.remove();window.rpgForgeSaveCurrentPageNow?.();
+        if(typeof logMsg==='function')logMsg('Token removido com dois cliques no botão direito.');
+      }else{
+        t.dataset.lastRightClick=String(now);showMenu(t,e);
+      }
+    });
 
     // Arraste independente do sistema global da mesa.
     let moving=false, ox=0, oy=0;
@@ -2111,7 +2138,7 @@ window.tool = window.tool || 'select';
 
   // Bloqueia o menu de clique direito nativo apenas sobre tokens.
   mapEl.addEventListener('contextmenu',e=>{if(e.target.closest('.token'))e.preventDefault()});
-  document.addEventListener('pointerdown',e=>{if(!e.target.closest('.tokenMenu'))closeMenus()});
+  document.addEventListener('pointerdown',e=>{if(!e.target.closest('.tokenMenu')&&!e.target.closest('.token.hasImage'))closeMenus()});
 
   // Reforça o bloqueio durante drag para tokens existentes e novos.
   const obs=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){if(n.matches?.('.token'))prepareToken(n);n.querySelectorAll?.('.token').forEach(prepareToken);}})));
@@ -2446,16 +2473,7 @@ window.tool = window.tool || 'select';
   if(window.rpgForgePageAutosaveObserver)return; window.rpgForgePageAutosaveObserver=1;
   const map=document.getElementById('map'); if(!map)return; let timer=0;
   const queue=()=>{if(window.rpgForgePageSnapshot && window.rpgForgePageApplying)return; clearTimeout(timer);timer=setTimeout(()=>{if(!window.rpgForgePageApplying)window.rpgForgeSaveCurrentPage?.()},350)};
-  new MutationObserver(m=>{
-    const relevant=m.some(x=>{
-      const t=x.target;
-      // Mudanças puramente visuais do grid/névoa não devem disparar salvamento integral do mapa.
-      if(t&&t.nodeType===1&&(t.matches?.('.grid,.rpgFogLayer,.rpgFogCloud,.rpgFogVisionMask')||t.closest?.('.rpgFogVisionMask')))return false;
-      if(x.type==='childList'&&t&&t.nodeType===1&&t.closest?.('.rpgFogLayer'))return false;
-      return x.type==='childList'||x.type==='attributes';
-    });
-    if(relevant)queue();
-  }).observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class','src','data-locked','data-item','data-obj']});
+  new MutationObserver(m=>{if(m.some(x=>x.type==='childList'||x.type==='attributes'))queue()}).observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class','src','data-locked','data-item','data-obj']});
   document.addEventListener('input',e=>{if(e.target.closest?.('#map,#rpgFogControls,.rpgFogControls'))queue()});
   document.addEventListener('change',e=>{if(e.target.closest?.('#map,.rpgFogControls'))queue()});
 })();
@@ -2655,13 +2673,8 @@ window.tool = window.tool || 'select';
   function applyGrid(){
     const cols=clampCount(controls.cols.value,48), rows=clampCount(controls.rows.value,32);
     controls.cols.value=String(cols); controls.rows.value=String(rows);
-    // Mantém o grid preso à área do mapa; só muda o tamanho das células.
-    // Assim o mapa não ganha overflow nem provoca recálculos de layout desnecessários.
-    grid.style.width='100%'; grid.style.height='100%';
-    const cellW=Math.max(1,map.clientWidth/cols), cellH=Math.max(1,map.clientHeight/rows);
-    grid.style.setProperty('--grid-cell-w',cellW+'px');
-    grid.style.setProperty('--grid-cell-h',cellH+'px');
-    grid.style.backgroundSize=cellW+'px '+cellH+'px';
+    grid.style.width=(cols*CELL)+'px'; grid.style.height=(rows*CELL)+'px';
+    grid.style.backgroundSize=CELL+'px '+CELL+'px';
     controls.colsv.textContent=cols+' quadrados'; controls.rowsv.textContent=rows+' quadrados';
     safeSave(state());
   }
@@ -2691,15 +2704,156 @@ window.tool = window.tool || 'select';
   window.rpgForgeGridCellSize=()=>({x:CELL,y:CELL});
   window.rpgForgeGridDimensions=()=>({columns:clampCount(controls.cols.value,48),rows:clampCount(controls.rows.value,32)});
   load();
-  // Recalcula as células se o tamanho visível do mapa mudar.
-  if(typeof ResizeObserver!=='undefined'){
-    let resizeFrame=0;
-    const mapResizeObserver=new ResizeObserver(()=>{
-      if(resizeFrame)cancelAnimationFrame(resizeFrame);
-      resizeFrame=requestAnimationFrame(()=>{resizeFrame=0;applyGrid();});
-    });
-    mapResizeObserver.observe(map);
-  } else window.addEventListener('resize',applyGrid,{passive:true});
 })();
 </script>
+
+<style id="rpgForge3DDiceStyles">
+#rpgForgeDiceOverlay{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 42%,#273142d9 0%,#090d16f2 57%,#020307f7 100%);backdrop-filter:blur(7px);opacity:0;visibility:hidden;transition:opacity .2s ease,visibility .2s ease;color:#fff;font-family:inherit;overflow:hidden}
+#rpgForgeDiceOverlay:before{content:"";position:absolute;width:min(70vw,540px);height:min(70vw,540px);border-radius:50%;background:radial-gradient(circle,#d8a94b13 0%,#8a5c1910 34%,transparent 70%);pointer-events:none}
+#rpgForgeDiceOverlay.show{opacity:1;visibility:visible}
+#rpgForgeDiceCard{position:relative;width:min(370px,90vw);min-height:350px;padding:26px 22px 20px;border-radius:24px;text-align:center;background:linear-gradient(145deg,#303846fa 0%,#171d28fa 48%,#0c1018fa 100%);border:1px solid #f0cf8580;box-shadow:0 28px 100px #000e,0 0 0 1px #fff09, inset 0 1px 0 #ffffff20,0 0 48px #d8a84b20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;overflow:hidden}
+#rpgForgeDiceCard:before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,#ffffff0c,transparent 32%,transparent 68%,#d9ad5110);pointer-events:none}
+#rpgForgeDiceTitle{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:#f0cd7b;font-weight:850;text-shadow:0 1px 10px #e7b65330}
+#rpgForgeDieStage{position:relative;height:235px;width:min(300px,82vw);display:flex;align-items:center;justify-content:center;perspective:620px;margin:0;isolation:isolate;overflow:visible}
+#rpgForgeDieStage canvas.rpg-real-die{position:absolute;inset:0;width:100%;height:100%;z-index:2;display:block}
+#rpgForgeDieStage.rpg-three-ready #rpgForgeDie{display:none}
+#rpgForgeDieStage.rpg-three-ready:before{top:78%;width:150px;height:34px;filter:blur(8px)}
+#rpgForgeDieStage:before{content:"";position:absolute;left:50%;top:72%;width:120px;height:32px;transform:translateX(-50%) rotateX(68deg);border-radius:50%;background:radial-gradient(ellipse,#000c 0%,#0007 36%,transparent 72%);filter:blur(7px);opacity:.8}
+#rpgForgeDie{position:relative;width:104px;height:104px;transform-style:preserve-3d;filter:drop-shadow(0 20px 13px #000b) drop-shadow(0 0 8px #d8ad4b22);will-change:transform}
+#rpgForgeDie.rolling{animation:rpgForgeDieTumble 1.85s cubic-bezier(.15,.72,.18,1) both}
+.rpgForgeDieFace{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #fff8;border-radius:17px;background:linear-gradient(138deg,#fff4c7 0%,#e3bd68 12%,#b37a2d 46%,#81501c 72%,#e2bb68 100%);color:#261706;font-size:38px;font-weight:1000;letter-spacing:-.04em;text-shadow:0 1px 0 #fff8,0 -1px 1px #5d3b1680;box-shadow:inset 0 0 0 2px #f8e5a780,inset 0 0 0 5px #65401955,inset 5px 6px 13px #fff6,inset -7px -9px 15px #3d250a70;backface-visibility:hidden;overflow:hidden}
+.rpgForgeDieFace:before{content:"";position:absolute;inset:4px;border-radius:12px;border:1px solid #fff5;box-shadow:inset 0 1px 2px #fff6;pointer-events:none}
+.rpgForgeDieFace:after{content:"";position:absolute;left:8%;top:5%;width:66%;height:32%;border-radius:50%;transform:rotate(-28deg);background:linear-gradient(180deg,#ffffff9c,#fff0);filter:blur(3px);pointer-events:none}
+.rpgForgeDieFace:nth-child(1){transform:translateZ(52px)}
+.rpgForgeDieFace:nth-child(2){transform:rotateY(180deg) translateZ(52px);background:linear-gradient(140deg,#e6edf7 0%,#9eafc7 28%,#53657d 70%,#d7e1f0 100%);box-shadow:inset 0 0 0 2px #eef5ff99,inset 0 0 0 5px #31425766,inset 6px 7px 14px #fff7,inset -7px -9px 15px #17233388}
+.rpgForgeDieFace:nth-child(3){transform:rotateY(90deg) translateZ(52px);background:linear-gradient(140deg,#fff0c9,#d8a95a 30%,#8d5c28 74%,#f4d48d)}
+.rpgForgeDieFace:nth-child(4){transform:rotateY(-90deg) translateZ(52px);background:linear-gradient(140deg,#f4f0e6,#bdb5a5 32%,#71695c 75%,#e4dac8)}
+.rpgForgeDieFace:nth-child(5){transform:rotateX(90deg) translateZ(52px);background:linear-gradient(140deg,#fff0b9,#d8b768 30%,#967035 75%,#f1d58c)}
+.rpgForgeDieFace:nth-child(6){transform:rotateX(-90deg) translateZ(52px);background:linear-gradient(140deg,#ffd9a2,#d9893f 30%,#8c461d 76%,#f3b873)}
+#rpgForgeDiceResult{font-size:clamp(35px,8vw,52px);font-weight:1000;line-height:1.05;color:#ffe7a9;letter-spacing:-.035em;text-shadow:0 2px 0 #5b3517,0 0 18px #f0b74b70}
+#rpgForgeDiceMeta{font-size:13px;color:#c5ccd7;min-height:18px}
+#rpgForgeDiceClose{border:1px solid #aeb7c680;background:linear-gradient(#394352,#202734);color:#fff;border-radius:10px;padding:9px 20px;font:inherit;font-size:12px;cursor:pointer;margin-top:4px;box-shadow:inset 0 1px #fff2,0 5px 14px #0005;transition:transform .15s ease,filter .15s ease}
+#rpgForgeDiceClose:hover{filter:brightness(1.18);transform:translateY(-1px)}
+@keyframes rpgForgeDieTumble{0%{transform:translateY(-100px) rotateX(-35deg) rotateY(10deg) rotateZ(-18deg) scale(.7)}18%{transform:translateY(-28px) rotateX(230deg) rotateY(165deg) rotateZ(110deg) scale(1.13)}36%{transform:translateY(28px) rotateX(455deg) rotateY(320deg) rotateZ(205deg) scale(.94)}52%{transform:translateY(-13px) rotateX(610deg) rotateY(485deg) rotateZ(292deg) scale(1.04)}66%{transform:translateY(9px) rotateX(735deg) rotateY(620deg) rotateZ(340deg) scale(.99)}79%{transform:translateY(-4px) rotateX(800deg) rotateY(700deg) rotateZ(355deg) scale(1.015)}90%{transform:translateY(2px) rotateX(825deg) rotateY(718deg) rotateZ(360deg) scale(1)}100%{transform:translateY(0) rotateX(828deg) rotateY(720deg) rotateZ(360deg) scale(1)}}
+@media(max-width:480px){#rpgForgeDiceCard{min-height:320px;padding:22px 16px 18px}#rpgForgeDieStage{height:180px;width:240px}#rpgForgeDie{width:92px;height:92px}.rpgForgeDieFace:nth-child(1){transform:translateZ(46px)}.rpgForgeDieFace:nth-child(2){transform:rotateY(180deg) translateZ(46px)}.rpgForgeDieFace:nth-child(3){transform:rotateY(90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(4){transform:rotateY(-90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(5){transform:rotateX(90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(6){transform:rotateX(-90deg) translateZ(46px)}}
+@media(prefers-reduced-motion:reduce){#rpgForgeDiceOverlay{transition:none}#rpgForgeDie.rolling{animation-duration:.25s}}
+</style>
+<div id="rpgForgeDiceOverlay" aria-live="polite" aria-label="Rolagem de dados"><div id="rpgForgeDiceCard"><div id="rpgForgeDiceTitle">🎲 Rolagem de dados</div><div id="rpgForgeDieStage"><div id="rpgForgeDie"><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div></div></div><div id="rpgForgeDiceResult">d20 → 20</div><div id="rpgForgeDiceMeta">Aguardando rolagem…</div><button id="rpgForgeDiceClose" type="button">Fechar</button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script id="rpgForgeRealDice3D">
+(function(){
+ const stage=document.getElementById('rpgForgeDieStage'); if(!stage||!window.THREE)return;
+ const THREE=window.THREE; let renderer,scene,camera,mesh,meshes=[],raf=0,rollingUntil=0,lastSides=20,lastValue=20,spinStart=0,fromQ=null,toQ=null,settleStart=0;
+ try{
+  renderer=new THREE.WebGLRenderer({alpha:true,antialias:true}); renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2.5)); renderer.setSize(stage.clientWidth,stage.clientHeight,false); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap; renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.15; renderer.domElement.className='rpg-real-die'; renderer.setAttribute?.('aria-label','Dado tridimensional'); stage.appendChild(renderer.domElement);
+  scene=new THREE.Scene(); camera=new THREE.PerspectiveCamera(32,stage.clientWidth/stage.clientHeight,.1,100); camera.position.set(0,0,6.6);
+  scene.add(new THREE.AmbientLight(0xffe9c4,1.55)); const key=new THREE.DirectionalLight(0xffd17c,4.0);key.position.set(-3,4,5);scene.add(key);const rim=new THREE.PointLight(0x4e9dff,18,20);rim.position.set(3,1,2);scene.add(rim);const fill=new THREE.PointLight(0xff963d,9,15);fill.position.set(-3,-2,2);scene.add(fill);
+  const floor=new THREE.Mesh(new THREE.CircleGeometry(1.0,48),new THREE.ShadowMaterial({opacity:.3}));floor.rotation.x=-Math.PI/2;floor.position.y=-1.28;floor.scale.set(1.6,1.6,1);scene.add(floor);
+  const colors={4:0xb82f24,6:0x1761b7,8:0x167c50,10:0x7b2eb0,100:0xb87916,12:0x138da2,20:0x202b3c};
+  function material(color){return new THREE.MeshPhysicalMaterial({color,metalness:.66,roughness:.25,clearcoat:.9,clearcoatRoughness:.14,flatShading:true});}
+  function geometryFor(s){
+   if(s===4)return new THREE.TetrahedronGeometry(1.08,0);
+   if(s===6)return new THREE.BoxGeometry(1.55,1.55,1.55,1,1,1);
+   if(s===8)return new THREE.OctahedronGeometry(1.13,0);
+   if(s===12)return new THREE.DodecahedronGeometry(1.13,0);
+   if(s===20)return new THREE.IcosahedronGeometry(1.15,0);
+   if(s===10||s===100){const verts=[];const R=1.0,h=1.16;for(let i=0;i<5;i++){const a=i*Math.PI*2/5-Math.PI/2,b=(i+1)*Math.PI*2/5-Math.PI/2;const p1=[Math.cos(a)*R,0,Math.sin(a)*R],p2=[Math.cos(b)*R,0,Math.sin(b)*R];verts.push(0,h,0,...p1,...p2);verts.push(0,-h,0,...p2,...p1);}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));g.computeVertexNormals();return g;}
+   return new THREE.IcosahedronGeometry(1.1,0);
+  }
+  function labelsFor(s){if(s===4)return [1,2,3,4]; if(s===6)return [1,2,3,4,5,6];if(s===8)return [1,2,3,4,5,6,7,8];if(s===10)return [0,1,2,3,4,5,6,7,8,9];if(s===100)return [10,20,30,40,50,60,70,80,90,0];if(s===12)return Array.from({length:12},(_,i)=>i+1);return Array.from({length:20},(_,i)=>i+1)}
+  function makeLabel(text){const c=document.createElement('canvas');c.width=256;c.height=128;const x=c.getContext('2d');x.clearRect(0,0,256,128);x.font='bold 82px Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.lineWidth=7;x.strokeStyle='#120d09';x.strokeText(String(text),128,64);x.fillStyle='#ffe3a0';x.fillText(String(text),128,64);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;const m=new THREE.SpriteMaterial({map:t,transparent:true,depthTest:true});const sp=new THREE.Sprite(m);sp.scale.set(.58,.29,1);return sp;}
+  function disposeMesh(){meshes.forEach(m=>{scene.remove(m);m.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(mat=>{if(mat.map)mat.map.dispose();mat.dispose()})}})});meshes=[];mesh=null;}
+  function createDie(s,value,keepExisting=false,index=0,total=1){
+   if(!keepExisting)disposeMesh();lastSides=s;lastValue=value;mesh=new THREE.Group();const geo=geometryFor(s);geo.computeVertexNormals();const body=new THREE.Mesh(geo,material(colors[s]||0x27364b));body.castShadow=true;body.receiveShadow=true;mesh.add(body);
+   const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geo,1),new THREE.LineBasicMaterial({color:0xf7ca75,transparent:true,opacity:.95}));mesh.add(edges);
+   const labels=labelsFor(s),pos=geo.attributes.position,faceMap=[];
+   // Agrupa os triângulos pela normal: cada rótulo fica no plano de uma face real, não flutuando à frente da câmera.
+   for(let i=0;i<pos.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(pos,i),b=new THREE.Vector3().fromBufferAttribute(pos,i+1),c=new THREE.Vector3().fromBufferAttribute(pos,i+2);const normal=b.clone().sub(a).cross(c.clone().sub(a)).normalize();const center=a.clone().add(b).add(c).multiplyScalar(1/3);let face=faceMap.find(f=>f.normal.dot(normal)>.985);if(!face){face={normal:normal.clone(),points:[],center:new THREE.Vector3(),count:0};faceMap.push(face);}face.points.push(a,b,c);face.center.add(center);face.count++;}
+   faceMap.forEach(f=>{f.center.multiplyScalar(1/f.count);});
+   // Remove triangulações duplicadas de faces planas e ordena as faces de forma estável.
+   faceMap.sort((a,b)=>Math.atan2(a.normal.z,a.normal.x)-Math.atan2(b.normal.z,b.normal.x)||a.normal.y-b.normal.y);
+   if(s===6&&faceMap.length>6){const unique=[];faceMap.forEach(f=>{if(!unique.some(u=>u.normal.dot(f.normal)>.985))unique.push(f)});faceMap.splice(0,faceMap.length,...unique);}
+   const count=faceMap.length;const labelList=labels.length===count?labels:Array.from({length:count},(_,i)=>labels[i%labels.length]);
+   let resultDirection=faceMap[0]?.normal.clone()||new THREE.Vector3(0,0,1);
+   // D6: faces definidas explicitamente pelos seis planos do cubo. Isso evita que a triangulação
+   // do BoxGeometry calcule centros inconsistentes; cada número vira filho do dado e gira com ele.
+   const d6Faces=[
+    {n:1,normal:new THREE.Vector3(0,0,1)},
+    {n:6,normal:new THREE.Vector3(0,0,-1)},
+    {n:2,normal:new THREE.Vector3(1,0,0)},
+    {n:5,normal:new THREE.Vector3(-1,0,0)},
+    {n:3,normal:new THREE.Vector3(0,1,0)},
+    {n:4,normal:new THREE.Vector3(0,-1,0)}
+   ];
+   const facesToDraw=s===6?d6Faces:faceMap.map((face,i)=>({n:labelList[i],normal:face.normal,center:face.center}));
+   facesToDraw.forEach(face=>{
+    const label=face.n;const normal=face.normal;
+    if(Number(label)===Number(value))resultDirection=normal.clone();
+    const canvas=document.createElement('canvas');canvas.width=256;canvas.height=160;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,256,160);ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`bold ${s===6?104:94}px Georgia,serif`;ctx.lineWidth=8;ctx.strokeStyle='#120b05';ctx.strokeText(String(label),128,80);ctx.fillStyle='#ffe2a0';ctx.shadowColor='#ffbf48';ctx.shadowBlur=8;ctx.fillText(String(label),128,80);
+    const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide,depthTest:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});
+    const plane=new THREE.Mesh(new THREE.PlaneGeometry(s===6?.92:.40,s===6?.68:.27),mat);
+    if(s===6)plane.position.copy(normal.clone().multiplyScalar(.778));else plane.position.copy(face.center).add(normal.clone().multiplyScalar(.012));
+    plane.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),normal);plane.renderOrder=3;plane.userData.dieValue=label;mesh.add(plane);
+   });
+   scene.add(mesh);meshes.push(mesh);mesh.rotation.set(.45+index*.12,.5+index*.19,.08);const spacing=total<=3?1.95:total<=5?1.48:1.12;mesh.position.x=(index-(total-1)/2)*spacing;mesh.scale.setScalar(total>6?.52:total>4?.60:total>2?.72:1);fromQ=mesh.quaternion.clone();const faceToCamera=new THREE.Quaternion().setFromUnitVectors(resultDirection.clone().normalize(),new THREE.Vector3(0,0,1));const twist=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),Math.random()*Math.PI*2);mesh.userData.toQ=twist.multiply(faceToCamera);mesh.userData.spinStart=performance.now();mesh.userData.settleStart=mesh.userData.spinStart+1450;mesh.userData.rollingUntil=mesh.userData.spinStart+2050;mesh.userData.rollSeed=Math.random()*1000;
+  }
+
+  function animate(now){raf=requestAnimationFrame(animate);if(!renderer||!scene)return;meshes.forEach(m=>{const elapsed=now-(m.userData.spinStart||now),settle=m.userData.settleStart||now,until=m.userData.rollingUntil||now,to=m.userData.toQ||m.quaternion;if(now<settle){if(lastSides===6){const dq=new THREE.Quaternion().setFromEuler(new THREE.Euler(.105,.137,.091,'XYZ'));m.quaternion.multiply(dq).normalize();}else{m.rotation.x+=.105;m.rotation.y+=.137;m.rotation.z+=.091;}m.position.y=Math.abs(Math.sin(elapsed*.012))*.36;m.position.x+=(m.userData.baseX||m.position.x)*0;}else if(now<until){const t=Math.min(1,(now-settle)/(until-settle));const eased=1-Math.pow(1-t,3);m.quaternion.slerp(to,eased);m.position.y=Math.abs(Math.sin(t*Math.PI*2))*.10*(1-t);}else{m.quaternion.slerp(to,.18);m.position.y+=(0-m.position.y)*.22;}});renderer.render(scene,camera);}
+  function resize(){if(!renderer)return;const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  window.addEventListener('resize',resize);new ResizeObserver(resize).observe(stage);stage.classList.add('rpg-three-ready');createDie(20,20);raf=requestAnimationFrame(animate);
+  window.__rpgForgeRealDieRoll=function(s,v){if(!renderer)return;createDie(Number(s)||20,Number(v)||1);};
+  window.__rpgForgeRealDiceRoll=function(s,values){
+    if(!renderer||!Array.isArray(values)||!values.length)return;
+    disposeMesh();const shown=values.slice(0,8);shown.forEach((v,i)=>createDie(Number(s)||20,Number(v)||1,true,i,shown.length));
+  };
+ }catch(e){console.warn('RPG Forge 3D dice unavailable; using CSS fallback.',e)}
+})();
+</script>
+<script id="rpgForge3DDiceSync">
+(function(){
+  if(window.__rpgForge3DDiceSyncInstalled)return;window.__rpgForge3DDiceSyncInstalled=true;
+  const overlay=document.getElementById('rpgForgeDiceOverlay'),die=document.getElementById('rpgForgeDie'),resultEl=document.getElementById('rpgForgeDiceResult'),metaEl=document.getElementById('rpgForgeDiceMeta'),titleEl=document.getElementById('rpgForgeDiceTitle');
+  if(!overlay||!die)return;
+  let closeTimer=null,source=null,seq=0,roomReady=false;
+  let clientId='dice-'+Math.random().toString(36).slice(2)+Date.now();
+  try{clientId=localStorage.getItem('rpgForgeDiceClientV1')||clientId;localStorage.setItem('rpgForgeDiceClientV1',clientId)}catch(e){}
+  const isServer=()=>location.protocol==='http:'||location.protocol==='https:';
+  function showRoll(data){
+    const sides=Math.max(2,Math.min(1000,Number(data.sides)||20));const value=Math.max(1,Math.min(sides,Number(data.result)||1));
+    clearTimeout(closeTimer);overlay.classList.add('show');titleEl.textContent='🎲 '+(data.roller||'Jogador')+' rolou';
+    const values=Array.isArray(data.results)&&data.results.length?data.results.map(n=>Math.max(1,Math.min(sides,Number(n)||1))):[value];const total=values.reduce((a,b)=>a+b,0);
+    resultEl.textContent=values.length+'d'+sides+' → '+values.join(' + ')+' = '+total;metaEl.textContent=data.detail?String(data.detail):('Resultados: '+values.join(', ')+' · Total: '+total);
+    die.querySelectorAll('.rpgForgeDieFace').forEach((f,i)=>{f.textContent=i===0?String(values[0]):String(sides)});
+    die.classList.remove('rolling');void die.offsetWidth;if(!window.__rpgForgeRealDieRoll)die.classList.add('rolling');if(window.__rpgForgeRealDieRoll){if(window.__rpgForgeRealDiceRoll)window.__rpgForgeRealDiceRoll(sides,values);else values.forEach((v,i)=>setTimeout(()=>window.__rpgForgeRealDieRoll(sides,v),i*900));}
+    const rollBox=document.querySelector('#roll');if(rollBox)rollBox.textContent=values.length+'d'+sides+' → '+values.join(' + ')+' = '+total;
+    const log=document.querySelector('#log');if(log){const row=document.createElement('div');const b=document.createElement('b');b.textContent='Dados: ';row.appendChild(b);row.appendChild(document.createTextNode((data.roller||'Jogador')+' rolou '+values.length+'d'+sides+' = '+values.join(' + ')+' = '+total));log.prepend(row);}
+    closeTimer=setTimeout(()=>overlay.classList.remove('show'),4300);
+  }
+  document.getElementById('rpgForgeDiceClose').addEventListener('click',()=>{clearTimeout(closeTimer);overlay.classList.remove('show')});
+  window.addEventListener('rpgforge-room-ready',()=>{roomReady=true});
+  async function roll(sides){
+    const countInput=document.getElementById('rpgForgeDiceCount');const count=Math.max(1,Math.min(20,Number(countInput?.value)||1));const results=Array.from({length:count},()=>Math.floor(Math.random()*sides)+1);const result=results[0];
+    const name=(document.querySelector('#playerName')?.value||document.querySelector('[data-player-name]')?.value||localStorage.getItem('rpgForgePlayerName')||'Jogador').trim()||'Jogador';
+    const rollId=clientId+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+    const payload={action:'roll',type:'dice-roll',rollId,clientId,roller:name,sides,result,results,createdAt:new Date().toISOString()};
+    showRoll(payload);
+    if(isServer()){
+      const liveSocket=window.rpgForgeSocket;
+      if(roomReady&&liveSocket&&liveSocket.connected){try{liveSocket.emit('rpg-dice-roll',payload);return}catch(e){}}
+      try{const r=await fetch(new URL('/api/sound',location.href),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),keepalive:true});if(!r.ok)metaEl.textContent='Resultado: '+result+' · não foi possível sincronizar com o servidor';}
+      catch(e){metaEl.textContent='Resultado: '+result+' · conexão com o servidor indisponível';}
+    }
+  }
+  // Captura ambos os grupos de botões de dados antes dos handlers antigos.
+  document.addEventListener('click',function(e){const b=e.target.closest?.('[data-die],[data-shared-die]');if(!b)return;const sides=Number(b.dataset.die||b.dataset.sharedDie);if(!Number.isFinite(sides)||sides<2)return;e.preventDefault();e.stopImmediatePropagation();roll(sides)},true);
+  function acceptRoll(d){if(!d||d.type!=='dice-roll'||!d.rollId||d.clientId===clientId)return;showRoll(d)}
+  if(isServer()){
+    try{source=new EventSource(new URL('/api/sound/events',location.href));source.addEventListener('sound-sync',ev=>{try{const d=JSON.parse(ev.data||'{}');if(d.action!=='roll'||d.type!=='dice-roll'||!d.rollId||d.clientId===clientId)return;if((Number(d.seq)||0)<=seq)return;seq=Number(d.seq)||seq;showRoll(d)}catch(e){}})}catch(e){}
+  }
+  window.addEventListener('rpgforge-room-ready',()=>{const s=window.rpgForgeSocket;if(s&&!s.__rpgForgeDiceListener){s.__rpgForgeDiceListener=true;s.on('rpg-dice-roll',acceptRoll)}});
+  if(window.rpgForgeSocket&&!window.rpgForgeSocket.__rpgForgeDiceListener){window.rpgForgeSocket.__rpgForgeDiceListener=true;window.rpgForgeSocket.on('rpg-dice-roll',acceptRoll)}
+  window.rpgForgeRollDice3D=roll;
+})();
+</script>
+
 </body></html>
