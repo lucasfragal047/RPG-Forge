@@ -2737,6 +2737,39 @@ window.tool = window.tool || 'select';
 @keyframes rpgForgeDieTumble{0%{transform:translateY(-100px) rotateX(-35deg) rotateY(10deg) rotateZ(-18deg) scale(.7)}18%{transform:translateY(-28px) rotateX(230deg) rotateY(165deg) rotateZ(110deg) scale(1.13)}36%{transform:translateY(28px) rotateX(455deg) rotateY(320deg) rotateZ(205deg) scale(.94)}52%{transform:translateY(-13px) rotateX(610deg) rotateY(485deg) rotateZ(292deg) scale(1.04)}66%{transform:translateY(9px) rotateX(735deg) rotateY(620deg) rotateZ(340deg) scale(.99)}79%{transform:translateY(-4px) rotateX(800deg) rotateY(700deg) rotateZ(355deg) scale(1.015)}90%{transform:translateY(2px) rotateX(825deg) rotateY(718deg) rotateZ(360deg) scale(1)}100%{transform:translateY(0) rotateX(828deg) rotateY(720deg) rotateZ(360deg) scale(1)}}
 @media(max-width:480px){#rpgForgeDiceCard{min-height:320px;padding:22px 16px 18px}#rpgForgeDieStage{height:180px;width:240px}#rpgForgeDie{width:92px;height:92px}.rpgForgeDieFace:nth-child(1){transform:translateZ(46px)}.rpgForgeDieFace:nth-child(2){transform:rotateY(180deg) translateZ(46px)}.rpgForgeDieFace:nth-child(3){transform:rotateY(90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(4){transform:rotateY(-90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(5){transform:rotateX(90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(6){transform:rotateX(-90deg) translateZ(46px)}}
 @media(prefers-reduced-motion:reduce){#rpgForgeDiceOverlay{transition:none}#rpgForgeDie.rolling{animation-duration:.25s}}
+
+/* Rolagem compacta flutuante no canto inferior direito, sem bloquear a mesa */
+#rpgForgeDiceOverlay{
+  inset:auto 24px 24px auto!important;
+  width:min(330px,calc(100vw - 32px));
+  height:auto; max-height:calc(100vh - 48px);
+  display:flex; align-items:flex-end; justify-content:flex-end;
+  padding:0; box-sizing:border-box;
+  background:transparent!important; backdrop-filter:none!important;
+  opacity:0; visibility:hidden; pointer-events:none;
+  transform:translateY(14px) scale(.97);
+  transition:opacity .2s ease,visibility .2s ease,transform .2s ease;
+}
+#rpgForgeDiceOverlay:before{display:none!important}
+#rpgForgeDiceOverlay.show{opacity:1;visibility:visible;pointer-events:none;transform:translateY(0) scale(1)}
+#rpgForgeDiceCard{
+  width:100%; min-height:0; max-height:calc(100vh - 48px);
+  padding:14px 14px 12px; gap:7px; border-radius:18px;
+  box-shadow:0 12px 36px #000b,0 0 0 1px #fff09,inset 0 1px 0 #ffffff20,0 0 24px #d8a84b18;
+  overflow:hidden; pointer-events:auto;
+}
+#rpgForgeDiceTitle{font-size:10px;letter-spacing:.14em}
+#rpgForgeDieStage{height:142px;width:100%;max-width:270px}
+#rpgForgeDiceResult{font-size:clamp(25px,4vw,34px)}
+#rpgForgeDiceMeta{font-size:11px;min-height:14px}
+#rpgForgeDiceClose{padding:6px 14px;font-size:11px;margin-top:1px}
+@media(max-width:480px){
+ #rpgForgeDiceOverlay{inset:auto 12px 12px auto!important;width:min(280px,calc(100vw - 24px));max-height:calc(100vh - 24px)}
+ #rpgForgeDiceCard{min-height:0;padding:11px 11px 10px;gap:5px}
+ #rpgForgeDieStage{height:118px;width:100%}
+ #rpgForgeDiceResult{font-size:26px}
+}
+
 </style>
 <div id="rpgForgeDiceOverlay" aria-live="polite" aria-label="Rolagem de dados"><div id="rpgForgeDiceCard"><div id="rpgForgeDiceTitle">🎲 Rolagem de dados</div><div id="rpgForgeDieStage"><div id="rpgForgeDie"><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div></div></div><div id="rpgForgeDiceResult">d20 → 20</div><div id="rpgForgeDiceMeta">Aguardando rolagem…</div><button id="rpgForgeDiceClose" type="button">Fechar</button></div></div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
@@ -2856,4 +2889,47 @@ window.tool = window.tool || 'select';
 })();
 </script>
 
+<script src="/socket.io/socket.io.js"></script>
+<style id="rpgForgeRoomManagerStyle">
+#rpgForgeRoomManager{position:fixed;top:82px;right:18px;z-index:99990;width:min(310px,calc(100vw - 28px));padding:14px;background:rgba(20,23,29,.97);color:#f2f4f8;border:1px solid #414956;border-radius:14px;box-shadow:0 12px 35px #0008;font:13px/1.4 system-ui,sans-serif;backdrop-filter:blur(12px)}
+#rpgForgeRoomManager *{box-sizing:border-box}#rpgForgeRoomManager .rf-title{font-weight:800;font-size:15px;margin-bottom:8px}#rpgForgeRoomManager .rf-row{display:flex;gap:7px;margin-top:8px}#rpgForgeRoomManager button,#rpgForgeRoomManager input{font:inherit;border-radius:8px;border:1px solid #454d5b;padding:8px;background:#242a34;color:#f4f6fb;min-width:0}#rpgForgeRoomManager button{cursor:pointer;flex:1}#rpgForgeRoomManager button.rf-primary{background:#8b5cf6;border-color:#8b5cf6;color:white;font-weight:700}#rpgForgeRoomManager input{width:100%;text-transform:uppercase}#rpgForgeRoomManager .rf-status{color:#b7c0ce;margin-top:8px;overflow-wrap:anywhere}#rpgForgeRoomManager .rf-recent{display:flex;flex-direction:column;gap:5px;margin-top:7px;max-height:120px;overflow:auto}#rpgForgeRoomManager .rf-recent button{flex:none;text-align:left}#rpgForgeRoomManager .rf-head{display:flex;justify-content:space-between;align-items:center;gap:8px}#rpgForgeRoomManager .rf-hide{flex:0 0 auto;padding:3px 8px!important}#rpgForgeRoomManager.rf-collapsed{width:auto;padding:8px}#rpgForgeRoomManager.rf-collapsed .rf-content{display:none}@media(max-width:600px){#rpgForgeRoomManager{top:auto;right:12px;bottom:12px;width:min(290px,calc(100vw - 24px))}}
+</style>
+<div id="rpgForgeRoomManager" aria-label="Salas multiplayer">
+ <div class="rf-head"><div class="rf-title">🎲 RPG Forge — Salas</div><button class="rf-hide" id="rfRoomCollapse" title="Recolher">−</button></div>
+ <div class="rf-content">
+  <div class="rf-row"><button class="rf-primary" id="rfCreateRoom">＋ Criar sala</button><button id="rfJoinRoom">Entrar em sala</button></div>
+  <div class="rf-row"><input id="rfRoomCode" maxlength="8" placeholder="Código da sala" aria-label="Código da sala"></div>
+  <div class="rf-row"><button id="rfJoinCode">Entrar com código</button><button id="rfShareRoom">Copiar convite</button></div>
+  <div class="rf-status" id="rfRoomStatus">Conectando ao servidor…</div>
+  <div style="margin-top:10px;font-weight:700">Últimas salas</div><div class="rf-recent" id="rfRecentRooms"><div class="rf-status">Nenhuma sala recente.</div></div>
+ </div>
+</div>
+<script id="rpgForgeRoomManager">
+(function(){
+ if(window.__rpgForgeRoomManagerInstalled)return;window.__rpgForgeRoomManagerInstalled=true;
+ const $=id=>document.getElementById(id),ROOM_KEY='rpgForgeRoomV1',MODE_KEY='rpgForgeRoomModeV1',PLAYER_KEY='rpgForgePlayerNameV1',CLIENT_KEY='rpgForgeClientIdV1',RECENT_KEY='rpgForgeRecentRoomsV1';
+ const safeGet=(k)=>{try{return localStorage.getItem(k)||''}catch(e){return ''}},safeSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+ let socket=null,room='',ready=false;
+ const url=new URL(location.href);const queryRoom=(url.searchParams.get('sala')||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+ let clientId=safeGet(CLIENT_KEY);if(!clientId){clientId='rf-'+Math.random().toString(36).slice(2)+Date.now().toString(36);safeSet(CLIENT_KEY,clientId)}
+ function recent(){try{const a=JSON.parse(safeGet(RECENT_KEY)||'[]');return Array.isArray(a)?a.filter(x=>x&&x.code).slice(0,8):[]}catch(e){return []}}
+ function remember(code){code=String(code||'').toUpperCase();if(!code)return;let a=recent().filter(x=>x.code!==code);a.unshift({code,at:Date.now()});safeSet(RECENT_KEY,JSON.stringify(a.slice(0,8)));drawRecent()}
+ function status(t){$('rfRoomStatus').textContent=t}
+ function drawRecent(){const root=$('rfRecentRooms');root.innerHTML='';const a=recent();if(!a.length){root.innerHTML='<div class="rf-status">Nenhuma sala recente.</div>';return}a.forEach(x=>{const b=document.createElement('button');b.textContent='↗ Sala '+x.code;b.title='Entrar novamente na sala '+x.code;b.onclick=()=>join(x.code);root.appendChild(b)})}
+ function setRoom(code){room=String(code||'').toUpperCase();if(!room)return;safeSet(ROOM_KEY,room);safeSet(MODE_KEY,'join');remember(room);url.searchParams.delete('criar');url.searchParams.set('sala',room);history.replaceState(null,'',url.pathname+url.search+url.hash);$('rfRoomCode').value=room;$('rfShareRoom').disabled=false;status('Conectado à sala '+room+'. Compartilhe o convite com os jogadores.');window.rpgForgeSocket=socket;window.rpgForgeRoomCode=room;window.rpgForgeRoomReady=true;window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:{sala:room}}));}
+ function join(code){code=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(!code){status('Digite o código da sala.');return}if(!socket||!socket.connected){$('rfRoomCode').value=code;status('Ainda conectando ao servidor… tente novamente em instantes.');return}room=code;safeSet(ROOM_KEY,room);safeSet(MODE_KEY,'join');socket.emit('entrar-sala',{sala:room,clientId,nome:safeGet(PLAYER_KEY)||'Jogador'});status('Entrando na sala '+room+'…')}
+ function create(){if(!socket||!socket.connected){status('Ainda conectando ao servidor… tente novamente.');return}url.searchParams.delete('sala');url.searchParams.set('criar','1');history.replaceState(null,'',url.pathname+url.search+url.hash);socket.emit('criar-sala',{clientId,nome:safeGet(PLAYER_KEY)||'Mestre'});status('Criando sala…')}
+ $('rfCreateRoom').onclick=create;$('rfJoinRoom').onclick=()=>{const c=prompt('Digite o código da sala:');if(c)join(c)};$('rfJoinCode').onclick=()=>join($('rfRoomCode').value);$('rfRoomCode').addEventListener('keydown',e=>{if(e.key==='Enter')join($('rfRoomCode').value)});
+ $('rfShareRoom').onclick=async()=>{if(!room){status('Entre em uma sala primeiro.');return}const link=location.origin+location.pathname+'?sala='+encodeURIComponent(room);try{await navigator.clipboard.writeText(link);status('Link de convite copiado!')}catch(e){prompt('Copie o link da sala:',link)}};
+ $('rfRoomCollapse').onclick=()=>{const p=$('rpgForgeRoomManager');p.classList.toggle('rf-collapsed');$('rfRoomCollapse').textContent=p.classList.contains('rf-collapsed')?'+':'−'};
+ drawRecent();$('rfShareRoom').disabled=true;
+ if(typeof io!=='function'){status('Não foi possível carregar o multiplayer. Abra esta página pelo endereço do servidor.');return}
+ socket=io();window.rpgForgeSocket=socket;
+ socket.on('connect',()=>{status('Servidor conectado. Crie uma sala ou entre com um código.');const createRequested=url.searchParams.get('criar')==='1'||safeGet(MODE_KEY)==='create';if(createRequested){safeSet(MODE_KEY,'join');create()}else if(queryRoom){join(queryRoom)}else{const last=safeGet(ROOM_KEY);if(last)$('rfRoomCode').value=last}});
+ socket.on('sala-criada',d=>{if(d&&d.sala){setRoom(d.sala);status('Sala '+room+' criada! Envie o convite aos jogadores.')}});
+ socket.on('sala-estado',d=>{ready=true;if(d&&d.room){}if(room)setRoom(room);else if(queryRoom)setRoom(queryRoom);status('Sala '+(room||queryRoom)+' conectada. Jogadores sincronizados.');window.rpgForgeRoomReady=true;window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:{sala:room||queryRoom,state:d}}));});
+ socket.on('sala-erro',m=>{status(m||'Não foi possível acessar a sala.');ready=false});
+ socket.on('disconnect',()=>{ready=false;window.rpgForgeRoomReady=false;status('Conexão perdida. Tentando reconectar…')});
+})();
+</script>
 </body></html>
