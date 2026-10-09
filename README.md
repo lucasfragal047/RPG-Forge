@@ -1,49 +1,17 @@
-# RPG Forge — Servidor
+# RPG Forge — Home inicial + salas
 
-Pacote organizado para o RPG Forge multiplayer.
+Este projeto usa Node.js + Socket.IO para criar e participar de salas. Para multiplayer, publique como um serviço Node.js, não apenas como hospedagem estática.
 
 ## Estrutura
+- `server.js`: servidor HTTP e Socket.IO.
+- `package.json`: dependências e comando `npm start`.
+- `public/index.html`: interface entregue pelo servidor.
+- `index.html`: cópia para pré-visualização estática; o multiplayer exige o servidor Socket.IO.
 
-- `server.js` — servidor Node + Socket.IO, salas, permissões e sincronização.
-- `package.json` — dependências e comando de inicialização.
-- `public/index.html` — interface completa do RPG Forge.
+## Publicação Node.js
+1. Extraia o ZIP e envie estes arquivos diretamente para a raiz do repositório, sem uma pasta extra em volta.
+2. Build/install command: `npm install`
+3. Start command: `npm start`
+4. Abra a URL do serviço Node.js publicado.
 
-## O que está integrado
-
-- Salas multiplayer por código/link.
-- Mestre definido pelo dono da sala.
-- Cenários/mapas múltiplos.
-- Tamanho do mapa.
-- Clima sincronizado.
-- Névoa e visão.
-- Tokens e objetos.
-- Magias e efeitos.
-- Sons sincronizados.
-- Rolagem de dados com animação 3D sincronizada em tempo real para todos os jogadores da mesma sala.
-- Importação/exportação do mapa.
-
-## Rodar localmente
-
-```bash
-npm install
-npm start
-```
-
-Abra `http://localhost:3000`.
-
-## Publicar no Render
-
-- Runtime: Node
-- Build Command: `npm install`
-- Start Command: `npm start`
-- Health Check Path: `/api/health`
-
-O servidor usa `PORT` e `0.0.0.0`, então funciona no ambiente do Render.
-
-## Dados 3D sincronizados
-
-Ao clicar em d4, d6, d8 ou d20, o resultado aparece em uma animação 3D. O servidor transmite o evento pela sala Socket.IO, para que todos os jogadores da mesma sala vejam o mesmo resultado. Não é necessário instalar extensão de navegador.
-
-## Importante
-
-As salas ficam em memória. Se o servidor reiniciar ou sofrer redeploy, as salas atuais são perdidas.
+Não abra `server.js` nem a visualização Raw do GitHub como se fossem o site.
