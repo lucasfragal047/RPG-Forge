@@ -1,16 +1,49 @@
-# RPG Forge — Menu Lumathhu + salas corrigidas
+# RPG Forge — Servidor
 
-Projeto Node.js com Socket.IO. A correção inclui criação de sala com tentativa automática quando o servidor ainda está conectando, retorno visual e desbloqueio do botão em caso de erro/timeout, além de reconexão à sala após queda temporária.
+Pacote organizado para o RPG Forge multiplayer.
 
 ## Estrutura
-- `server.js`: servidor HTTP e Socket.IO.
-- `package.json`: dependências e comando `npm start`.
-- `public/index.html`: interface servida pelo servidor (arquivo principal).
-- `index.html`: cópia para pré-visualização.
-- `render.yaml`: configuração de deploy no Render.
 
-## Publicação
-1. Extraia o ZIP.
-2. Envie os arquivos diretamente para a raiz do repositório GitHub, sem uma pasta extra.
-3. No Render, use Build Command `npm install` e Start Command `npm start`.
-4. Abra a URL do serviço Node.js, não a prévia estática do GitHub.
+- `server.js` — servidor Node + Socket.IO, salas, permissões e sincronização.
+- `package.json` — dependências e comando de inicialização.
+- `public/index.html` — interface completa do RPG Forge.
+
+## O que está integrado
+
+- Salas multiplayer por código/link.
+- Mestre definido pelo dono da sala.
+- Cenários/mapas múltiplos.
+- Tamanho do mapa.
+- Clima sincronizado.
+- Névoa e visão.
+- Tokens e objetos.
+- Magias e efeitos.
+- Sons sincronizados.
+- Rolagem de dados com animação 3D sincronizada em tempo real para todos os jogadores da mesma sala.
+- Importação/exportação do mapa.
+
+## Rodar localmente
+
+```bash
+npm install
+npm start
+```
+
+Abra `http://localhost:3000`.
+
+## Publicar no Render
+
+- Runtime: Node
+- Build Command: `npm install`
+- Start Command: `npm start`
+- Health Check Path: `/api/health`
+
+O servidor usa `PORT` e `0.0.0.0`, então funciona no ambiente do Render.
+
+## Dados 3D sincronizados
+
+Ao clicar em d4, d6, d8 ou d20, o resultado aparece em uma animação 3D. O servidor transmite o evento pela sala Socket.IO, para que todos os jogadores da mesma sala vejam o mesmo resultado. Não é necessário instalar extensão de navegador.
+
+## Importante
+
+As salas ficam em memória. Se o servidor reiniciar ou sofrer redeploy, as salas atuais são perdidas.
