@@ -3002,8 +3002,22 @@ window.tool = window.tool || 'select';
   if(isServer()){
     try{source=new EventSource(new URL('/api/sound/events',location.href));source.addEventListener('sound-sync',ev=>{try{const d=JSON.parse(ev.data||'{}');if(d.action!=='roll'||d.type!=='dice-roll'||!d.rollId||d.clientId===clientId)return;if((Number(d.seq)||0)<=seq)return;seq=Number(d.seq)||seq;showRoll(d)}catch(e){}})}catch(e){}
   }
-  window.addEventListener('rpgforge-room-ready',()=>{const s=window.rpgForgeSocket;if(s&&!s.__rpgForgeDiceListener){s.__rpgForgeDiceListener=true;s.on('rpg-dice-roll',acceptRoll)}});
-  if(window.rpgForgeSocket&&!window.rpgForgeSocket.__rpgForgeDiceListener){window.rpgForgeSocket.__rpgForgeDiceListener=true;window.rpgForgeSocket.on('rpg-dice-roll',acceptRoll)}
+  // Sincronização robusta da animação: vincula o listener à conexão real da sala,
+  // inclusive se o Socket.IO for criado depois deste script ou reconectar.
+  function bindDiceSocket(){
+    const s=window.rpgForgeSocket;
+    if(!s||typeof s.on!=='function')return;
+    if(!s.__lumathhuDiceAnimationListener){
+      s.__lumathhuDiceAnimationListener=true;
+      s.on('rpg-dice-roll',acceptRoll);
+      s.on('connect',()=>{if(roomReady)bindDiceSocket()});
+    }
+  }
+  function markRoomReady(){roomReady=true;bindDiceSocket();}
+  window.addEventListener('rpgforge-room-ready',markRoomReady);
+  window.addEventListener('lumathhu-room-ready',markRoomReady);
+  window.addEventListener('lumathhu-room-left',()=>{roomReady=false});
+  bindDiceSocket();
   window.rpgForgeRollDice3D=roll;
 })();
 </script>
