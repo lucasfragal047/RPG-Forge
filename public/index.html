@@ -1989,7 +1989,30 @@ window.tool = window.tool || 'select';
     p.querySelector('#weatherClose').onclick=()=>p.remove();
   }
   btn.onclick=openPanel;
-  window.rpgForge=window.rpgForge||{}; window.rpgForge.weather=()=>({...state}); window.rpgForge.setWeather=(type,details)=>{if(details&&weatherNames[details.type])state={type:details.type,intensity:Number(details.intensity)||55,wind:Number(details.wind)||45,lightning:details.lightning!==false};else if(weatherNames[type])state={...state,type};build();};
+  window.rpgForge=window.rpgForge||{};
+  window.rpgForge.weather=()=>({...state});
+  window.rpgForge.setWeather=(type,details)=>{
+    if(details&&weatherNames[details.type])state={type:details.type,intensity:Number(details.intensity)||55,wind:Number(details.wind)||45,lightning:details.lightning!==false};
+    else if(weatherNames[type])state={...state,type};
+    // A sincronização do mapa pode substituir seus filhos; garante que a camada
+    // meteorológica continue anexada ao mapa atual antes de redesenhar o efeito.
+    const currentMap=document.querySelector('#map');
+    if(currentMap && overlay.parentElement!==currentMap) currentMap.appendChild(overlay);
+    build();
+  };
+  // Mantém o clima vivo após atualizações/sincronizações do conteúdo do mapa.
+  if(window.MutationObserver){
+    const weatherMapObserver=new MutationObserver(()=>{
+      const currentMap=document.querySelector('#map');
+      if(currentMap && overlay.parentElement!==currentMap) currentMap.appendChild(overlay);
+      if(overlay.parentElement) syncWeatherBounds();
+    });
+    weatherMapObserver.observe(map,{childList:true,subtree:true});
+  }
+  window.addEventListener('lumathhu-map-sync',()=>{
+    const last={...state};
+    requestAnimationFrame(()=>{window.rpgForge.setWeather(last.type,last);});
+  });
   const savedWeather=window.rpgForgePageSnapshot?.weather;
   if(savedWeather&&weatherNames[savedWeather.type]){
     state={type:savedWeather.type,intensity:Number(savedWeather.intensity)||55,wind:Number(savedWeather.wind)||45,lightning:!!savedWeather.lightning};
