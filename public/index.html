@@ -1117,7 +1117,18 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       const wrap=panel.querySelector('.ytPlayerWrap'),now=panel.querySelector('.ytNowPlaying');wrap.style.display='block';now.innerHTML='<b>'+escHtml(item.name||'Som do YouTube')+'</b><div style="color:#9ca5b3;margin-top:3px">'+escHtml(text||'Som sincronizado pelo Mestre.')+'</div>';
     }
     function openSoundPanel(){
-      if(activeSoundPanel){updateSyncStatus(activeSoundPanel);renderSoundList();return activeSoundPanel}
+      if(activeSoundPanel){
+        activeSoundPanel.style.display='block';
+        if(activeSoundPanel.dataset.minimized==='1'){
+          activeSoundPanel.dataset.minimized='0';
+          const body=activeSoundPanel.querySelector('.ytPanelBody'),minBtn=activeSoundPanel.querySelector('.ytMinimize'),title=activeSoundPanel.querySelector('.ytPanelTitle');
+          if(body)body.style.display='block';
+          activeSoundPanel.style.padding='14px';
+          if(minBtn){minBtn.textContent='—';minBtn.title='Minimizar — o som continua tocando';}
+          if(title)title.textContent='🔊 Som / efeito';
+        }
+        updateSyncStatus(activeSoundPanel);renderSoundList();return activeSoundPanel
+      }
       const panel=document.createElement('div');activeSoundPanel=panel;panel.className='youtubeSoundPanel';
       panel.style.cssText='position:fixed;z-index:130;right:24px;top:96px;width:min(430px,calc(100vw - 48px));max-height:78vh;overflow:auto;background:#171a20;border:1px solid #555e6d;border-radius:12px;padding:14px;box-shadow:0 18px 55px #000c;color:#fff;';
       panel.innerHTML=`<div class="ytPanelHeader" style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><h2 class="ytPanelTitle" style="margin:0;font-size:16px;flex:1">🔊 Som / efeito</h2><button type="button" class="btn ytMinimize" title="Minimizar — a música continua tocando" aria-label="Minimizar painel de som">—</button><button type="button" class="btn ytClose" title="Fechar painel" aria-label="Fechar painel de som">✕</button></div>
@@ -1137,8 +1148,12 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
         if(minimized){
           panel.dataset.minimized='0';body.style.display='block';panel.style.padding='14px';minBtn.textContent='—';minBtn.title='Minimizar — a música continua tocando';title.textContent='🔊 Som / efeito';
         }else{
-          panel.dataset.minimized='1';body.style.display='none';panel.style.padding='9px 12px';minBtn.textContent='＋';minBtn.title='Abrir painel de som';
-          const now=panel.querySelector('.ytNowPlaying')?.querySelector('b')?.textContent;title.textContent=now?'🔊 '+now:'🔊 Som / efeito';
+          panel.dataset.minimized='1';
+          body.style.display='none';
+          panel.style.display='none';
+          minBtn.textContent='＋';
+          minBtn.title='Abrir painel de som';
+          title.textContent='🔊 Som / efeito';
         }
       };
       panel.querySelector('.ytStop').onclick=async()=>{stopPlayback();const wrap=panel.querySelector('.ytPlayerWrap');wrap.style.display='none';if(roleIsMaster()&&isServerMode())await postJson('/api/sound',{action:'stop',commandId:'cmd-'+Date.now(),sourceClientId:clientId});};
@@ -1879,19 +1894,30 @@ window.tool = window.tool || 'select';
   overlay.innerHTML='<div class="weatherShade"></div><div id="weatherVisual"></div>';
   map.appendChild(overlay);
 
-  // O efeito climático deve cobrir toda a área do mapa, não uma caixa fixa
-  // que pode ficar deslocada ou pequena em mapas de dimensões diferentes.
+  // Vincula os efeitos à área real da grade, e não à tela inteira ou ao #map.
+  // Assim a chuva/neve/neblina acompanham o espaço jogável e respeitam o tamanho
+  // e a posição da grade quando o Mestre altera sua proporção.
   function syncWeatherBounds(){
-    const w=Math.max(map.scrollWidth||0,map.clientWidth||0,map.offsetWidth||0);
-    const h=Math.max(map.scrollHeight||0,map.clientHeight||0,map.offsetHeight||0);
-    overlay.style.setProperty('--weather-left','0px');
-    overlay.style.setProperty('--weather-top','0px');
-    overlay.style.setProperty('--weather-width',Math.max(1,w)+'px');
-    overlay.style.setProperty('--weather-height',Math.max(1,h)+'px');
+    const grid=map.querySelector('.grid');
+    if(!grid){
+      overlay.style.setProperty('--weather-left','0px');
+      overlay.style.setProperty('--weather-top','0px');
+      overlay.style.setProperty('--weather-width',Math.max(1,map.clientWidth||map.offsetWidth||1)+'px');
+      overlay.style.setProperty('--weather-height',Math.max(1,map.clientHeight||map.offsetHeight||1)+'px');
+      return;
+    }
+    const left=parseFloat(grid.style.left)||grid.offsetLeft||0;
+    const top=parseFloat(grid.style.top)||grid.offsetTop||0;
+    const width=Math.max(1,grid.offsetWidth||parseFloat(getComputedStyle(grid).width)||2400);
+    const height=Math.max(1,grid.offsetHeight||parseFloat(getComputedStyle(grid).height)||1600);
+    overlay.style.setProperty('--weather-left',left+'px');
+    overlay.style.setProperty('--weather-top',top+'px');
+    overlay.style.setProperty('--weather-width',width+'px');
+    overlay.style.setProperty('--weather-height',height+'px');
   }
   syncWeatherBounds();
   window.addEventListener('resize',syncWeatherBounds);
-  if(window.ResizeObserver){new ResizeObserver(syncWeatherBounds).observe(map);}
+  if(window.ResizeObserver){const weatherBoundsObserver=new ResizeObserver(syncWeatherBounds);weatherBoundsObserver.observe(map);const grid=map.querySelector('.grid');if(grid)weatherBoundsObserver.observe(grid);}
   const visual=overlay.querySelector('#weatherVisual');
   let state={type:'clear',intensity:55,wind:45,lightning:true};
   let lightningTimer=null;
