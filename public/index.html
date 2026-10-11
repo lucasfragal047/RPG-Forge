@@ -1879,15 +1879,15 @@ window.tool = window.tool || 'select';
   overlay.innerHTML='<div class="weatherShade"></div><div id="weatherVisual"></div>';
   map.appendChild(overlay);
 
-  // ÁREA REAL DO CENÁRIO: Salão + Cripta + Almoxarifado + Corredor.
-  // Não usar o canto da tela/stage nem o tamanho inteiro do grid como referência.
-  // Coordenadas em unidades do próprio #map, portanto acompanham zoom e pan.
-  const WEATHER_AREA={left:-400,top:-300,width:2400,height:1600};
+  // O efeito climático deve cobrir toda a área do mapa, não uma caixa fixa
+  // que pode ficar deslocada ou pequena em mapas de dimensões diferentes.
   function syncWeatherBounds(){
-    overlay.style.setProperty('--weather-left',WEATHER_AREA.left+'px');
-    overlay.style.setProperty('--weather-top',WEATHER_AREA.top+'px');
-    overlay.style.setProperty('--weather-width',WEATHER_AREA.width+'px');
-    overlay.style.setProperty('--weather-height',WEATHER_AREA.height+'px');
+    const w=Math.max(map.scrollWidth||0,map.clientWidth||0,map.offsetWidth||0);
+    const h=Math.max(map.scrollHeight||0,map.clientHeight||0,map.offsetHeight||0);
+    overlay.style.setProperty('--weather-left','0px');
+    overlay.style.setProperty('--weather-top','0px');
+    overlay.style.setProperty('--weather-width',Math.max(1,w)+'px');
+    overlay.style.setProperty('--weather-height',Math.max(1,h)+'px');
   }
   syncWeatherBounds();
   window.addEventListener('resize',syncWeatherBounds);
@@ -2325,9 +2325,17 @@ window.tool = window.tool || 'select';
   }
   function updateSizeLabel(){if(sizeValue){const g=gridSize();sizeValue.textContent=Math.round((cloud.offsetWidth/Math.max(1,g.w))*100)+'%'}}
   function setSizePercent(percent){
-    const p=Math.max(10,Math.min(100,Number(percent)||100)),g=gridSize(),oldW=cloud.offsetWidth,oldH=cloud.offsetHeight;
-    const w=Math.max(260,g.w*p/100),h=Math.max(180,g.h*p/100),oldLeft=parseFloat(cloud.style.left)||g.left,oldTop=parseFloat(cloud.style.top)||g.top;
-    cloud.style.width=w+'px';cloud.style.height=h+'px';cloud.style.left=(oldLeft+(oldW-w)/2)+'px';cloud.style.top=(oldTop+(oldH-h)/2)+'px';updateSizeLabel();updateVision();
+    const p=Math.max(10,Math.min(100,Number(percent)||100)),g=gridSize();
+    // A 100% névoa cobre o cenário inteiro; tamanhos menores continuam centrados
+    // na posição atual para permitir ajuste manual pelo Mestre.
+    const baseW=Math.max(g.w,map.clientWidth||0,map.scrollWidth||0);
+    const baseH=Math.max(g.h,map.clientHeight||0,map.scrollHeight||0);
+    const oldW=cloud.offsetWidth,oldH=cloud.offsetHeight;
+    const w=Math.max(260,baseW*p/100),h=Math.max(180,baseH*p/100);
+    const oldLeft=parseFloat(cloud.style.left)||g.left,oldTop=parseFloat(cloud.style.top)||g.top;
+    if(p>=100){cloud.style.left='0px';cloud.style.top='0px';}
+    else {cloud.style.left=(oldLeft+(oldW-w)/2)+'px';cloud.style.top=(oldTop+(oldH-h)/2)+'px';}
+    cloud.style.width=w+'px';cloud.style.height=h+'px';updateSizeLabel();updateVision();
   }
   function currentSize(){const g=gridSize();return Math.round((cloud.offsetWidth/Math.max(1,g.w))*100)}
   function scale(f){setSizePercent(currentSize()*f)}
