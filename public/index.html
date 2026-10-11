@@ -1989,30 +1989,7 @@ window.tool = window.tool || 'select';
     p.querySelector('#weatherClose').onclick=()=>p.remove();
   }
   btn.onclick=openPanel;
-  window.rpgForge=window.rpgForge||{};
-  window.rpgForge.weather=()=>({...state});
-  window.rpgForge.setWeather=(type,details)=>{
-    if(details&&weatherNames[details.type])state={type:details.type,intensity:Number(details.intensity)||55,wind:Number(details.wind)||45,lightning:details.lightning!==false};
-    else if(weatherNames[type])state={...state,type};
-    // A sincronização do mapa pode substituir seus filhos; garante que a camada
-    // meteorológica continue anexada ao mapa atual antes de redesenhar o efeito.
-    const currentMap=document.querySelector('#map');
-    if(currentMap && overlay.parentElement!==currentMap) currentMap.appendChild(overlay);
-    build();
-  };
-  // Mantém o clima vivo após atualizações/sincronizações do conteúdo do mapa.
-  if(window.MutationObserver){
-    const weatherMapObserver=new MutationObserver(()=>{
-      const currentMap=document.querySelector('#map');
-      if(currentMap && overlay.parentElement!==currentMap) currentMap.appendChild(overlay);
-      if(overlay.parentElement) syncWeatherBounds();
-    });
-    weatherMapObserver.observe(map,{childList:true,subtree:true});
-  }
-  window.addEventListener('lumathhu-map-sync',()=>{
-    const last={...state};
-    requestAnimationFrame(()=>{window.rpgForge.setWeather(last.type,last);});
-  });
+  window.rpgForge=window.rpgForge||{}; window.rpgForge.weather=()=>({...state}); window.rpgForge.setWeather=(type,details)=>{if(details&&weatherNames[details.type])state={type:details.type,intensity:Number(details.intensity)||55,wind:Number(details.wind)||45,lightning:details.lightning!==false};else if(weatherNames[type])state={...state,type};build();};
   const savedWeather=window.rpgForgePageSnapshot?.weather;
   if(savedWeather&&weatherNames[savedWeather.type]){
     state={type:savedWeather.type,intensity:Number(savedWeather.intensity)||55,wind:Number(savedWeather.wind)||45,lightning:!!savedWeather.lightning};
@@ -3056,30 +3033,7 @@ window.tool = window.tool || 'select';
 
 <script id="lumathhuSharedWeatherFogApply">
 (function(){
- let lastWeather=null;
- function applyWeather(d,attempt=0){
-   if(!d||!d.type)return;
-   lastWeather={...d};
-   try{
-     const api=window.rpgForge;
-     const map=document.querySelector('#map');
-     const overlay=document.querySelector('#weatherOverlay');
-     if(typeof api?.setWeather==='function'&&map&&overlay){
-       if(overlay.parentElement!==map)map.appendChild(overlay);
-       api.setWeather(d.type,d);
-       if(typeof window.rpgForgeUpdateWeatherBounds==='function')window.rpgForgeUpdateWeatherBounds();
-       const panel=document.querySelector('.weatherPanel');
-       if(panel){const st=panel.querySelector('#weatherStatus');if(st)st.textContent='Clima atual: '+(d.type==='clear'?'Limpo':d.type);}
-       return;
-     }
-   }catch(err){console.warn('Falha ao aplicar clima recebido',err)}
-   // Em celulares mais lentos, a camada meteorológica pode terminar de iniciar
-   // depois que o Socket.IO entrega o estado. Tenta reaplicar sem perder o efeito.
-   if(attempt<20)setTimeout(()=>applyWeather(d,attempt+1),250);
- }
- window.addEventListener('lumathhu-weather',e=>applyWeather(e.detail||{}));
- window.addEventListener('lumathhu-page-changed',()=>{if(lastWeather)setTimeout(()=>applyWeather(lastWeather),150)});
- window.addEventListener('resize',()=>{if(typeof window.rpgForgeUpdateWeatherBounds==='function')window.rpgForgeUpdateWeatherBounds()});
+ window.addEventListener('lumathhu-weather',e=>{const d=e.detail||{};if(!d.type)return;try{window.rpgForge?.setWeather?.(d.type,d);const panel=document.querySelector('.weatherPanel');if(panel){const st=panel.querySelector('#weatherStatus');if(st)st.textContent='Clima atual: '+(d.type==='clear'?'Limpo':d.type);}}catch(err){console.warn('Falha ao aplicar clima recebido',err)}});
  window.addEventListener('lumathhu-fog',e=>{const d=e.detail||{};try{window.dispatchEvent(new CustomEvent('rpgforge:apply-fog-state',{detail:d}));}catch(err){console.warn('Falha ao aplicar fumaça recebida',err)}});
 })();
 </script>
