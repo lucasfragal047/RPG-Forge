@@ -3062,10 +3062,10 @@ window.tool = window.tool || 'select';
    lastWeather={...d};
    try{
      const api=window.rpgForge;
-     if(typeof api?.setWeather==='function'){
-       const map=document.querySelector('#map');
-       const overlay=document.querySelector('#weatherOverlay');
-       if(map&&overlay&&overlay.parentElement!==map)map.appendChild(overlay);
+     const map=document.querySelector('#map');
+     const overlay=document.querySelector('#weatherOverlay');
+     if(typeof api?.setWeather==='function'&&map&&overlay){
+       if(overlay.parentElement!==map)map.appendChild(overlay);
        api.setWeather(d.type,d);
        if(typeof window.rpgForgeUpdateWeatherBounds==='function')window.rpgForgeUpdateWeatherBounds();
        const panel=document.querySelector('.weatherPanel');
