@@ -1863,8 +1863,9 @@ window.tool = window.tool || 'select';
   if(toolsPanel) toolsPanel.appendChild(btn); else document.querySelector('.toolbar')?.appendChild(btn);
 
   const map=document.querySelector('#map');
-  const grid=map?.querySelector('.grid');
-  if(!map || !grid) return;
+  // O clima precisa apenas do contêiner do mapa. A grade pode estar fora dele
+  // em algumas versões da interface; não interromper a instalação por isso.
+  if(!map) { console.warn('[LUMATHHU clima] Contêiner #map não encontrado.'); return; }
   const overlay=document.createElement('div'); overlay.id='weatherOverlay'; overlay.className='weatherOverlay';
   overlay.innerHTML='<div class="weatherShade"></div><div id="weatherVisual"></div>';
   map.appendChild(overlay);
@@ -1913,7 +1914,9 @@ window.tool = window.tool || 'select';
   function build(){
     stopLightning();
     clearVisual(); overlay.classList.toggle('active',state.type!=='clear'); overlay.dataset.weather=state.type;
-    overlay.style.setProperty('--weather-width',overlay.clientWidth+'px'); overlay.style.setProperty('--weather-height',overlay.clientHeight+'px');
+    // Mantém a área meteorológica definida em coordenadas do mapa; medir o overlay
+    // durante mudanças de layout podia reduzi-lo a zero e fazer os efeitos sumirem.
+    syncWeatherBounds();
     const shade=state.type==='storm'?.28:state.type==='blizzard'?.16:state.type==='fog'?.12:state.type==='cloudy'?.08:state.type==='ash'?.14:0;
     overlay.querySelector('.weatherShade').style.setProperty('--shade',shade);
     if(state.type==='clear') return;
