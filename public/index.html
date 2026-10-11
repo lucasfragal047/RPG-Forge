@@ -2967,8 +2967,9 @@ window.tool = window.tool || 'select';
   const overlay=document.getElementById('rpgForgeDiceOverlay'),die=document.getElementById('rpgForgeDie'),resultEl=document.getElementById('rpgForgeDiceResult'),metaEl=document.getElementById('rpgForgeDiceMeta'),titleEl=document.getElementById('rpgForgeDiceTitle');
   if(!overlay||!die)return;
   let closeTimer=null,source=null,seq=0,roomReady=false;
-  let clientId='dice-'+Math.random().toString(36).slice(2)+Date.now();
-  try{clientId=localStorage.getItem('rpgForgeDiceClientV1')||clientId;localStorage.setItem('rpgForgeDiceClientV1',clientId)}catch(e){}
+  // ID único por aba: não compartilhar via localStorage, senão outras abas
+  // do mesmo navegador confundem a rolagem como se fosse delas próprias.
+  const clientId='dice-'+Math.random().toString(36).slice(2)+Date.now();
   const isServer=()=>location.protocol==='http:'||location.protocol==='https:';
   function showRoll(data){
     const sides=Math.max(2,Math.min(1000,Number(data.sides)||20));const value=Math.max(1,Math.min(sides,Number(data.result)||1));
@@ -2991,7 +2992,11 @@ window.tool = window.tool || 'select';
     showRoll(payload);
     if(isServer()){
       const liveSocket=window.rpgForgeSocket;
-      if(roomReady&&liveSocket&&liveSocket.connected){try{liveSocket.emit('rpg-dice-roll',payload);return}catch(e){}}
+      const sala=window.lumathhuRoomCode;
+      if(liveSocket&&liveSocket.connected&&sala){
+        try{liveSocket.emit('rpg-dice-roll',{...payload,sala});return}catch(e){console.warn('Falha ao enviar rolagem pelo Socket.IO',e)}
+      }
+      // Fallback somente quando a conexão da sala ainda não está pronta.
       try{const r=await fetch(new URL('/api/sound',location.href),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),keepalive:true});if(!r.ok)metaEl.textContent='Resultado: '+result+' · não foi possível sincronizar com o servidor';}
       catch(e){metaEl.textContent='Resultado: '+result+' · conexão com o servidor indisponível';}
     }
