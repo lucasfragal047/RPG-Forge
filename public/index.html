@@ -1718,6 +1718,15 @@ window.tool = window.tool || 'select';
       document.body.appendChild(menu);
     };
   }
+  // Fecha o menu de ações do objeto ao clicar fora dele ou do próprio menu.
+  // Cliques no objeto/menu continuam funcionando normalmente.
+  if(!window.__lumathhuObjMenuOutsideBound){
+    window.__lumathhuObjMenuOutsideBound=true;
+    document.addEventListener('click',e=>{
+      if(e.target.closest('.objMenu')||e.target.closest('.forgeObj'))return;
+      document.querySelectorAll('.objMenu').forEach(menu=>menu.remove());
+    });
+  }
   function makeObj(def,x=700,y=400){
     const el=document.createElement('div');
     el.className='forgeObj';
