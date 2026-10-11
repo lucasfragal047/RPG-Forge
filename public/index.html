@@ -1283,7 +1283,7 @@ window.tool = window.tool || 'select';
   overlayBtn.className='btn';overlayBtn.id='gridOverlayToggle';
   function updateGridOverlay(){
     const on=grid.dataset.overlay==='1';
-    grid.style.zIndex=on?'999999':'0';
+    grid.style.zIndex=on?'4':'0';
     grid.style.pointerEvents='none';
     // No modo sobrepor, somente as linhas da grade ficam sobre o cenário.
     // O fundo da grade precisa ficar transparente para não cobrir o mapa.
