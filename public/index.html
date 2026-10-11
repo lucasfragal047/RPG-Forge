@@ -263,8 +263,55 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
 #rpgGridFogAdjustments .small{line-height:1.35}
 #rpgGridFogReset{width:100%;margin-top:4px}
 </style>
+
+<style id="lumathhuLobbyStyles">
+#lumathhuLobby{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto;background:radial-gradient(ellipse at 50% 5%,#29374b 0%,#101722 48%,#080b11 100%);color:#f5ead1;font-family:Georgia,'Times New Roman',serif}
+#lumathhuLobby *{box-sizing:border-box}
+#lumathhuLobby:before{content:"";position:fixed;inset:16px;border:1px solid #b99a5b55;pointer-events:none;border-radius:18px}
+#lumathhuLobby .lh-wrap{width:min(100%,480px);position:relative;border:1px solid #b99a5b80;border-radius:20px;padding:30px;background:linear-gradient(145deg,#1a2534f5,#0e141ef7);box-shadow:0 24px 90px #0009,inset 0 1px 0 #fff1;text-align:center}
+#lumathhuLobby .lh-mark{font-family:Georgia,serif;font-size:clamp(34px,7vw,52px);font-weight:bold;letter-spacing:.16em;color:#e8c779;text-shadow:0 0 28px #d9a84b38;margin:0 0 5px;padding-left:.16em}
+#lumathhuLobby .lh-sub{font-family:Arial,sans-serif;font-size:11px;letter-spacing:.27em;color:#9eacbd;text-transform:uppercase;margin-bottom:25px}
+#lumathhuLobby .lh-rule{height:1px;background:linear-gradient(90deg,transparent,#c7a35d,transparent);margin:0 0 22px}
+#lumathhuLobby .lh-field{display:block;text-align:left;font:12px Arial,sans-serif;letter-spacing:.06em;color:#c9d2df;margin:0 0 6px}
+#lumathhuLobby input{width:100%;height:44px;border:1px solid #566477;background:#0a1019;color:#fff3d7;border-radius:10px;padding:0 13px;font:15px Arial,sans-serif;outline:none;margin-bottom:14px}
+#lumathhuLobby input:focus{border-color:#d6b36a;box-shadow:0 0 0 3px #d6b36a20}
+#lumathhuLobby .lh-actions{display:grid;gap:10px;margin-top:4px}
+#lumathhuLobby button{border:1px solid #9e8047;border-radius:10px;min-height:45px;padding:11px 14px;cursor:pointer;font:600 14px Arial,sans-serif;letter-spacing:.025em;color:#f9edcf;background:linear-gradient(180deg,#8b6d36,#5d4725);transition:filter .15s,transform .15s}
+#lumathhuLobby button:hover{filter:brightness(1.16);transform:translateY(-1px)}
+#lumathhuLobby .lh-secondary{background:#172231;border-color:#4a5a6d;color:#e2e8ef}
+#lumathhuLobby .lh-back{background:transparent;border-color:#3f4c5d;color:#aab8c9;min-height:38px}
+#lumathhuLobby .lh-status{min-height:20px;margin-top:14px;color:#e8c779;font:12px Arial,sans-serif;line-height:1.45}
+#lumathhuLobby .lh-recent{display:none;text-align:left;margin-top:20px;padding-top:16px;border-top:1px solid #455064}
+#lumathhuLobby .lh-recent h3{font-size:16px;color:#e8c779;margin:0 0 10px}
+#lumathhuLobby .lh-room{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid #ffffff12;font:12px Arial,sans-serif}
+#lumathhuLobby .lh-room strong{display:block;color:#f6e9cc;font-size:13px;margin-bottom:4px}
+#lumathhuLobby .lh-room small{color:#9eacbd}
+#lumathhuLobby .lh-room button{min-height:34px;padding:7px 12px;font-size:12px;flex-shrink:0}
+#lumathhuLobby .lh-empty{color:#9eacbd;font:12px Arial,sans-serif;padding:12px 0}
+#lumathhuLobby[hidden]{display:none!important}
+#lumathhuRoomChip{position:fixed;right:16px;top:72px;z-index:99990;display:none;align-items:center;gap:9px;max-width:calc(100vw - 32px);padding:9px 12px;border:1px solid #b99a5b99;border-radius:12px;background:#101824ed;color:#f2dfb1;box-shadow:0 6px 20px #0006;font:12px Arial,sans-serif}
+#lumathhuRoomChip button{border:1px solid #596579;border-radius:7px;background:#202c3b;color:#e7edf5;padding:5px 8px;cursor:pointer}
+#lumathhuLobby .lh-code{letter-spacing:.18em;color:#e8c779;font-weight:bold}
+@media(max-width:520px){#lumathhuLobby{padding:16px}#lumathhuLobby .lh-wrap{padding:24px 18px}#lumathhuLobby:before{inset:7px}#lumathhuRoomChip{top:auto;bottom:12px;right:12px}}
+</style>
 </head>
-<body><div class="app"><header><div class="logo">RPG <span>FORGE</span></div><div class="session">Campanha: <b>Ruínas de Arkhon</b></div><div class="spacer"></div><span class="pill mode" id="modeBadge">● Jogador</span></header>
+<body>
+<div id="lumathhuLobby" role="dialog" aria-modal="true" aria-label="Menu inicial LUMATHHU">
+ <section class="lh-wrap">
+  <h1 class="lh-mark">LUMATHHU</h1><div class="lh-sub">Mesa virtual de aventuras</div><div class="lh-rule"></div>
+  <label class="lh-field" for="lhPlayerName">Nome do jogador</label><input id="lhPlayerName" maxlength="40" autocomplete="nickname" placeholder="Como os outros vão te ver?">
+  <div class="lh-actions" id="lhMainActions">
+   <button id="lhCreate">✦ Criar sala</button>
+   <button id="lhShowJoin" class="lh-secondary">Participar de sala</button>
+   <button id="lhShowRecent" class="lh-secondary">Últimas salas</button>
+  </div>
+  <div id="lhJoinPanel" hidden style="margin-top:18px;text-align:left"><label class="lh-field" for="lhRoomCode">Código da sala</label><input id="lhRoomCode" maxlength="4" autocomplete="off" placeholder="Ex.: K7MP" style="text-transform:uppercase;text-align:center;letter-spacing:.25em;font-weight:bold;font-size:20px"><div class="lh-actions"><button id="lhJoin">Entrar na sala</button><button id="lhBackJoin" class="lh-back">Voltar</button></div></div>
+  <div id="lhStatus" class="lh-status" aria-live="polite">Conecte-se com seus amigos usando o código da sala.</div>
+  <div id="lhRecentPanel" class="lh-recent"><h3>Salas recentes</h3><div id="lhRecentList" class="lh-empty">Carregando salas...</div><button id="lhBackRecent" class="lh-back" style="width:100%;margin-top:12px">Voltar</button></div>
+ </section>
+</div>
+<div id="lumathhuRoomChip"><span id="lhRoomChipText">Sala</span><button id="lhCopyCode" type="button">Copiar código</button><button id="lhOpenLobby" type="button">Menu</button></div>
+<div class="app"><header><div class="logo">RPG <span>FORGE</span></div><div class="session">Campanha: <b>Ruínas de Arkhon</b></div><div class="spacer"></div><span class="pill mode" id="modeBadge">● Jogador</span></header>
 <div class="main"><aside class="side"><div class="section"><h3>Ferramentas</h3><div class="toolgrid"><button class="tool active" data-tool="select">↖ Selecionar</button><button class="tool" data-tool="measure">⌁ Medir</button><button class="tool" data-tool="fog">☁ Névoa</button><button class="tool" data-tool="ping">⊙ Marcar</button><button class="tool" id="rpgPageTool" type="button">🗺️ Cenários</button></div><div id="rpgPagePanel" class="rpgPagePanel" hidden></div></div><div class="section"><h3>🎭 Modo de jogo</h3><div class="card"><div class="small" id="roleDescription">Você está como Jogador.</div><button class="btn" id="toggleRole" style="width:100%;margin-top:8px">Tornar-se Mestre</button></div></div><div class="section"><h3>🌫️ Névoa</h3><div class="rpgFogControls">
   <button class="btn" id="rpgFogLock" style="width:100%">🔓 Travar névoa</button>
   <button class="btn" id="rpgFogToggle" style="width:100%">🌫️ Ativar fumaça</button>
@@ -2738,6 +2785,51 @@ window.tool = window.tool || 'select';
 @media(max-width:480px){#rpgForgeDiceCard{min-height:320px;padding:22px 16px 18px}#rpgForgeDieStage{height:180px;width:240px}#rpgForgeDie{width:92px;height:92px}.rpgForgeDieFace:nth-child(1){transform:translateZ(46px)}.rpgForgeDieFace:nth-child(2){transform:rotateY(180deg) translateZ(46px)}.rpgForgeDieFace:nth-child(3){transform:rotateY(90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(4){transform:rotateY(-90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(5){transform:rotateX(90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(6){transform:rotateX(-90deg) translateZ(46px)}}
 @media(prefers-reduced-motion:reduce){#rpgForgeDiceOverlay{transition:none}#rpgForgeDie.rolling{animation-duration:.25s}}
 </style>
+
+<style id="rpgForgeDiceCornerPosition">
+/* Rolagem de dados em painel discreto no canto inferior direito */
+#rpgForgeDiceOverlay{
+  inset: auto 24px 24px auto !important;
+  width: min(320px, calc(100vw - 32px)) !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: flex-end !important;
+  padding: 0 !important;
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  overflow: visible !important;
+  pointer-events: none !important;
+}
+#rpgForgeDiceOverlay:before{display:none !important}
+#rpgForgeDiceOverlay.show{pointer-events:none !important}
+#rpgForgeDiceCard{
+  width: 100% !important;
+  min-height: 0 !important;
+  padding: 14px 14px 12px !important;
+  gap: 7px !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 35px #000a, 0 0 0 1px #fff09, inset 0 1px 0 #ffffff20, 0 0 22px #d8a84b18 !important;
+  pointer-events: auto !important;
+}
+#rpgForgeDiceTitle{font-size:10px !important;letter-spacing:.14em !important}
+#rpgForgeDieStage{height:135px !important;width:100% !important;max-width:260px !important}
+#rpgForgeDie{transform:scale(.82);transform-origin:center}
+#rpgForgeDiceResult{font-size:clamp(28px,4vw,38px) !important}
+#rpgForgeDiceMeta{font-size:11px !important;min-height:14px !important}
+#rpgForgeDiceClose{padding:6px 14px !important;margin-top:1px !important}
+@media(max-width:600px){
+  #rpgForgeDiceOverlay{
+    inset:auto 12px 12px auto !important;
+    width:min(270px, calc(100vw - 24px)) !important;
+  }
+  #rpgForgeDiceCard{padding:10px 10px 9px !important;gap:5px !important}
+  #rpgForgeDieStage{height:105px !important}
+  #rpgForgeDiceResult{font-size:29px !important}
+}
+</style>
+
 <div id="rpgForgeDiceOverlay" aria-live="polite" aria-label="Rolagem de dados"><div id="rpgForgeDiceCard"><div id="rpgForgeDiceTitle">🎲 Rolagem de dados</div><div id="rpgForgeDieStage"><div id="rpgForgeDie"><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div><div class="rpgForgeDieFace">20</div></div></div><div id="rpgForgeDiceResult">d20 → 20</div><div id="rpgForgeDiceMeta">Aguardando rolagem…</div><button id="rpgForgeDiceClose" type="button">Fechar</button></div></div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script id="rpgForgeRealDice3D">
@@ -2856,4 +2948,28 @@ window.tool = window.tool || 'select';
 })();
 </script>
 
+
+<script src="/socket.io/socket.io.js"></script>
+<script id="lumathhuRoomSystem">
+(function(){
+ if(window.__lumathhuRoomSystemInstalled)return;window.__lumathhuRoomSystemInstalled=true;
+ const $=id=>document.getElementById(id), lobby=$('lumathhuLobby'),status=$('lhStatus'),joinPanel=$('lhJoinPanel'),recentPanel=$('lhRecentPanel');
+ if(!lobby)return;
+ let socket=null,currentCode='',roomInfo=null;
+ let clientId='lh-'+Math.random().toString(36).slice(2)+Date.now();
+ try{clientId=localStorage.getItem('lumathhuClientId')||clientId;localStorage.setItem('lumathhuClientId',clientId);$('lhPlayerName').value=localStorage.getItem('lumathhuPlayerName')||''}catch(e){}
+ function say(t){status.textContent=t||''}
+ function playerName(){const n=$('lhPlayerName').value.trim().slice(0,40)||'Aventureiro';try{localStorage.setItem('lumathhuPlayerName',n)}catch(e){}return n}
+ function ensureSocket(){if(socket&&socket.connected)return socket;if(typeof window.io!=='function'){say('Não foi possível carregar a conexão. Abra pelo endereço do Render ou pelo servidor Node, não pelo arquivo HTML.');return null}if(!socket){socket=window.io({transports:['websocket','polling']});window.rpgForgeSocket=socket;socket.on('connect',()=>{if(!lobby.hidden)say('Conectado. Crie uma sala ou informe um código para entrar.')});socket.on('connect_error',()=>{if(!lobby.hidden)say('Não consegui conectar ao servidor. Confira se o serviço do Render está ativo.')});socket.on('disconnect',()=>{if(!lobby.hidden)say('Conexão interrompida. Tentando reconectar...');else say('Conexão perdida. O navegador tentará reconectar automaticamente.')});socket.on('sala-erro',msg=>say(String(msg||'Não foi possível acessar a sala.')));socket.on('sala-criada',d=>{if(d&&d.sala)currentCode=d.sala});socket.on('sala-estado',state=>enterRoom(state));socket.on('pagina-atualizada',state=>updateRoom(state));socket.on('pagina-troca-confirmada',()=>{});socket.on('pagina-estado',e=>{window.dispatchEvent(new CustomEvent('lumathhu-page-state',{detail:e}))});socket.on('rpg-efeito-clima',e=>window.dispatchEvent(new CustomEvent('lumathhu-weather',{detail:e})));socket.on('rpg-efeito-fumaca',e=>window.dispatchEvent(new CustomEvent('lumathhu-fog',{detail:e})));}
+ return socket}
+ function enterRoom(state){if(!state||!state.roomCode)return;currentCode=state.roomCode;roomInfo=state;try{let list=JSON.parse(localStorage.getItem('lumathhuRecentRooms')||'[]');list=[{code:currentCode,name:'Mesa '+currentCode,at:Date.now()},...list.filter(x=>x.code!==currentCode)].slice(0,10);localStorage.setItem('lumathhuRecentRooms',JSON.stringify(list))}catch(e){}lobby.hidden=true;$('lumathhuRoomChip').style.display='flex';document.querySelectorAll('.session').forEach(el=>{el.textContent='LUMATHHU · Sala '+currentCode});updateRoom(state);window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:state}));window.dispatchEvent(new CustomEvent('lumathhu-room-ready',{detail:state}));setTimeout(()=>window.dispatchEvent(new Event('resize')),100);}
+ function updateRoom(state){if(!state)return;if(state.roomCode)currentCode=state.roomCode;if(state.players)roomInfo=state;const players=(state.players||[]).length;const names=(state.players||[]).map(p=>p.name).filter(Boolean);$('lhRoomChipText').innerHTML='Sala <span class="lh-code">'+esc(currentCode)+'</span> · '+players+' jogador'+(players===1?'':'es')+(names.length?' · '+names.map(esc).join(', '):'');}
+ function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+ function createRoom(){const s=ensureSocket();if(!s)return;say('Criando sua sala...');if(!s.connected){say('Conectando ao servidor...');s.once('connect',()=>s.emit('criar-sala',{clientId,nome:playerName()}));return}s.emit('criar-sala',{clientId,nome:playerName()})}
+ function joinRoom(code){const s=ensureSocket();if(!s)return;code=String(code||'').trim().toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g,'').slice(0,4);if(code.length!==4){say('Digite o código de 4 caracteres da sala.');return}$('lhRoomCode').value=code;say('Entrando na sala '+code+'...');if(!s.connected){s.once('connect',()=>s.emit('entrar-sala',{sala:code,clientId,nome:playerName()}));return}s.emit('entrar-sala',{sala:code,clientId,nome:playerName()})}
+ async function loadRecent(){recentPanel.style.display='block';$('lhRecentList').innerHTML='<div class="lh-empty">Carregando salas...</div>';let serverRooms=[];try{const r=await fetch('/api/rooms',{cache:'no-store'});if(r.ok){const d=await r.json();serverRooms=d.rooms||[]}}catch(e){}let local=[];try{local=JSON.parse(localStorage.getItem('lumathhuRecentRooms')||'[]')}catch(e){}const map=new Map();local.forEach(r=>map.set(r.code,{code:r.code,name:r.name||('Mesa '+r.code),players:null,local:true,createdAt:r.at||0}));serverRooms.forEach(r=>map.set(r.code,{...map.get(r.code),...r,local:!!map.get(r.code)}));const rooms=[...map.values()].sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0)).slice(0,10);if(!rooms.length){$('lhRecentList').innerHTML='<div class="lh-empty">Nenhuma sala recente encontrada. Crie uma sala ou entre usando um código.</div>';return}$('lhRecentList').innerHTML=rooms.map(r=>'<div class="lh-room"><div><strong>'+esc(r.name||('Mesa '+r.code))+' <span class="lh-code">'+esc(r.code)+'</span></strong><small>'+(r.players===null?'Visitada neste navegador':(r.players+' conectado(s)'))+'</small></div><button data-join-code="'+esc(r.code)+'">Entrar</button></div>').join('');$('lhRecentList').querySelectorAll('[data-join-code]').forEach(b=>b.addEventListener('click',()=>joinRoom(b.getAttribute('data-join-code'))))}
+ $('lhCreate').addEventListener('click',createRoom);$('lhShowJoin').addEventListener('click',()=>{joinPanel.hidden=false;recentPanel.style.display='none';$('lhRoomCode').focus();say('Digite o código que o Mestre compartilhou com você.')});$('lhJoin').addEventListener('click',()=>joinRoom($('lhRoomCode').value));$('lhRoomCode').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom($('lhRoomCode').value)});$('lhRoomCode').addEventListener('input',()=>{$('lhRoomCode').value=$('lhRoomCode').value.toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g,'').slice(0,4)});$('lhBackJoin').addEventListener('click',()=>{joinPanel.hidden=true;say('Escolha uma opção para continuar.')});$('lhShowRecent').addEventListener('click',()=>{joinPanel.hidden=true;loadRecent()});$('lhBackRecent').addEventListener('click',()=>{recentPanel.style.display='none';say('Escolha uma opção para continuar.')});$('lhCopyCode').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(currentCode);$('lhCopyCode').textContent='Copiado!';setTimeout(()=>$('lhCopyCode').textContent='Copiar código',1300)}catch(e){say('Código da sala: '+currentCode)}});$('lhOpenLobby').addEventListener('click',()=>{if(socket&&socket.connected)socket.emit('sair-sala');lobby.hidden=false;$('lumathhuRoomChip').style.display='none';joinPanel.hidden=true;recentPanel.style.display='none';say('Você saiu da visualização da sala. Pode criar ou acessar outra sala.');window.dispatchEvent(new CustomEvent('lumathhu-room-left'))});
+ ensureSocket();
+})();
+</script>
 </body></html>
