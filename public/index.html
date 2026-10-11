@@ -3056,7 +3056,30 @@ window.tool = window.tool || 'select';
 
 <script id="lumathhuSharedWeatherFogApply">
 (function(){
- window.addEventListener('lumathhu-weather',e=>{const d=e.detail||{};if(!d.type)return;try{window.rpgForge?.setWeather?.(d.type,d);const panel=document.querySelector('.weatherPanel');if(panel){const st=panel.querySelector('#weatherStatus');if(st)st.textContent='Clima atual: '+(d.type==='clear'?'Limpo':d.type);}}catch(err){console.warn('Falha ao aplicar clima recebido',err)}});
+ let lastWeather=null;
+ function applyWeather(d,attempt=0){
+   if(!d||!d.type)return;
+   lastWeather={...d};
+   try{
+     const api=window.rpgForge;
+     if(typeof api?.setWeather==='function'){
+       const map=document.querySelector('#map');
+       const overlay=document.querySelector('#weatherOverlay');
+       if(map&&overlay&&overlay.parentElement!==map)map.appendChild(overlay);
+       api.setWeather(d.type,d);
+       if(typeof window.rpgForgeUpdateWeatherBounds==='function')window.rpgForgeUpdateWeatherBounds();
+       const panel=document.querySelector('.weatherPanel');
+       if(panel){const st=panel.querySelector('#weatherStatus');if(st)st.textContent='Clima atual: '+(d.type==='clear'?'Limpo':d.type);}
+       return;
+     }
+   }catch(err){console.warn('Falha ao aplicar clima recebido',err)}
+   // Em celulares mais lentos, a camada meteorológica pode terminar de iniciar
+   // depois que o Socket.IO entrega o estado. Tenta reaplicar sem perder o efeito.
+   if(attempt<20)setTimeout(()=>applyWeather(d,attempt+1),250);
+ }
+ window.addEventListener('lumathhu-weather',e=>applyWeather(e.detail||{}));
+ window.addEventListener('lumathhu-page-changed',()=>{if(lastWeather)setTimeout(()=>applyWeather(lastWeather),150)});
+ window.addEventListener('resize',()=>{if(typeof window.rpgForgeUpdateWeatherBounds==='function')window.rpgForgeUpdateWeatherBounds()});
  window.addEventListener('lumathhu-fog',e=>{const d=e.detail||{};try{window.dispatchEvent(new CustomEvent('rpgforge:apply-fog-state',{detail:d}));}catch(err){console.warn('Falha ao aplicar fumaça recebida',err)}});
 })();
 </script>
