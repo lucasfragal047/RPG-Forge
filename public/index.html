@@ -1745,6 +1745,7 @@ window.tool = window.tool || 'select';
   function makeObj(def,x=700,y=400){
     const el=document.createElement('div');
     el.className='forgeObj';
+    el.id='forge-object-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);
     el.dataset.obj=def[0];
     el.dataset.name=def[2];
     el.innerHTML=objectIcon(def[0]);
@@ -3066,7 +3067,7 @@ window.tool = window.tool || 'select';
  try{clientId=localStorage.getItem('lumathhuClientId')||clientId;localStorage.setItem('lumathhuClientId',clientId);$('lhPlayerName').value=localStorage.getItem('lumathhuPlayerName')||''}catch(e){}
  function say(t){status.textContent=t||''}
  function playerName(){const n=$('lhPlayerName').value.trim().slice(0,40)||'Aventureiro';try{localStorage.setItem('lumathhuPlayerName',n)}catch(e){}return n}
- function ensureSocket(){if(socket&&socket.connected)return socket;if(typeof window.io!=='function'){say('Não foi possível carregar a conexão. Abra pelo endereço do Render ou pelo servidor Node, não pelo arquivo HTML.');return null}if(!socket){socket=window.io({transports:['websocket','polling']});window.rpgForgeSocket=socket;socket.on('connect',()=>{if(!lobby.hidden)say('Conectado. Crie uma sala ou informe um código para entrar.')});socket.on('connect_error',()=>{if(!lobby.hidden)say('Não consegui conectar ao servidor. Confira se o serviço do Render está ativo.')});socket.on('disconnect',()=>{if(!lobby.hidden)say('Conexão interrompida. Tentando reconectar...');else say('Conexão perdida. O navegador tentará reconectar automaticamente.')});socket.on('sala-erro',msg=>say(String(msg||'Não foi possível acessar a sala.')));socket.on('sala-criada',d=>{if(d&&d.sala)currentCode=d.sala});socket.on('sala-estado',state=>enterRoom(state));socket.on('pagina-atualizada',state=>updateRoom(state));socket.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){window.lumathhuCurrentPageId=d.pageId;window.dispatchEvent(new CustomEvent('lumathhu-page-changed',{detail:d}))}});socket.on('pagina-estado',e=>{window.dispatchEvent(new CustomEvent('lumathhu-page-state',{detail:e}))});socket.on('lumathhu-map-sync',e=>{window.dispatchEvent(new CustomEvent('lumathhu-map-sync',{detail:e}))});socket.on('rpg-efeito-clima',e=>window.dispatchEvent(new CustomEvent('lumathhu-weather',{detail:e})));socket.on('rpg-efeito-fumaca',e=>window.dispatchEvent(new CustomEvent('lumathhu-fog',{detail:e})));}
+ function ensureSocket(){if(socket&&socket.connected)return socket;if(typeof window.io!=='function'){say('Não foi possível carregar a conexão. Abra pelo endereço do Render ou pelo servidor Node, não pelo arquivo HTML.');return null}if(!socket){socket=window.io({transports:['websocket','polling']});window.rpgForgeSocket=socket;socket.on('connect',()=>{if(!lobby.hidden)say('Conectado. Crie uma sala ou informe um código para entrar.')});socket.on('connect_error',()=>{if(!lobby.hidden)say('Não consegui conectar ao servidor. Confira se o serviço do Render está ativo.')});socket.on('disconnect',()=>{if(!lobby.hidden)say('Conexão interrompida. Tentando reconectar...');else say('Conexão perdida. O navegador tentará reconectar automaticamente.')});socket.on('sala-erro',msg=>say(String(msg||'Não foi possível acessar a sala.')));socket.on('sala-criada',d=>{if(d&&d.sala)currentCode=d.sala});socket.on('sala-estado',state=>enterRoom(state));socket.on('pagina-atualizada',state=>updateRoom(state));socket.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){window.lumathhuCurrentPageId=d.pageId;window.dispatchEvent(new CustomEvent('lumathhu-page-changed',{detail:d}))}});socket.on('pagina-estado',e=>{window.dispatchEvent(new CustomEvent('lumathhu-page-state',{detail:e}))});socket.on('lumathhu-map-sync',e=>{window.dispatchEvent(new CustomEvent('lumathhu-map-sync',{detail:e}))});socket.on('rpg-map-element-move',e=>window.dispatchEvent(new CustomEvent('rpg-map-element-move',{detail:e})));socket.on('rpg-efeito-clima',e=>window.dispatchEvent(new CustomEvent('lumathhu-weather',{detail:e})));socket.on('rpg-efeito-fumaca',e=>window.dispatchEvent(new CustomEvent('lumathhu-fog',{detail:e})));}
  return socket}
  function enterRoom(state){if(!state||!state.roomCode)return;currentCode=state.roomCode;window.lumathhuRoomCode=currentCode;window.lumathhuCurrentPageId=state.currentPageId||window.lumathhuCurrentPageId||'page-1';roomInfo=state;try{let list=JSON.parse(localStorage.getItem('lumathhuRecentRooms')||'[]');list=[{code:currentCode,name:'Mesa '+currentCode,at:Date.now()},...list.filter(x=>x.code!==currentCode)].slice(0,10);localStorage.setItem('lumathhuRecentRooms',JSON.stringify(list))}catch(e){}lobby.hidden=true;$('lumathhuRoomChip').style.display='flex';document.querySelectorAll('.session').forEach(el=>{el.textContent='LUMATHHU · Sala '+currentCode});updateRoom(state);window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:state}));window.dispatchEvent(new CustomEvent('lumathhu-room-ready',{detail:state}));setTimeout(()=>window.dispatchEvent(new Event('resize')),100);}
  function updateRoom(state){if(!state)return;if(state.roomCode)currentCode=state.roomCode;if(state.players)roomInfo=state;if(state.players){window.lumathhuConnectedPlayers=state.players.map(p=>({name:String(p.name||'Jogador'),role:String(p.role||'player')}));window.dispatchEvent(new CustomEvent('lumathhu-players-updated',{detail:window.lumathhuConnectedPlayers}));}const players=(state.players||[]).length;const names=(state.players||[]).map(p=>p.name).filter(Boolean);$('lhRoomChipText').innerHTML='Sala <span class="lh-code">'+esc(currentCode)+'</span> · '+players+' jogador'+(players===1?'':'es')+(names.length?' · '+names.map(esc).join(', '):'');}
@@ -3078,4 +3079,57 @@ window.tool = window.tool || 'select';
  ensureSocket();
 })();
 </script>
+
+<script>
+// Sincronização contínua de movimento de tokens e objetos, por sala e mapa.
+(function(){
+  const clientId=(window.rpgForgeClientId||window.lumathhuClientId||'client-'+Math.random().toString(36).slice(2));
+  let lastSent=0, applyingRemote=false, active=null;
+  function getSocket(){return window.rpgForgeSocket||null}
+  function room(){return window.lumathhuRoomCode||window.rpgForgeRoomCode||''}
+  function page(){return window.lumathhuCurrentPageId||'page-1'}
+  function ensureId(el){
+    if(!el.id){
+      const seq=el.dataset.tokenId||el.dataset.objectId||el.dataset.objId;
+      if(seq)el.id=(el.classList.contains('token')?'token-':'forge-object-')+seq;
+      else return '';
+    }
+    return el.id;
+  }
+  function coords(el){return {left:parseFloat(el.style.left)||0,top:parseFloat(el.style.top)||0}}
+  document.addEventListener('pointerdown',e=>{
+    const el=e.target.closest?.('.token,.forgeObj');
+    if(!el||e.button!==0)return;
+    active=el;
+    ensureId(el);
+  },true);
+  document.addEventListener('pointermove',e=>{
+    if(!active||applyingRemote)return;
+    const el=active;
+    if(!el.isConnected){active=null;return}
+    const socket=getSocket(),code=room();
+    if(!socket||!socket.connected||!code)return;
+    const now=performance.now(); if(now-lastSent<35)return; lastSent=now;
+    const p=coords(el),id=ensureId(el); if(!id)return;
+    socket.emit('rpg-map-element-move',{sala:code,pageId:page(),elementId:id,left:p.left,top:p.top,clientId});
+  });
+  const stop=()=>{active=null};
+  document.addEventListener('pointerup',stop,true);
+  document.addEventListener('pointercancel',stop,true);
+  window.addEventListener('rpg-map-element-move',ev=>{
+    const d=ev.detail||{}; if(d.pageId!==page())return;
+    const el=document.getElementById(d.elementId); if(!el||!el.matches('.token,.forgeObj'))return;
+    applyingRemote=true;
+    el.style.left=d.left+'px'; el.style.top=d.top+'px';
+    requestAnimationFrame(()=>{applyingRemote=false});
+  });
+  // Mantém os objetos e tokens já existentes elegíveis para cliques repetidos.
+  document.addEventListener('click',e=>{
+    const el=e.target.closest?.('.token,.forgeObj');
+    if(!el)return;
+    ensureId(el);
+  },true);
+})();
+</script>
+
 </body></html>

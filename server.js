@@ -60,6 +60,19 @@ io.on('connection',socket=>{
  socket.on('rpg-efeito-clima',({sala,type,intensity,wind,lightning,pageId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);if(!room||!me||me.role!=='gm')return socket.emit('sala-erro','Apenas o Mestre pode alterar o clima.');const effect={type:type||'clear',intensity:Number(intensity)||55,wind:Number(wind)||45,lightning:lightning!==false,pageId:pageId||me.pageId};room.weatherEffect=effect;for(const p of room.players.values())io.to(p.socketId).emit('rpg-efeito-clima',effect);});
  socket.on('rpg-efeito-fumaca',({sala,active,opacity,color,visionRadius,locked,cloudStyle,gmSeeThrough,pageId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);if(!room||!me||me.role!=='gm')return socket.emit('sala-erro','Apenas o Mestre pode alterar a fumaça.');const pg=room.pages.find(p=>p.id===pageId)||room.pages.find(p=>p.id===me.pageId);if(!pg)return;const effect={active:!!active,opacity:Number(opacity)||72,color:color||'#dfe5ee',visionRadius:Number(visionRadius)||2,locked:!!locked,cloudStyle:cloudStyle||'',gmSeeThrough:!!gmSeeThrough,pageId:pg.id};pg.fogEffect=effect;for(const p of room.players.values())if(p.pageId===pg.id)io.to(p.socketId).emit('rpg-efeito-fumaca',effect);});
  socket.on('rpg-dice-roll',(payload={})=>{const code=String(payload.sala||socket.data.room||'').toUpperCase(),room=rooms.get(code),me=room?.players.get(socket.id);if(!room||!me||socket.data.room!==code)return;const sides=Math.max(2,Math.min(1000,Number(payload.sides)||20));const result=Math.max(1,Math.min(sides,Number(payload.result)||1));const rollId=String(payload.rollId||('roll-'+Date.now()+'-'+Math.random().toString(36).slice(2,7))).slice(0,160);const results=Array.isArray(payload.results)?payload.results.slice(0,20).map(n=>Math.max(1,Math.min(sides,Number(n)||1))):[result];const event={action:'roll',type:'dice-roll',rollId,clientId:String(payload.clientId||('dice-'+socket.id)),roller:cleanName(payload.roller||me.name),sides,result,results,createdAt:new Date().toISOString(),sala:code};io.to(code).emit('rpg-dice-roll',event)});
+ socket.on('rpg-map-element-move',(payload={})=>{
+   const code=String(payload.sala||socket.data.room||'').toUpperCase();
+   const room=rooms.get(code),me=room?.players.get(socket.id);
+   if(!room||!me||socket.data.room!==code)return;
+   const pageId=String(payload.pageId||me.pageId);
+   const page=room.pages.find(p=>p.id===pageId);
+   if(!page||me.pageId!==pageId)return;
+   const elementId=String(payload.elementId||'').slice(0,160);
+   const left=Number(payload.left),top=Number(payload.top);
+   if(!elementId||!Number.isFinite(left)||!Number.isFinite(top)||Math.abs(left)>100000||Math.abs(top)>100000)return;
+   const event={pageId,elementId,left,top,clientId:String(payload.clientId||'').slice(0,100)};
+   for(const p of room.players.values())if(p.pageId===pageId&&p.socketId!==socket.id)io.to(p.socketId).emit('rpg-map-element-move',event);
+ });
  socket.on('sair-sala',()=>{const code=socket.data.room,room=rooms.get(code);if(!room)return;room.players.delete(socket.id);socket.leave(code);socket.data.room=null;if(room.players.size>0)broadcast(room)});
  socket.on('disconnect',()=>{const code=socket.data.room,room=rooms.get(code);if(!room)return;room.players.delete(socket.id);if(room.players.size>0)broadcast(room)});
 });
