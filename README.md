@@ -34,11 +34,11 @@ Abra `http://localhost:3000`.
 ## Publicar no Render
 
 - Runtime: Node
-- Build Command: `npm install && npm run build:dice`
+- Build Command: `npm install`
 - Start Command: `npm start`
 - Health Check Path: `/api/health`
 
-O Build Command instala as dependências do servidor, instala as dependências do sistema de dados 3D, compila o cliente e prepara `public/dice`. O Start Command inicia apenas o servidor web, sem executar uma compilação demorada durante a inicialização. O servidor usa `process.env.PORT`, conforme exigido pelo Render.
+O servidor usa `PORT` e `0.0.0.0`, então funciona no ambiente do Render.
 
 ## Dados 3D sincronizados
 
@@ -51,19 +51,4 @@ As salas ficam em memória. Se o servidor reiniciar ou sofrer redeploy, as salas
 
 ## Menu LUMATHHU e salas online
 
-O menu inicial oferece **Criar sala**, **Participar de sala** e **Últimas salas**. As salas usam Socket.IO no servidor Node; para jogar com outras pessoas, publique a pasta do projeto no GitHub e conecte o repositório ao Render como serviço Web Service. Configure o Build Command como `npm install && npm run build:dice` e o Start Command como `npm start`. Compartilhe o código de 4 caracteres que aparece ao entrar na sala. A lista de salas recentes do servidor depende de o processo do Render continuar ativo; a memória das salas é reiniciada quando o processo reinicia.
-
-
-## Dados 3D sincronizados (Owlbear Rodeo Dice)
-
-O projeto inclui o código-fonte do Owlbear Rodeo Dice, sob GPL-3.0, adaptado para abrir dentro do LUMATHHU. A física 3D usa Three.js e Rapier. O cliente que inicia a rolagem envia a definição dos dados e os parâmetros físicos iniciais pelo Socket.IO; os demais clientes na mesma sala reproduzem a simulação.
-
-### Primeira execução
-
-1. Instale a versão atual do Node.js.
-2. Na pasta `RPG-Forge-FINAL`, execute `npm install`.
-3. Execute `npm run build:dice`. Esse comando instala as dependências do subprojeto `dice-source`, compila os dados 3D e copia os arquivos compilados para `public/dice`. É necessária conexão com a internet nessa primeira compilação.
-4. Execute `npm start` para iniciar o servidor.
-5. Abra o LUMATHHU, entre na mesma sala com dois navegadores/dispositivos e clique em **Abrir mesa de dados 3D**. Escolha os dados e role; a mesa deve abrir também nos outros participantes quando a rolagem for recebida.
-
-O código do servidor e os scripts da página passaram por verificação sintática. A compilação TypeScript/Vite e o teste real com múltiplos navegadores não foram executados neste ambiente, porque a instalação das dependências externas não concluiu; valide esses passos no primeiro `npm start`.
+O menu inicial oferece **Criar sala**, **Participar de sala** e **Últimas salas**. As salas usam Socket.IO no servidor Node; para jogar com outras pessoas, publique a pasta do projeto no GitHub e conecte o repositório ao Render como serviço Web Service, com comando de build vazio e comando de início `npm start`. Compartilhe o código de 4 caracteres que aparece ao entrar na sala. A lista de salas recentes do servidor depende de o processo do Render continuar ativo; a memória das salas é reiniciada quando o processo reinicia.
