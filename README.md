@@ -1,54 +1,25 @@
-# RPG Forge — Servidor
+# RPG Forge · LUMATHHU — reprodução sincronizada do YouTube
 
-Pacote organizado para o RPG Forge multiplayer.
+Esta versão ajusta o fluxo de reprodução sincronizada do som compartilhado.
 
-## Estrutura
+## Alteração
+- O Mestre continua enviando o comando de reprodução para a sala imediatamente.
+- Nos dispositivos dos jogadores, a reprodução tenta iniciar silenciada para contornar políticas de autoplay do navegador e libera o som quando o player confirma que começou a tocar.
+- Um bloqueio de autoplay com áudio não desativa imediatamente a sincronização da sala.
+- Mantém o restante dos arquivos e recursos da versão de origem.
 
-- `server.js` — servidor Node + Socket.IO, salas, permissões e sincronização.
-- `package.json` — dependências e comando de inicialização.
-- `public/index.html` — interface completa do RPG Forge.
+## Limitação importante
+Navegadores podem exigir uma interação do usuário para permitir áudio automático. Nenhum site consegue garantir que todo navegador/dispositivo reproduza som audível sem essa autorização. Se o navegador bloquear até a reprodução silenciada ou exigir ativação inicial, o jogador pode precisar liberar o áudio uma vez; não deve precisar apertar Play a cada faixa quando a autorização e o player estiverem funcionando.
 
-## O que está integrado
+## Publicação
+1. Faça backup da versão atual.
+2. Substitua os arquivos do projeto pelos arquivos deste ZIP, mantendo a estrutura de pastas.
+3. Envie as alterações ao GitHub e aguarde o deploy do Render.
+4. Recarregue a mesa em todos os dispositivos e teste com uma faixa curta.
 
-- Salas multiplayer por código/link.
-- Mestre definido pelo dono da sala.
-- Cenários/mapas múltiplos.
-- Tamanho do mapa.
-- Clima sincronizado.
-- Névoa e visão.
-- Tokens e objetos.
-- Magias e efeitos.
-- Sons sincronizados.
-- Rolagem de dados com animação 3D sincronizada em tempo real para todos os jogadores da mesma sala.
-- Importação/exportação do mapa.
-
-## Rodar localmente
-
-```bash
-npm install
-npm start
-```
-
-Abra `http://localhost:3000`.
-
-## Publicar no Render
-
-- Runtime: Node
-- Build Command: `npm install`
-- Start Command: `npm start`
-- Health Check Path: `/api/health`
-
-O servidor usa `PORT` e `0.0.0.0`, então funciona no ambiente do Render.
-
-## Dados 3D sincronizados
-
-Ao clicar em d4, d6, d8 ou d20, o resultado aparece em uma animação 3D. O servidor transmite o evento pela sala Socket.IO, para que todos os jogadores da mesma sala vejam o mesmo resultado. Não é necessário instalar extensão de navegador.
-
-## Importante
-
-As salas ficam em memória. Se o servidor reiniciar ou sofrer redeploy, as salas atuais são perdidas.
+A sintaxe do servidor e dos scripts inline foi verificada. A reprodução real entre dispositivos ainda precisa ser testada na sala publicada.
 
 
-## Menu LUMATHHU e salas online
+## Sistema de som integrado
 
-O menu inicial oferece **Criar sala**, **Participar de sala** e **Últimas salas**. As salas usam Socket.IO no servidor Node; para jogar com outras pessoas, publique a pasta do projeto no GitHub e conecte o repositório ao Render como serviço Web Service, com comando de build vazio e comando de início `npm start`. Compartilhe o código de 4 caracteres que aparece ao entrar na sala. A lista de salas recentes do servidor depende de o processo do Render continuar ativo; a memória das salas é reiniciada quando o processo reinicia.
+Esta versão mantém o projeto LUMATHHU SOM e substitui somente o bloco do painel de som/efeitos pelo sistema de som da versão LUMATHHU DADOS. O restante da mesa foi preservado. O sistema usa a API HTTP `/api/sounds`, `/api/sound` e os eventos SSE `/api/sound/events` já presentes no servidor.
