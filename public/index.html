@@ -407,7 +407,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     if(roleDesc)roleDesc.textContent=role==='gm'?'Você está como Mestre. Você pode controlar mapas, névoa e ferramentas do Mestre.':'Você está como Jogador. Recursos exclusivos do Mestre ficam protegidos.';
     if(roleBtn){roleBtn.textContent=role==='gm'?'Voltar para Jogador':'Tornar-se Mestre';roleBtn.hidden=!isRoomCreator;roleBtn.disabled=!isRoomCreator;}
     const gmView=document.getElementById('rpgFogGMView');
-    if(gmView)gmView.disabled=role!=='gm';
+    if(gmView){gmView.hidden=role!=='gm';gmView.disabled=role!=='gm';}
     render();
   }
   function saveNow(){
@@ -2322,7 +2322,7 @@ window.tool = window.tool || 'select';
   const sizeValue=document.getElementById('rpgFogSizeValue'),visionRadius=document.getElementById('rpgFogVisionRadius'),visionValue=document.getElementById('rpgFogVisionValue');
   const gmView=document.getElementById('rpgFogGMView');
   function isMaster(){return !!(window.rpgForgeRole?.isGM?.() || window.lumathhuRoomRole==='gm')}
-  function applyFogPermissionUI(){const panel=document.getElementById('rpgGridFogAdjustments');const ids=['rpgFogToggle','rpgFogClear','rpgFogOpacity','rpgFogColor','rpgFogVisionRadius','rpgFogCenter','rpgFogBig','rpgFogSmall','rpgFogLock','rpgFogResize','rpgGridFogReset','rpgFogPosX','rpgFogPosY'];ids.forEach(id=>{const el=document.getElementById(id);if(el){el.disabled=!isMaster();el.style.opacity=isMaster()?'':'0.55';el.title=isMaster()?'':'Somente o Mestre pode alterar a névoa e seus ajustes'}});if(panel){panel.style.opacity=isMaster()?'':'0.7';panel.title=isMaster()?'':'Somente o Mestre pode alterar estes ajustes'}}
+  function applyFogPermissionUI(){if(gmView){gmView.hidden=!isMaster();gmView.disabled=!isMaster();}const panel=document.getElementById('rpgGridFogAdjustments');const ids=['rpgFogToggle','rpgFogClear','rpgFogOpacity','rpgFogColor','rpgFogVisionRadius','rpgFogCenter','rpgFogBig','rpgFogSmall','rpgFogLock','rpgFogResize','rpgGridFogReset','rpgFogPosX','rpgFogPosY'];ids.forEach(id=>{const el=document.getElementById(id);if(el){el.disabled=!isMaster();el.style.opacity=isMaster()?'':'0.55';el.title=isMaster()?'':'Somente o Mestre pode alterar a névoa e seus ajustes'}});if(panel){panel.style.opacity=isMaster()?'':'0.7';panel.title=isMaster()?'':'Somente o Mestre pode alterar estes ajustes'}}
   window.addEventListener('lumathhu-room-ready',applyFogPermissionUI);window.addEventListener('lumathhu-role-changed',applyFogPermissionUI);setTimeout(applyFogPermissionUI,0);
   function applyScenarioFogState(st){
     st=st||{};
@@ -2397,10 +2397,13 @@ window.tool = window.tool || 'select';
   const savedGMView=fogGet(FOG_GM_VIEW_KEY)==='1';
   let gmSeeThrough=savedGMView;
   function applyGMView(){
-    if(gmSeeThrough){cloud.classList.add('gmSeeThrough');if(gmView){gmView.textContent='👁 Mestre: névoa transparente';gmView.classList.add('active')}}
-    else{cloud.classList.remove('gmSeeThrough');if(gmView){gmView.textContent='👁 Mestre: ver através';gmView.classList.remove('active')}}
+    const master=isMaster();
+    // A transparência é apenas visual/local: jogadores nunca recebem visão através da névoa.
+    cloud.classList.toggle('gmSeeThrough',master&&gmSeeThrough);
+    if(gmView){gmView.hidden=!master;gmView.disabled=!master;gmView.textContent=gmSeeThrough?'👁 Mestre: névoa transparente':'👁 Mestre: ver através';gmView.classList.toggle('active',master&&gmSeeThrough)}
   }
-  if(gmView){gmView.addEventListener('click',()=>{gmSeeThrough=!gmSeeThrough;fogSet(FOG_GM_VIEW_KEY,gmSeeThrough?'1':'0');applyGMView()});}
+  if(gmView){gmView.addEventListener('click',()=>{if(!isMaster())return;gmSeeThrough=!gmSeeThrough;fogSet(FOG_GM_VIEW_KEY,gmSeeThrough?'1':'0');applyGMView()});}
+  window.addEventListener('lumathhu-room-ready',applyGMView);window.addEventListener('lumathhu-role-changed',applyGMView);
   function setOpacity(save=true){const v=Math.max(0,Math.min(100,Number(range.value)||0));cloud.style.opacity=String(v/100);value.textContent=v+'%';if(save)fogSet(FOG_OPACITY_KEY,v)}
   range.addEventListener('input',()=>setOpacity(true));setOpacity(false);
   applyGMView();
