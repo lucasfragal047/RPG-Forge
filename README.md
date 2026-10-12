@@ -1,54 +1,11 @@
-# RPG Forge — Servidor
+# RPG Forge · LUMATHHU — correção do menu de objetos
 
-Pacote organizado para o RPG Forge multiplayer.
+Correção pontual: quando o estado do mapa é reaplicado via `innerHTML`, os objetos mantêm o atributo `data-obj-bound`, mas perdem seus listeners de clique/arraste. A rotina de religação agora reaplica os eventos aos elementos reconstruídos, permitindo abrir novamente o menu de ações.
 
-## Estrutura
+## Atualização
+1. Faça backup dos arquivos atuais.
+2. Substitua os arquivos pelos deste pacote mantendo a estrutura `public/index.html`, `server.js` e `package.json`.
+3. Envie para o GitHub e aguarde o deploy do Render.
+4. Atualize a mesa em Mestre e jogadores e teste clicar num objeto já colocado.
 
-- `server.js` — servidor Node + Socket.IO, salas, permissões e sincronização.
-- `package.json` — dependências e comando de inicialização.
-- `public/index.html` — interface completa do RPG Forge.
-
-## O que está integrado
-
-- Salas multiplayer por código/link.
-- Mestre definido pelo dono da sala.
-- Cenários/mapas múltiplos.
-- Tamanho do mapa.
-- Clima sincronizado.
-- Névoa e visão.
-- Tokens e objetos.
-- Magias e efeitos.
-- Sons sincronizados.
-- Rolagem de dados com animação 3D sincronizada em tempo real para todos os jogadores da mesma sala.
-- Importação/exportação do mapa.
-
-## Rodar localmente
-
-```bash
-npm install
-npm start
-```
-
-Abra `http://localhost:3000`.
-
-## Publicar no Render
-
-- Runtime: Node
-- Build Command: `npm install`
-- Start Command: `npm start`
-- Health Check Path: `/api/health`
-
-O servidor usa `PORT` e `0.0.0.0`, então funciona no ambiente do Render.
-
-## Dados 3D sincronizados
-
-Ao clicar em d4, d6, d8 ou d20, o resultado aparece em uma animação 3D. O servidor transmite o evento pela sala Socket.IO, para que todos os jogadores da mesma sala vejam o mesmo resultado. Não é necessário instalar extensão de navegador.
-
-## Importante
-
-As salas ficam em memória. Se o servidor reiniciar ou sofrer redeploy, as salas atuais são perdidas.
-
-
-## Menu LUMATHHU e salas online
-
-O menu inicial oferece **Criar sala**, **Participar de sala** e **Últimas salas**. As salas usam Socket.IO no servidor Node; para jogar com outras pessoas, publique a pasta do projeto no GitHub e conecte o repositório ao Render como serviço Web Service, com comando de build vazio e comando de início `npm start`. Compartilhe o código de 4 caracteres que aparece ao entrar na sala. A lista de salas recentes do servidor depende de o processo do Render continuar ativo; a memória das salas é reiniciada quando o processo reinicia.
+Esta correção foi validada por inspeção e verificação de sintaxe; não foi testada numa sala real do Render.

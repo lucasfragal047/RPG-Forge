@@ -1744,7 +1744,9 @@ window.tool = window.tool || 'select';
   uploadDrop.ondrop=e=>{e.preventDefault();uploadDrop.classList.remove('dragover');if(e.dataTransfer.files?.length)handleUploadFiles(e.dataTransfer.files);else{const id=e.dataTransfer.getData('rpg-object');const def=objects.find(o=>o[0]===id);if(def){const p=pos(e);makeObj(def,p[0]-24,p[1]-24);log(def[2]+' colocado no mapa.')}}};
   uploadInput.onchange=e=>{handleUploadFiles(e.target.files||[]);uploadInput.value=''};
   function bindObjElement(el,def){
-    if(!el||!def||el.dataset.objBound==='1')return;
+    // Snapshots da sala recriam os elementos via innerHTML: os atributos data-* são
+    // preservados, mas os listeners JavaScript não. Por isso sempre religamos os eventos.
+    if(!el||!def)return;
     el.dataset.objBound='1';
     el.dataset.name=def[2];
     if(!el.innerHTML.trim())el.innerHTML=objectIcon(def[0]);
@@ -3129,9 +3131,9 @@ window.tool = window.tool || 'select';
  if(window.__lumathhuSharedMapSync)return;window.__lumathhuSharedMapSync=true;
  const map=document.getElementById('map');if(!map)return;
  let roomCode='',pageId='page-1',timer=0,applying=false,lastSent='';
- window.rpgForgeSendTokenMove=function(t){const s=window.rpgForgeSocket;if(!t||!s||!s.connected||!roomCode)return;s.emit('rpg-token-move',{sala:roomCode,pageId,tokenId:t.id,left:parseFloat(t.style.left)||0,top:parseFloat(t.style.top)||0})};
+ window.rpgForgeSendTokenMove=function(t){const s=window.rpgForgeSocket;const sala=String(window.lumathhuRoomCode||roomCode||'').toUpperCase();const currentPage=window.lumathhuCurrentPageId||pageId;if(!t||!t.id||!s||!s.connected||!sala||!currentPage)return;s.emit('rpg-token-move',{sala,pageId:currentPage,tokenId:t.id,left:parseFloat(t.style.left)||0,top:parseFloat(t.style.top)||0});};
  window.rpgForgeSendObjectMove=function(o){const s=window.rpgForgeSocket;if(!o||!s||!s.connected||!roomCode)return;s.emit('rpg-object-move',{sala:roomCode,pageId,objectId:o.dataset.objectInstanceId||o.dataset.instanceId||o.id,objKey:o.dataset.obj||'',left:parseFloat(o.style.left)||0,top:parseFloat(o.style.top)||0})};
- function bindMoveListener(){const s=window.rpgForgeSocket;if(!s||s.__lumathhuTokenMoveListener)return;s.__lumathhuTokenMoveListener=true;let visionRaf=0;s.on('rpg-token-move',d=>{if(!d||d.pageId!==pageId||!d.tokenId)return;const t=document.getElementById(d.tokenId);if(!t||!map.contains(t)||t.dataset.localDragging==='1')return;t.style.left=d.left+'px';t.style.top=d.top+'px';if(!visionRaf){visionRaf=requestAnimationFrame(()=>{visionRaf=0;try{window.rpgForgeUpdateFogVision?.()}catch(_){}})}});}
+ function bindMoveListener(){const s=window.rpgForgeSocket;if(!s||s.__lumathhuTokenMoveListener)return;s.__lumathhuTokenMoveListener=true;let visionRaf=0;s.on('rpg-token-move',d=>{const currentPage=window.lumathhuCurrentPageId||pageId;if(!d||d.pageId!==currentPage||!d.tokenId)return;const t=document.getElementById(d.tokenId);if(!t||!map.contains(t)||t.dataset.localDragging==='1')return;const nx=Number(d.left),ny=Number(d.top);if(!Number.isFinite(nx)||!Number.isFinite(ny))return;t.style.left=nx+'px';t.style.top=ny+'px';if(!visionRaf){visionRaf=requestAnimationFrame(()=>{visionRaf=0;try{window.rpgForgeUpdateFogVision?.()}catch(_){}})}});s.on('connect',()=>{if(window.lumathhuRoomCode)roomCode=window.lumathhuRoomCode;if(window.lumathhuCurrentPageId)pageId=window.lumathhuCurrentPageId;});}
  function bindObjectMoveListener(){const s=window.rpgForgeSocket;if(!s||s.__lumathhuObjectMoveListener)return;s.__lumathhuObjectMoveListener=true;s.on('rpg-object-move',d=>{if(!d||d.pageId!==pageId)return;const all=[...map.querySelectorAll('.forgeObj')];const o=all.find(x=>(x.dataset.objectInstanceId||x.dataset.instanceId||x.id)===d.objectId);if(!o||o.dataset.localDragging==='1')return;o.style.left=d.left+'px';o.style.top=d.top+'px'});}
  bindMoveListener();bindObjectMoveListener();
  const gridSelector='.grid';
@@ -3145,8 +3147,8 @@ window.tool = window.tool || 'select';
  // Durante o arraste, a posição usa eventos leves em tempo real. Salva o estado completo só ao soltar.
  document.addEventListener('pointerup',e=>{if(e.target?.closest?.('#map .token,#map .forgeObj,#map .monster')){clearTimeout(timer);timer=setTimeout(send,90)}},true);
  document.addEventListener('input',e=>{if(e.target.closest?.('#map'))queue()});document.addEventListener('change',e=>{if(e.target.closest?.('#map'))queue()});
- window.addEventListener('lumathhu-map-sync',receive);window.addEventListener('lumathhu-page-changed',e=>{if(e.detail?.pageId)pageId=e.detail.pageId;});
- function ready(e){const d=e.detail||{};roomCode=d.roomCode||roomCode;pageId=d.currentPageId||pageId;const s=window.rpgForgeSocket;bindMoveListener();bindObjectMoveListener();if(s&&!s.__lumathhuMapSyncListener){s.__lumathhuMapSyncListener=true;s.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){pageId=d.pageId;queue()}})}if(s&&s.connected)setTimeout(()=>{if(roomCode)send()},900)}
+ window.addEventListener('lumathhu-map-sync',receive);window.addEventListener('lumathhu-page-changed',e=>{if(e.detail?.pageId){pageId=e.detail.pageId;window.lumathhuCurrentPageId=e.detail.pageId;}});
+ function ready(e){const d=e.detail||{};roomCode=d.roomCode||window.lumathhuRoomCode||roomCode;pageId=d.currentPageId||window.lumathhuCurrentPageId||pageId;window.lumathhuRoomCode=roomCode;window.lumathhuCurrentPageId=pageId;const s=window.rpgForgeSocket;bindMoveListener();bindObjectMoveListener();if(s&&!s.__lumathhuMapSyncListener){s.__lumathhuMapSyncListener=true;s.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){pageId=d.pageId;queue()}})}if(s&&s.connected)setTimeout(()=>{if(roomCode)send()},900)}
  window.addEventListener('lumathhu-room-ready',ready);window.addEventListener('rpgforge-room-ready',ready);
  window.addEventListener('lumathhu-room-left',()=>{roomCode='';lastSent=''});
  const origEmit=window.rpgForgeSocket?.emit;
