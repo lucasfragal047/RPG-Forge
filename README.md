@@ -52,3 +52,8 @@ As salas ficam em memória. Se o servidor reiniciar ou sofrer redeploy, as salas
 ## Menu LUMATHHU e salas online
 
 O menu inicial oferece **Criar sala**, **Participar de sala** e **Últimas salas**. As salas usam Socket.IO no servidor Node; para jogar com outras pessoas, publique a pasta do projeto no GitHub e conecte o repositório ao Render como serviço Web Service, com comando de build vazio e comando de início `npm start`. Compartilhe o código de 4 caracteres que aparece ao entrar na sala. A lista de salas recentes do servidor depende de o processo do Render continuar ativo; a memória das salas é reiniciada quando o processo reinicia.
+
+
+## Animação dos dados — atualização
+
+A animação 3D foi aprimorada com deslocamento no espaço, gravidade visual, quique, rotação com desaceleração e orientação final voltada para o resultado. A origem da animação é compartilhada no evento de rolagem para que os participantes recebam parâmetros consistentes. Esta versão é uma implementação própria inspirada no comportamento de dados 3D; ela não incorpora diretamente o código-fonte do Owlbear Rodeo.
