@@ -15,7 +15,7 @@ const CODE='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeCode(){let c='';do{c='';for(let i=0;i<4;i++)c+=CODE[Math.floor(Math.random()*CODE.length)]}while(rooms.has(c));return c}
 function newPage(id,name){return{id,name,locked:false,allowedPlayers:[],state:null,sharedMapState:null,weatherEffect:null,fogEffect:null}}
 function cleanName(v){return String(v||'Jogador').trim().slice(0,40)||'Jogador'}
-function roomState(room,me){return{role:me?.role||'player',roomCode:room.code,currentPageId:me?.pageId||room.pages[0].id,pages:room.pages.map(p=>({id:p.id,name:p.name,locked:p.locked,allowedPlayers:p.allowedPlayers.slice()})),players:[...room.players.values()].map(p=>({id:p.clientId,name:p.name,role:p.role,pageId:p.pageId}))}}
+function roomState(room,me){return{role:me?.role||'player',roomCode:room.code,currentPageId:me?.pageId||room.pages[0].id,pages:room.pages.map(p=>({id:p.id,name:p.name,locked:p.locked,allowedPlayers:p.allowedPlayers.slice()})),players:[...room.players.values()].map(p=>({id:p.clientId,name:p.name,role:p.role,pageId:p.pageId})),extensions:room.extensions||{}}}
 function broadcast(room){for(const p of room.players.values())io.to(p.socketId).emit('pagina-atualizada',roomState(room,p))}
 function gm(socket,room){const p=room.players.get(socket.id);return !!p&&p.role==='gm'}
 function defaultPage(room){return room.pages.find(p=>!p.locked)||room.pages[0]}
@@ -34,7 +34,7 @@ const io=new Server(server,{cors:{origin:true,credentials:true}});
 io.on('connection',socket=>{
  socket.on('criar-sala',({clientId,nome}={})=>{
    if(!clientId)return socket.emit('sala-erro','Identidade do Mestre inválida.');
-   const code=makeCode();const ownerName=cleanName(nome||'Mestre');const room={code,name:'Mesa de '+ownerName,ownerName,createdAt:Date.now(),ownerClientId:clientId,pages:[newPage('page-1','Mapa 1')],players:new Map()};rooms.set(code,room);
+   const code=makeCode();const ownerName=cleanName(nome||'Mestre');const room={code,name:'Mesa de '+ownerName,ownerName,createdAt:Date.now(),ownerClientId:clientId,extensions:{},pages:[newPage('page-1','Mapa 1')],players:new Map()};rooms.set(code,room);
    const p={socketId:socket.id,clientId,name:cleanName(nome||'Mestre'),role:'gm',pageId:room.pages[0].id};room.players.set(socket.id,p);socket.data.room=code;socket.join(code);
    socket.emit('sala-criada',{sala:code});socket.emit('sala-estado',roomState(room,p));
  });
@@ -48,6 +48,8 @@ io.on('connection',socket=>{
    if(room.weatherEffect)socket.emit('rpg-efeito-clima',room.weatherEffect);
    if(page.fogEffect)socket.emit('rpg-efeito-fumaca',page.fogEffect);broadcast(room);
  });
+ socket.on('extensao-listar',({sala}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);if(!room||!me)return;socket.emit('extensoes-estado',{sala:room.code,extensions:room.extensions||{}})});
+ socket.on('extensao-ativar',({sala,id,enabled,config}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);if(!room||!me)return;if(me.role!=='gm')return socket.emit('sala-erro','Apenas o Mestre pode ativar ou desativar extensões.');id=String(id||'').trim().slice(0,80);if(!/^[a-zA-Z0-9_-]+$/.test(id))return;room.extensions=room.extensions||{};room.extensions[id]={enabled:!!enabled,config:config&&typeof config==='object'?config:{},updatedAt:Date.now(),by:me.name};const packet={sala:room.code,id,extension:room.extensions[id],extensions:room.extensions};io.to(room.code).emit('extensao-atualizada',packet);});
  socket.on('pagina-trocar',({sala,pageId})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg)return;if(me.role!=='gm'&&(pg.locked||!pg.allowedPlayers.includes(me.clientId))){return socket.emit('pagina-acesso-negado','O Mestre não liberou este mapa para você.')}me.pageId=pg.id;socket.emit('pagina-troca-confirmada',{pageId:pg.id});if(pg.state)socket.emit('pagina-estado',{pageId:pg.id,state:pg.state});if(room.weatherEffect)socket.emit('rpg-efeito-clima',room.weatherEffect);broadcast(room)});
  socket.on('pagina-salvar-estado',({sala,pageId,state})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg||!state||typeof state.html!=='string')return;if(JSON.stringify(state).length>6000000)return;if(me.role!=='gm'&&(pg.locked||me.pageId!==pg.id))return;pg.state=state;for(const p of room.players.values())if(p.pageId===pg.id&&p.socketId!==socket.id)io.to(p.socketId).emit('pagina-estado',{pageId:pg.id,state})});
  socket.on('lumathhu-map-sync',({sala,pageId,state}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg||!state||typeof state.html!=='string'||state.html.length>6000000)return;if(me.role!=='gm'&&me.pageId!==pg.id)return;pg.sharedMapState=state;for(const p of room.players.values())if(p.pageId===pg.id&&p.socketId!==socket.id)io.to(p.socketId).emit('lumathhu-map-sync',{pageId:pg.id,state})});
