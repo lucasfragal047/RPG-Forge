@@ -565,6 +565,26 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     add('↓ Enviar para trás',()=>{
       el.style.zIndex='1'; removeEditor();
     });
+    add('🗺️ Anexar ao grid como fundo',()=>{
+      const grid=mapEl.querySelector('.grid');
+      const img=el.querySelector('img');
+      if(!grid||!img||!img.src){message('Não foi possível anexar esta imagem ao grid.');return;}
+      const gl=parseFloat(grid.style.left)||-400, gt=parseFloat(grid.style.top)||-300;
+      const left=parseFloat(el.style.left)||0, top=parseFloat(el.style.top)||0;
+      const w=parseFloat(el.style.width)||600, h=parseFloat(el.style.height)||400;
+      const src=img.src.replace(/\\/g,'\\\\').replace(/"/g,'%22');
+      grid.dataset.backgroundImage=src;
+      grid.dataset.backgroundWidth=String(w); grid.dataset.backgroundHeight=String(h);
+      grid.dataset.backgroundX=String(left-gl); grid.dataset.backgroundY=String(top-gt);
+      const cell=grid.style.backgroundSize||'50px 50px';
+      grid.style.backgroundImage='url("'+src+'"),linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';
+      grid.style.backgroundSize=w+'px '+h+'px,'+cell+','+cell;
+      grid.style.backgroundPosition=(left-gl)+'px '+(top-gt)+'px,0 0,0 0';
+      grid.style.backgroundRepeat='no-repeat,repeat,repeat';
+      el.remove(); selectedImage=null; removeEditor();
+      window.rpgForgeSyncMapNow?.(); window.rpgForgeSaveCurrentPageNow?.();
+      message('Imagem anexada ao grid como fundo.');
+    });
     add('↔ Aumentar largura',()=>{el.style.width=(Math.max(30,parseFloat(el.style.width)||30)+25)+'px'; removeEditor()});
     add('↔ Diminuir largura',()=>{el.style.width=Math.max(30,(parseFloat(el.style.width)||30)-25)+'px'; removeEditor()});
     add('↕ Aumentar altura',()=>{el.style.height=(Math.max(30,parseFloat(el.style.height)||30)+25)+'px'; removeEditor()});
@@ -1268,13 +1288,16 @@ window.tool = window.tool || 'select';
   const gridBtn=document.createElement('button');
   gridBtn.className='btn';gridBtn.id='gridToggle';gridBtn.textContent='Grade: ligada';
   snap.parentNode.insertBefore(gridBtn,snap);
+  function gridIsVisible(){return grid.dataset.visible!=='0';}
+  function setGridVisible(visible){
+    grid.dataset.visible=visible?'1':'0';
+    grid.style.display=visible?'block':'none';
+    gridBtn.textContent='Grade: '+(visible?'ligada':'desligada');
+    window.dispatchEvent(new CustomEvent('lumathhu-grid-overlay-changed',{detail:{overlay:grid.dataset.overlay==='1',visible}}));
+  }
   gridBtn.onclick=()=>{
-    const off=grid.style.display==='none';
-    grid.style.display=off?'block':'none';
-    gridBtn.textContent='Grade: '+(off?'ligada':'desligada');
-    // A visibilidade também faz parte do estado da mesa: todos os jogadores veem igual.
-    window.dispatchEvent(new CustomEvent('lumathhu-grid-overlay-changed',{detail:{overlay:grid.dataset.overlay==='1',visible:off}}));
-    window.rpgForgeSyncMapNow?.();
+    setGridVisible(!gridIsVisible());
+    window.rpgForgeSyncMapNow?.(); window.rpgForgeSaveCurrentPageNow?.();
   };
   snap.title='Ativa/desativa encaixe dos tokens na grade';
   const sizeBtn=document.createElement('button');
@@ -1284,7 +1307,7 @@ window.tool = window.tool || 'select';
   sizeBtn.onclick=()=>{
     const sizes=[25,50,75,100],cur=parseInt(grid.style.backgroundSize)||50;
     const n=sizes[(sizes.indexOf(cur)+1)%sizes.length];
-    grid.style.backgroundSize=n+'px '+n+'px';sizeBtn.textContent='Grade '+n+'px';
+    grid.style.backgroundSize=grid.dataset.backgroundImage?(grid.dataset.backgroundWidth||600)+'px '+(grid.dataset.backgroundHeight||400)+'px,'+n+'px '+n+'px,'+n+'px '+n+'px':n+'px '+n+'px';sizeBtn.textContent='Grade '+n+'px';
     window.dispatchEvent(new CustomEvent('lumathhu-grid-cell-size-changed',{detail:{cell:n}}));
     window.rpgForgeSyncMapNow?.();window.rpgForgeSaveCurrentPageNow?.();
   };
@@ -1300,8 +1323,7 @@ window.tool = window.tool || 'select';
     grid.style.zIndex=on?'999999':'0';
     grid.style.pointerEvents='none';
     grid.style.backgroundColor=on?'transparent':'';
-    grid.style.backgroundImage='linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';
-    grid.style.backgroundSize=grid.style.backgroundSize||'50px 50px';
+    if(grid.dataset.backgroundImage){const bi=grid.dataset.backgroundImage.replace(/\\/g,'\\\\').replace(/"/g,'%22');const cell=grid.style.backgroundSize||'50px 50px';grid.style.backgroundImage='url("'+bi+'"),linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';grid.style.backgroundSize=(grid.dataset.backgroundWidth||600)+'px '+(grid.dataset.backgroundHeight||400)+'px,'+cell+','+cell;grid.style.backgroundPosition=(grid.dataset.backgroundX||0)+'px '+(grid.dataset.backgroundY||0)+'px,0 0,0 0';grid.style.backgroundRepeat='no-repeat,repeat,repeat';}else{grid.style.backgroundImage='linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';grid.style.backgroundSize=grid.style.backgroundSize||'50px 50px';}
     overlayBtn.textContent='Grade sobrepor: '+(on?'ligada':'desligada');
     overlayBtn.classList.toggle('active',on);
   }
@@ -1309,8 +1331,9 @@ window.tool = window.tool || 'select';
     grid.dataset.overlay=grid.dataset.overlay==='1'?'0':'1';
     // Ligar a sobreposição também torna a grade visível; não deixa o display:none
     // de um clique anterior apagar as linhas sem o usuário perceber.
-    if(grid.dataset.overlay==='1')grid.style.display='block';
-    gridBtn.textContent='Grade: '+(grid.style.display==='none'?'desligada':'ligada');
+    if(grid.dataset.overlay==='1' && grid.dataset.visible!=='0')grid.style.display='block';
+    else if(grid.dataset.visible==='0')grid.style.display='none';
+    gridBtn.textContent='Grade: '+(gridIsVisible()?'ligada':'desligada');
     updateGridOverlay();
     window.dispatchEvent(new CustomEvent('lumathhu-grid-overlay-changed',{detail:{overlay:grid.dataset.overlay==='1',visible:grid.style.display!=='none'}}));
     window.rpgForgeSyncMapNow?.();
@@ -3086,7 +3109,7 @@ window.tool = window.tool || 'select';
  function send(){if(applying)return;const s=window.rpgForgeSocket;if(!s||!s.connected||!roomCode)return;const st=serializable();const raw=JSON.stringify(st);if(raw===lastSent)return;lastSent=raw;s.emit('lumathhu-map-sync',{sala:roomCode,pageId,state:st})}
  function queue(){if(applying)return;clearTimeout(timer);timer=setTimeout(send,180)}
  window.rpgForgeSyncMapNow=function(){if(applying)return;clearTimeout(timer);send()};
- function receive(e){const d=e.detail||{};if(!d.state||typeof d.state.html!=='string'||(d.pageId&&pageId&&d.pageId!==pageId))return;applying=true;try{const oldPositions=new Map();map.querySelectorAll('.token[id]').forEach(t=>oldPositions.set(t.id,{left:t.style.left,top:t.style.top}));const persistentLayers=[...map.querySelectorAll('#weatherOverlay,#rpgFogLayer')];const grid=getLocalGrid();const holder=document.createElement('div');holder.innerHTML=d.state.html;holder.querySelectorAll('#weatherOverlay,#rpgFogLayer,.rpgFogVisionMask').forEach(x=>x.remove());const incomingGrid=holder.querySelector(gridSelector);if(incomingGrid&&grid){grid.style.cssText=incomingGrid.style.cssText;grid.className=incomingGrid.className;grid.dataset.overlay=incomingGrid.dataset.overlay||'0';grid.style.zIndex=grid.dataset.overlay==='1'?'999999':'0';grid.style.pointerEvents='none';grid.style.backgroundColor=grid.dataset.overlay==='1'?'transparent':'';grid.style.display=incomingGrid.style.display||'';grid.style.backgroundImage='linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';incomingGrid.replaceWith(grid)}else if(grid&&!incomingGrid){holder.insertBefore(grid,holder.firstChild)}map.innerHTML=holder.innerHTML;const renderedGrid=map.querySelector(gridSelector);if(renderedGrid&&renderedGrid!==grid)renderedGrid.replaceWith(grid);persistentLayers.forEach(layer=>{if(!map.contains(layer))map.appendChild(layer)});try{window.rpgForgeUpdateWeatherBounds?.();window.rpgForgeUpdateFogVision?.()}catch(_){}map.querySelectorAll('.token[id]').forEach(t=>{t.style.transition='none'});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:map.innerHTML};window.dispatchEvent(new Event('lumathhu-map-rebuilt'));try{document.getElementById('gridOverlayToggle')?.classList.toggle('active',grid?.dataset.overlay==='1');const b=document.getElementById('gridOverlayToggle');if(b)b.textContent='Grade sobrepor: '+(grid?.dataset.overlay==='1'?'ligada':'desligada')}catch(_){}lastSent=JSON.stringify(serializable());}catch(err){console.warn('LUMATHHU: falha ao sincronizar mapa',err)}finally{setTimeout(()=>{applying=false},80)}}
+ function receive(e){const d=e.detail||{};if(!d.state||typeof d.state.html!=='string'||(d.pageId&&pageId&&d.pageId!==pageId))return;applying=true;try{const oldPositions=new Map();map.querySelectorAll('.token[id]').forEach(t=>oldPositions.set(t.id,{left:t.style.left,top:t.style.top}));const persistentLayers=[...map.querySelectorAll('#weatherOverlay,#rpgFogLayer')];const grid=getLocalGrid();const holder=document.createElement('div');holder.innerHTML=d.state.html;holder.querySelectorAll('#weatherOverlay,#rpgFogLayer,.rpgFogVisionMask').forEach(x=>x.remove());const incomingGrid=holder.querySelector(gridSelector);if(incomingGrid&&grid){grid.style.cssText=incomingGrid.style.cssText;grid.className=incomingGrid.className;grid.dataset.overlay=incomingGrid.dataset.overlay||'0';grid.style.zIndex=grid.dataset.overlay==='1'?'999999':'0';grid.style.pointerEvents='none';grid.style.backgroundColor=grid.dataset.overlay==='1'?'transparent':'';grid.dataset.visible=incomingGrid.dataset.visible|| (incomingGrid.style.display==='none'?'0':'1');grid.dataset.backgroundImage=incomingGrid.dataset.backgroundImage||'';grid.dataset.backgroundWidth=incomingGrid.dataset.backgroundWidth||'';grid.dataset.backgroundHeight=incomingGrid.dataset.backgroundHeight||'';grid.dataset.backgroundX=incomingGrid.dataset.backgroundX||'';grid.dataset.backgroundY=incomingGrid.dataset.backgroundY||'';grid.style.display=grid.dataset.visible==='0'?'none':'block';if(grid.dataset.backgroundImage){const bi=grid.dataset.backgroundImage.replace(/\\/g,'\\\\').replace(/"/g,'%22');const cell=grid.style.backgroundSize||'50px 50px';grid.style.backgroundImage='url("'+bi+'"),linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';grid.style.backgroundSize=(grid.dataset.backgroundWidth||600)+'px '+(grid.dataset.backgroundHeight||400)+'px,'+cell+','+cell;grid.style.backgroundPosition=(grid.dataset.backgroundX||0)+'px '+(grid.dataset.backgroundY||0)+'px,0 0,0 0';grid.style.backgroundRepeat='no-repeat,repeat,repeat';}else{grid.style.backgroundImage='linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';}incomingGrid.replaceWith(grid)}else if(grid&&!incomingGrid){holder.insertBefore(grid,holder.firstChild)}map.innerHTML=holder.innerHTML;const renderedGrid=map.querySelector(gridSelector);if(renderedGrid&&renderedGrid!==grid)renderedGrid.replaceWith(grid);persistentLayers.forEach(layer=>{if(!map.contains(layer))map.appendChild(layer)});try{window.rpgForgeUpdateWeatherBounds?.();window.rpgForgeUpdateFogVision?.()}catch(_){}map.querySelectorAll('.token[id]').forEach(t=>{t.style.transition='none'});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:map.innerHTML};window.dispatchEvent(new Event('lumathhu-map-rebuilt'));try{document.getElementById('gridOverlayToggle')?.classList.toggle('active',grid?.dataset.overlay==='1');const b=document.getElementById('gridOverlayToggle');if(b)b.textContent='Grade sobrepor: '+(grid?.dataset.overlay==='1'?'ligada':'desligada')}catch(_){}lastSent=JSON.stringify(serializable());}catch(err){console.warn('LUMATHHU: falha ao sincronizar mapa',err)}finally{setTimeout(()=>{applying=false},80)}}
  const obs=new MutationObserver(m=>{if(applying)return;let relevant=false;for(const x of m){if(x.type==='attributes'&&x.attributeName==='style'&&x.target?.matches?.('.token,.forgeObj,.monster'))continue;if(x.type==='attributes'&&x.attributeName==='style'&&x.target?.closest?.('.token,.forgeObj,.monster'))continue;relevant=true;break}if(relevant)queue()});obs.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['class','src','style','data-overlay','data-locked','data-item','data-obj','data-hidden-items']});
  // Durante o arraste, a posição usa eventos leves em tempo real. Salva o estado completo só ao soltar.
  document.addEventListener('pointerup',e=>{if(e.target?.closest?.('#map .token,#map .forgeObj,#map .monster')){clearTimeout(timer);timer=setTimeout(send,90)}},true);

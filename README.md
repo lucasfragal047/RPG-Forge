@@ -1,15 +1,14 @@
-# LUMATHHU SOM — correção de névoa e grade
+# LUMATHHU — fundo de imagem no grid e alternância da grade
 
-Esta versão mantém a estrutura do projeto integrado e corrige:
-
-- A névoa e seus ajustes de ativação, posição, tamanho, cor e opacidade ficam sob controle do Mestre. O servidor já valida as alterações da névoa e rejeita comandos enviados por jogadores comuns.
-- A grade mantém o tamanho de célula selecionado (25, 50, 75 ou 100 px) quando a proporção horizontal/vertical é alterada.
-- Os controles de proporção horizontal e vertical atualizam as dimensões da grade sem redefinir o tamanho das células.
-- As dimensões e o tamanho da grade são sincronizados com o mapa e reaplicados quando chega uma atualização remota.
+## Alterações
+- No menu **Imagem selecionada** (aberto com duplo clique na imagem importada), foi adicionada a opção **🗺️ Anexar ao grid como fundo**.
+- Essa opção fixa a imagem na camada da grade na mesma posição e dimensão em que estava, remove o objeto flutuante e mantém a grade desenhada por cima da imagem.
+- A imagem de fundo e suas dimensões/posição são incluídas no estado da grade para sincronização entre participantes.
+- Corrigida a alternância da grade: o botão **Grade: ligada/desligada** mantém um estado explícito, para não reativar a grade inesperadamente após sincronização.
+- Alterar o tamanho das células continua funcionando sem redefinir o tamanho da imagem anexada.
 
 ## Atualização
-1. Extraia o ZIP.
-2. Substitua os arquivos correspondentes no repositório local.
-3. Faça commit e push para o GitHub.
-4. Aguarde o Render concluir a implantação.
-5. Teste com o Mestre e pelo menos um jogador na mesma sala.
+Substitua os arquivos do projeto pelos deste ZIP, envie as alterações ao GitHub e aguarde o deploy do Render.
+
+## Validação
+A sintaxe do servidor e dos scripts JavaScript embutidos foi verificada. A sincronização real entre navegadores precisa ser conferida no Render.
