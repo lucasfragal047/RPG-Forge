@@ -2827,7 +2827,7 @@ window.tool = window.tool || 'select';
 #rpgForgeDieStage.rpg-three-ready:before{top:78%;width:150px;height:34px;filter:blur(8px)}
 #rpgForgeDieStage:before{content:"";position:absolute;left:50%;top:72%;width:120px;height:32px;transform:translateX(-50%) rotateX(68deg);border-radius:50%;background:radial-gradient(ellipse,#000c 0%,#0007 36%,transparent 72%);filter:blur(7px);opacity:.8}
 #rpgForgeDie{position:relative;width:104px;height:104px;transform-style:preserve-3d;filter:drop-shadow(0 20px 13px #000b) drop-shadow(0 0 8px #d8ad4b22);will-change:transform}
-#rpgForgeDie.rolling{animation:rpgForgeDieTumble 1.85s cubic-bezier(.15,.72,.18,1) both}
+#rpgForgeDie.rolling{animation:rpgForgeDieTumble 2.25s cubic-bezier(.16,.72,.18,1) both}
 .rpgForgeDieFace{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px solid #fff8;border-radius:17px;background:linear-gradient(138deg,#fff4c7 0%,#e3bd68 12%,#b37a2d 46%,#81501c 72%,#e2bb68 100%);color:#261706;font-size:38px;font-weight:1000;letter-spacing:-.04em;text-shadow:0 1px 0 #fff8,0 -1px 1px #5d3b1680;box-shadow:inset 0 0 0 2px #f8e5a780,inset 0 0 0 5px #65401955,inset 5px 6px 13px #fff6,inset -7px -9px 15px #3d250a70;backface-visibility:hidden;overflow:hidden}
 .rpgForgeDieFace:before{content:"";position:absolute;inset:4px;border-radius:12px;border:1px solid #fff5;box-shadow:inset 0 1px 2px #fff6;pointer-events:none}
 .rpgForgeDieFace:after{content:"";position:absolute;left:8%;top:5%;width:66%;height:32%;border-radius:50%;transform:rotate(-28deg);background:linear-gradient(180deg,#ffffff9c,#fff0);filter:blur(3px);pointer-events:none}
@@ -2841,7 +2841,21 @@ window.tool = window.tool || 'select';
 #rpgForgeDiceMeta{font-size:13px;color:#c5ccd7;min-height:18px}
 #rpgForgeDiceClose{border:1px solid #aeb7c680;background:linear-gradient(#394352,#202734);color:#fff;border-radius:10px;padding:9px 20px;font:inherit;font-size:12px;cursor:pointer;margin-top:4px;box-shadow:inset 0 1px #fff2,0 5px 14px #0005;transition:transform .15s ease,filter .15s ease}
 #rpgForgeDiceClose:hover{filter:brightness(1.18);transform:translateY(-1px)}
-@keyframes rpgForgeDieTumble{0%{transform:translateY(-100px) rotateX(-35deg) rotateY(10deg) rotateZ(-18deg) scale(.7)}18%{transform:translateY(-28px) rotateX(230deg) rotateY(165deg) rotateZ(110deg) scale(1.13)}36%{transform:translateY(28px) rotateX(455deg) rotateY(320deg) rotateZ(205deg) scale(.94)}52%{transform:translateY(-13px) rotateX(610deg) rotateY(485deg) rotateZ(292deg) scale(1.04)}66%{transform:translateY(9px) rotateX(735deg) rotateY(620deg) rotateZ(340deg) scale(.99)}79%{transform:translateY(-4px) rotateX(800deg) rotateY(700deg) rotateZ(355deg) scale(1.015)}90%{transform:translateY(2px) rotateX(825deg) rotateY(718deg) rotateZ(360deg) scale(1)}100%{transform:translateY(0) rotateX(828deg) rotateY(720deg) rotateZ(360deg) scale(1)}}
+@keyframes rpgForgeDieTumble{
+0%{transform:translate3d(-18px,-145px,0) rotateX(-70deg) rotateY(20deg) rotateZ(-35deg) scale(.72)}
+10%{transform:translate3d(22px,-65px,0) rotateX(210deg) rotateY(190deg) rotateZ(95deg) scale(1.08)}
+20%{transform:translate3d(-24px,28px,0) rotateX(510deg) rotateY(420deg) rotateZ(205deg) scale(.96)}
+27%{transform:translate3d(18px,-30px,0) rotateX(680deg) rotateY(610deg) rotateZ(290deg) scale(1.02)}
+36%{transform:translate3d(-12px,36px,0) rotateX(930deg) rotateY(850deg) rotateZ(405deg) scale(.94)}
+43%{transform:translate3d(10px,-18px,0) rotateX(1120deg) rotateY(1030deg) rotateZ(490deg) scale(1.01)}
+52%{transform:translate3d(-7px,22px,0) rotateX(1320deg) rotateY(1220deg) rotateZ(590deg) scale(.97)}
+60%{transform:translate3d(5px,-10px,0) rotateX(1460deg) rotateY(1390deg) rotateZ(665deg) scale(1)}
+69%{transform:translate3d(-3px,12px,0) rotateX(1570deg) rotateY(1510deg) rotateZ(710deg) scale(.985)}
+78%{transform:translate3d(2px,-5px,0) rotateX(1640deg) rotateY(1580deg) rotateZ(715deg) scale(1)}
+88%{transform:translate3d(0,4px,0) rotateX(1680deg) rotateY(1620deg) rotateZ(720deg) scale(.99)}
+95%{transform:translate3d(0,-2px,0) rotateX(1690deg) rotateY(1628deg) rotateZ(720deg) scale(1)}
+100%{transform:translate3d(0,0,0) rotateX(1692deg) rotateY(1620deg) rotateZ(720deg) scale(1)}
+}
 @media(max-width:480px){#rpgForgeDiceCard{min-height:320px;padding:22px 16px 18px}#rpgForgeDieStage{height:180px;width:240px}#rpgForgeDie{width:92px;height:92px}.rpgForgeDieFace:nth-child(1){transform:translateZ(46px)}.rpgForgeDieFace:nth-child(2){transform:rotateY(180deg) translateZ(46px)}.rpgForgeDieFace:nth-child(3){transform:rotateY(90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(4){transform:rotateY(-90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(5){transform:rotateX(90deg) translateZ(46px)}.rpgForgeDieFace:nth-child(6){transform:rotateX(-90deg) translateZ(46px)}}
 @media(prefers-reduced-motion:reduce){#rpgForgeDiceOverlay{transition:none}#rpgForgeDie.rolling{animation-duration:.25s}}
 </style>
