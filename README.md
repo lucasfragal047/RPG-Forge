@@ -1,14 +1,10 @@
-# LUMATHHU — fundo de imagem no grid e alternância da grade
+# LUMATHHU — cor de fundo do mapa
 
-## Alterações
-- No menu **Imagem selecionada** (aberto com duplo clique na imagem importada), foi adicionada a opção **🗺️ Anexar ao grid como fundo**.
-- Essa opção fixa a imagem na camada da grade na mesma posição e dimensão em que estava, remove o objeto flutuante e mantém a grade desenhada por cima da imagem.
-- A imagem de fundo e suas dimensões/posição são incluídas no estado da grade para sincronização entre participantes.
-- Corrigida a alternância da grade: o botão **Grade: ligada/desligada** mantém um estado explícito, para não reativar a grade inesperadamente após sincronização.
-- Alterar o tamanho das células continua funcionando sem redefinir o tamanho da imagem anexada.
+Adicionado seletor **🎨 Cor de fundo** nas ferramentas do mapa, ao lado de importar/exportar.
 
-## Atualização
-Substitua os arquivos do projeto pelos deste ZIP, envie as alterações ao GitHub e aguarde o deploy do Render.
+- A cor altera o fundo da área do mapa, não a cor das linhas da grade.
+- A grade permanece transparente por trás das linhas, permitindo que a cor seja vista.
+- A imagem anexada como fundo continua sendo uma camada separada atrás da grade.
+- A escolha de cor fica salva neste navegador.
 
-## Validação
-A sintaxe do servidor e dos scripts JavaScript embutidos foi verificada. A sincronização real entre navegadores precisa ser conferida no Render.
+Substitua os arquivos do projeto por estes arquivos e envie as alterações ao GitHub para publicar no Render.
