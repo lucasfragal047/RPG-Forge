@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>RPG Forge — Mesa Virtual</title>
 <style>
-:root{color-scheme:dark;--bg:#101216;--panel:#171a20;--panel2:#1d2129;--line:#303641;--text:#eef1f5;--muted:#9ca5b3;--accent:#d6a85d;--good:#6dcc9b;--danger:#df7474}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,Segoe UI,sans-serif;overflow:hidden}.app{height:100vh;display:grid;grid-template-rows:58px 1fr;background:var(--bg)}header{display:flex;align-items:center;gap:18px;padding:0 18px;border-bottom:1px solid var(--line);background:#12151a}.logo{font-weight:800;letter-spacing:.4px}.logo span{color:var(--accent)}.session{color:var(--muted);font-size:12px}.spacer{flex:1}.pill,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:8px 11px}.btn{cursor:pointer}.btn:hover{border-color:#555e6d}.main{min-height:0;display:grid;grid-template-columns:250px 1fr 285px}.side{background:var(--panel);border-right:1px solid var(--line);overflow:auto;position:relative;min-width:0;transition:width .18s ease,opacity .18s ease}.right{border-left:1px solid var(--line);border-right:0}.main.leftCollapsed{grid-template-columns:44px 1fr 285px}.main.rightCollapsed{grid-template-columns:250px 1fr 44px}.main.leftCollapsed.rightCollapsed{grid-template-columns:44px 1fr 44px}.side.collapsed{overflow:hidden}.side.collapsed>*:not(.sideCollapse){display:none!important}.sideCollapse{position:sticky;top:8px;z-index:40;display:flex!important;align-items:center;justify-content:center;width:32px;height:32px;margin:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);cursor:pointer;font-size:18px;line-height:1}.sideCollapse:hover{border-color:#555e6d;color:var(--accent)}.side.right .sideCollapse{margin-left:auto}.section{padding:15px;border-bottom:1px solid var(--line)}h3{margin:0 0 11px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}.toolgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.tool{padding:9px;border:1px solid var(--line);border-radius:8px;background:#191d24;cursor:pointer}.tool.active{border-color:var(--accent);color:var(--accent)}.tokenItem{display:flex;align-items:center;gap:8px;padding:8px;border-radius:7px;cursor:pointer}.tokenItem:hover{background:#20252e}.dot{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;border:2px solid #fff}.player{background:#5774d9}.npc{background:#b25d65}.monster{background:#7a9a55}.canvasWrap{position:relative;overflow:hidden;background:#0c0f13}.toolbar{position:absolute;z-index:5;top:12px;left:12px;right:12px;display:flex;gap:7px;align-items:center}.toolbar .btn{background:#171b22dd;backdrop-filter:blur(5px)}.mapToolsWrap{position:relative;z-index:10;display:flex;align-items:flex-start}.mapToolsToggle{width:40px;height:40px;padding:0;font-size:18px}.mapToolsPanel{display:none;position:absolute;left:47px;top:0;gap:7px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:10px;background:#12151add;backdrop-filter:blur(7px);box-shadow:0 8px 24px #0008;white-space:nowrap}.mapToolsWrap.open .mapToolsPanel{display:flex}#map{position:absolute;inset:0;cursor:grab;transform-origin:0 0}.grid{position:absolute;width:2400px;height:1600px;left:-400px;top:-300px;background-color:#15191e;background-image:linear-gradient(#30353d 1px,transparent 1px),linear-gradient(90deg,#30353d 1px,transparent 1px);background-size:50px 50px;z-index:0}.grid[data-overlay="1"]{z-index:999999!important;background-color:transparent!important;pointer-events:none!important}.room{position:absolute;border:2px solid #777f8d;background:#20252bcc;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#707887;font-size:13px}.token{position:absolute;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;border:3px solid #eee;box-shadow:0 5px 16px #0008;cursor:grab;user-select:none;z-index:3}.token.selected{outline:3px solid var(--accent);outline-offset:3px}.token.player{background:#536fd2}.token.npc{background:#a95d65}.token.monster{background:#718e50}.fog{position:absolute;background:#050608cc;z-index:4;pointer-events:none;mix-blend-mode:normal}.magicEffect{position:absolute;z-index:7;pointer-events:none;border:3px solid var(--effect-color,#7c4dff);background:color-mix(in srgb,var(--effect-color,#7c4dff) 22%,transparent);box-shadow:0 0 24px var(--effect-color,#7c4dff),inset 0 0 24px var(--effect-color,#7c4dff);animation:magicPulse 1.4s ease-in-out infinite alternate}.magicBeam{position:absolute;height:5px;transform-origin:left center;background:var(--effect-color,#7c4dff);box-shadow:0 0 16px var(--effect-color,#7c4dff);z-index:7;pointer-events:none}.spellArea{position:absolute;z-index:7;pointer-events:auto;overflow:hidden;border:2px solid var(--effect-color);box-shadow:0 0 28px var(--effect-color),inset 0 0 20px var(--effect-color);background:color-mix(in srgb,var(--effect-color) 18%,transparent)}
+:root{color-scheme:dark;--bg:#101216;--panel:#171a20;--panel2:#1d2129;--line:#303641;--text:#eef1f5;--muted:#9ca5b3;--accent:#d6a85d;--good:#6dcc9b;--danger:#df7474}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,Segoe UI,sans-serif;overflow:hidden}.app{height:100vh;display:grid;grid-template-rows:58px 1fr;background:var(--bg)}header{display:flex;align-items:center;gap:18px;padding:0 18px;border-bottom:1px solid var(--line);background:#12151a}.logo{font-weight:800;letter-spacing:.4px}.logo span{color:var(--accent)}.session{color:var(--muted);font-size:12px}.spacer{flex:1}.pill,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:8px 11px}.btn{cursor:pointer}.btn:hover{border-color:#555e6d}.main{min-height:0;display:grid;grid-template-columns:250px 1fr 285px}.side{background:var(--panel);border-right:1px solid var(--line);overflow:auto;position:relative;min-width:0;transition:width .18s ease,opacity .18s ease}.right{border-left:1px solid var(--line);border-right:0}.main.leftCollapsed{grid-template-columns:44px 1fr 285px}.main.rightCollapsed{grid-template-columns:250px 1fr 44px}.main.leftCollapsed.rightCollapsed{grid-template-columns:44px 1fr 44px}.side.collapsed{overflow:hidden}.side.collapsed>*:not(.sideCollapse){display:none!important}.sideCollapse{position:sticky;top:8px;z-index:40;display:flex!important;align-items:center;justify-content:center;width:32px;height:32px;margin:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);cursor:pointer;font-size:18px;line-height:1}.sideCollapse:hover{border-color:#555e6d;color:var(--accent)}.side.right .sideCollapse{margin-left:auto}.section{padding:15px;border-bottom:1px solid var(--line)}h3{margin:0 0 11px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}.toolgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.tool{padding:9px;border:1px solid var(--line);border-radius:8px;background:#191d24;cursor:pointer}.tool.active{border-color:var(--accent);color:var(--accent)}.tokenItem{display:flex;align-items:center;gap:8px;padding:8px;border-radius:7px;cursor:pointer}.tokenItem:hover{background:#20252e}.dot{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;border:2px solid #fff}.player{background:#5774d9}.npc{background:#b25d65}.monster{background:#7a9a55}.canvasWrap{position:relative;overflow:hidden;background:#0c0f13}.toolbar{position:absolute;z-index:5;top:12px;left:12px;right:12px;display:flex;gap:7px;align-items:center}.toolbar .btn{background:#171b22dd;backdrop-filter:blur(5px)}.mapToolsWrap{position:relative;z-index:10;display:flex;align-items:flex-start}.mapToolsToggle{width:40px;height:40px;padding:0;font-size:18px}.mapToolsPanel{display:none;position:absolute;left:47px;top:0;gap:7px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:10px;background:#12151add;backdrop-filter:blur(7px);box-shadow:0 8px 24px #0008;white-space:nowrap}.mapToolsWrap.open .mapToolsPanel{display:flex}#map{position:absolute;inset:0;cursor:grab;transform-origin:0 0}.grid{position:absolute;width:2400px;height:1600px;left:-400px;top:-300px;background-color:#15191e;background-image:linear-gradient(#30353d 1px,transparent 1px),linear-gradient(90deg,#30353d 1px,transparent 1px);background-size:50px 50px;z-index:0}.room{position:absolute;border:2px solid #777f8d;background:#20252bcc;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#707887;font-size:13px}.token{position:absolute;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;border:3px solid #eee;box-shadow:0 5px 16px #0008;cursor:grab;user-select:none;z-index:3}.token.selected{outline:3px solid var(--accent);outline-offset:3px}.token.player{background:#536fd2}.token.npc{background:#a95d65}.token.monster{background:#718e50}.fog{position:absolute;background:#050608cc;z-index:4;pointer-events:none;mix-blend-mode:normal}.magicEffect{position:absolute;z-index:7;pointer-events:none;border:3px solid var(--effect-color,#7c4dff);background:color-mix(in srgb,var(--effect-color,#7c4dff) 22%,transparent);box-shadow:0 0 24px var(--effect-color,#7c4dff),inset 0 0 24px var(--effect-color,#7c4dff);animation:magicPulse 1.4s ease-in-out infinite alternate}.magicBeam{position:absolute;height:5px;transform-origin:left center;background:var(--effect-color,#7c4dff);box-shadow:0 0 16px var(--effect-color,#7c4dff);z-index:7;pointer-events:none}.spellArea{position:absolute;z-index:7;pointer-events:auto;overflow:hidden;border:2px solid var(--effect-color);box-shadow:0 0 28px var(--effect-color),inset 0 0 20px var(--effect-color);background:color-mix(in srgb,var(--effect-color) 18%,transparent)}
 .spellArea .spellClose{position:absolute;right:3px;top:3px;z-index:20;background:#111b;border:1px solid #fff5;color:#fff;border-radius:5px;cursor:pointer}.spellVisual{position:absolute;inset:0;transform:rotate(var(--spell-rotation,0deg));transform-origin:center center}.spellArea.spellEditing{overflow:visible}.spellArea.spellEditing .spellResizeHandle{position:absolute;z-index:40;pointer-events:auto;background:transparent;border:0}.spellResizeHandle.n,.spellResizeHandle.s{left:12px;right:12px;height:16px}.spellResizeHandle.n{top:-8px;cursor:ns-resize!important}.spellResizeHandle.s{bottom:-8px;cursor:ns-resize!important}.spellResizeHandle.e,.spellResizeHandle.w{top:12px;bottom:12px;width:16px}.spellResizeHandle.e{right:-8px;cursor:ew-resize!important}.spellResizeHandle.w{left:-8px;cursor:ew-resize!important}.spellResizeHandle.nw,.spellResizeHandle.ne,.spellResizeHandle.sw,.spellResizeHandle.se{width:18px;height:18px}.spellResizeHandle.nw{left:-9px;top:-9px;cursor:nwse-resize!important}.spellResizeHandle.ne{right:-9px;top:-9px;cursor:nesw-resize!important}.spellResizeHandle.sw{left:-9px;bottom:-9px;cursor:nesw-resize!important}.spellResizeHandle.se{right:-9px;bottom:-9px;cursor:nwse-resize!important}.spellArea.spellEditing:after{content:'';position:absolute;inset:0;border:2px dashed #d6a85d;box-shadow:0 0 0 1px #0008;pointer-events:none;z-index:38}.spellEditor{position:fixed;z-index:1200;width:min(330px,90vw);background:#171a20;border:1px solid #555e6d;border-radius:10px;box-shadow:0 16px 45px #000d;color:#fff;overflow:hidden}.spellEditorHead{padding:9px 11px;background:#20252e;border-bottom:1px solid #343b47;font-weight:700;display:flex;align-items:center;gap:8px}.spellEditorHead span{flex:1}.spellEditorBody{padding:10px}.spellEditorGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.spellEditor label{display:block;font-size:11px;color:#aeb7c5}.spellEditor input{margin-top:4px}.spellEditorBtns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.spellEditorRotate{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}.spellEditor .btn{width:100%}.spellEditorSave{margin-top:8px}.spellEditorHint{font-size:10px;color:#9ca5b3;margin-top:8px;line-height:1.35}.spellEditor.activeMove .moveSpellBtn{border-color:#d6a85d;color:#d6a85d}.spellArea.spellMoving{cursor:move!important}.spellArea.spellEditing .spellLabel{pointer-events:none}
 .spellParticles{position:absolute;inset:0;pointer-events:none}
 .spellParticle{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--effect-color);box-shadow:0 0 10px var(--effect-color);animation:particleFall var(--dur) linear infinite;left:var(--left);top:-10px}
@@ -331,7 +331,7 @@ filter:blur(38px);animation:rpgCloudMove2 42s ease-in-out infinite alternate}
     <div class="row2"><label class="small" for="rpgFogPosY">Névoa Y</label><input id="rpgFogPosY" type="range" min="-900" max="900" step="5" value="0"><span class="rpgFogValue" id="rpgFogPosYValue">0 px</span></div>
     <button class="btn" id="rpgGridFogReset" type="button">↺ Restaurar proporções e posição</button>
   </div>
-</div><div class="section"><h3>Mapa</h3><div class="card"><b>Ruínas — Salão Norte</b><div class="small">24 × 16 quadrados · 1 quadrado = 1,5 m</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button><button class="btn" id="clearGridContent" style="width:100%;margin-top:7px">🧹 Limpar grid</button><div class="small" style="margin-top:6px">Remove o que foi colocado no mapa, mantendo o cenário/base.</div></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="10">d10</button><button data-die="12">d12</button><button data-die="20">d20</button><button data-die="100">d100</button></div><div style="display:flex;align-items:center;gap:8px;margin-top:8px"><label for="rpgForgeDiceCount" class="small">Quantidade de dados</label><input id="rpgForgeDiceCount" type="number" min="1" step="1" value="1" style="width:68px;background:#171b22;color:#fff;border:1px solid #4a5260;border-radius:7px;padding:7px"></div><div class="small" style="margin-top:4px">Escolha qualquer quantidade de dados e clique no tipo desejado. Inclui d4, d6, d8, d10, d12, d20 e d100.</div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
+</div><div class="section"><h3>Mapa</h3><div class="card"><b>Ruínas — Salão Norte</b><div class="small">24 × 16 quadrados · 1 quadrado = 1,5 m</div></div><button class="btn" style="width:100%" id="reset">Centralizar mapa</button><button class="btn" id="clearGridContent" style="width:100%;margin-top:7px">🧹 Limpar grid</button><div class="small" style="margin-top:6px">Remove o que foi colocado no mapa, mantendo o cenário/base.</div></div><div class="section"><h3>Tokens</h3><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">L</span>Laxus <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="player"><span class="dot player">B</span>Benzuke <span class="small">PJ</span></div><div class="tokenItem" draggable="true" data-kind="npc"><span class="dot npc">N</span>Guarda <span class="small">NPC</span></div><div class="tokenItem" draggable="true" data-kind="monster"><span class="dot monster">G</span>Goblin <span class="small">Monstro</span></div></div><div class="section"><h3>Dados</h3><div class="dice"><button data-die="4">d4</button><button data-die="6">d6</button><button data-die="8">d8</button><button data-die="20">d20</button></div><div style="display:flex;align-items:center;gap:8px;margin-top:8px"><label for="rpgForgeDiceCount" class="small">Quantidade de dados</label><input id="rpgForgeDiceCount" type="number" min="1" max="20" value="1" style="width:68px;background:#171b22;color:#fff;border:1px solid #4a5260;border-radius:7px;padding:7px"></div><div class="small" style="margin-top:4px">Exemplo: escolha 3 e clique em d6 para rolar 3d6.</div><div class="card" style="margin-top:8px;text-align:center"><div class="small">Última rolagem</div><b id="roll">—</b></div></div></aside>
 <main class="canvasWrap" id="stage"><div class="toolbar"><button class="btn" id="zoomOut">−</button><button class="btn" id="zoomLabel" title="Clique para redefinir">100%</button><button class="btn" id="zoomIn">+</button><div class="mapToolsWrap" id="mapToolsWrap"><button class="btn mapToolsToggle" id="mapToolsToggle" title="Abrir ferramentas do mapa">⚙️</button><div class="mapToolsPanel" id="mapToolsPanel"><button class="btn" id="snap">Encaixar grade</button><button class="btn" id="importMap">📥 Importar mapa</button><button class="btn" id="exportMap">📤 Exportar mapa</button><input id="mapFile" type="file" accept="image/*,.json" class="hidden"></div></div><div class="spacer"></div><span class="pill" id="roleHint">Modo local</span></div><div id="map"><div class="grid"></div><div class="rpgFogLayer" id="rpgFogLayer"><div class="rpgFogCloud" id="rpgFogCloud"><div class="rpgFogCloudTools"><button id="rpgFogCenter" type="button">↺ Centro</button></div><div class="rpgFogResize" id="rpgFogResize" title="Arraste para redimensionar"></div></div></div><div class="room" style="left:500px;top:230px;width:550px;height:300px">SALÃO PRINCIPAL</div><div class="room" style="left:1080px;top:230px;width:320px;height:300px">CRIPTA</div><div class="room" style="left:500px;top:590px;width:280px;height:250px">ALMOXARIFADO</div><div class="room" style="left:820px;top:590px;width:580px;height:250px">CORREDOR</div><div class="token player" id="laxus" style="left:650px;top:350px" title="Laxus">L</div><div class="token player" id="benzuke" style="left:750px;top:400px" title="Benzuke">B</div><div class="token monster" id="goblin" style="left:1120px;top:330px" title="Goblin">G</div></div><script>
 /* Páginas/mapas locais — sem sistema de salas. O modo Mestre/Jogador é escolhido no botão lateral. */
 (function(){
@@ -993,22 +993,15 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     function saveLocal(){try{localStorage.setItem(storageKey,JSON.stringify(sounds))}catch(e){}}
     function youtubeId(value){
       const raw=String(value||'').trim();if(!raw)return null;
-      const valid=id=>{id=String(id||'').split(/[?&#/\s]/)[0];return /^[A-Za-z0-9_-]{11}$/.test(id)?id:null};
-      const direct=valid(raw);if(direct)return direct;
-      const loose=raw.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/i);if(loose)return valid(loose[1]);
       try{
-        const normalized=/^[a-z]+:\/\//i.test(raw)?raw:'https://'+raw;
-        const u=new URL(normalized),host=u.hostname.replace(/^www\./,'').toLowerCase();
-        if(['youtu.be','youtube.com','m.youtube.com','music.youtube.com','youtube-nocookie.com','www.youtube-nocookie.com'].includes(host)){
-          const q=valid(u.searchParams.get('v'));if(q)return q;
-          const parts=u.pathname.split('/').filter(Boolean);
-          if(host==='youtu.be'&&parts.length)return valid(parts[0]);
-          const marker=parts.findIndex(x=>['embed','shorts','live','v'].includes(x.toLowerCase()));
-          if(marker>=0&&parts[marker+1])return valid(parts[marker+1]);
+        const u=new URL(raw),host=u.hostname.replace(/^www\./,'').toLowerCase();
+        if(host==='youtu.be')return u.pathname.split('/').filter(Boolean)[0]||null;
+        if(host.endsWith('youtube.com')){
+          const q=u.searchParams.get('v');if(q)return q;
+          const m=u.pathname.match(/^\/(?:embed|shorts|live)\/([^\/?#]+)/i);if(m)return m[1];
         }
       }catch(e){}
-      const m=raw.match(/(?:[?&]v=|youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed|shorts|live|v)\/)([A-Za-z0-9_-]{11})(?:[^A-Za-z0-9_-]|$)/i);
-      return m?valid(m[1]):null;
+      const m=raw.match(/(?:v=|youtu\.be\/|youtube\.com\/(?:embed|shorts|live)\/)([A-Za-z0-9_-]{6,})/i);return m?m[1]:null;
     }
     async function getSounds(){
       if(!isServerMode())return;
@@ -1022,181 +1015,71 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       if(window.YT?.Player)return Promise.resolve();
       if(ytApiPromise)return ytApiPromise;
       ytApiPromise=new Promise((resolve,reject)=>{
-        let settled=false, timer=null, poll=null, tag=null;
-        const finish=(err)=>{
-          if(settled)return;settled=true;
-          if(timer)clearTimeout(timer);if(poll)clearInterval(poll);
-          if(err){if(tag&&!window.YT?.Player)tag.remove();ytApiPromise=null;reject(err)}else resolve();
-        };
-        const previous=window.onYouTubeIframeAPIReady;
-        window.onYouTubeIframeAPIReady=function(){
-          try{if(typeof previous==='function')previous()}catch(_){}
-          if(window.YT?.Player)finish();
-        };
-        // Reaproveita uma API já inserida por outra parte da página; evita scripts duplicados.
-        tag=[...document.scripts].find(x=>/youtube\.com\/iframe_api(?:\?|$)/i.test(x.src));
-        if(!tag){tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';tag.async=true;tag.dataset.rpgYoutubeApi='1';document.head.appendChild(tag)}
-        tag.onerror=()=>finish(new Error('O navegador bloqueou o download de https://www.youtube.com/iframe_api. Verifique bloqueador de anúncios, DNS privado ou restrições de rede neste dispositivo.'));
-        // Alguns navegadores não disparam o callback global quando outra integração o substitui.
-        poll=setInterval(()=>{if(window.YT?.Player)finish()},200);
-        timer=setTimeout(()=>finish(new Error('A API do YouTube não respondeu em 15 segundos neste dispositivo. O carregamento pode estar bloqueado pela rede, navegador ou extensão.')),15000);
-        if(window.YT?.Player)finish();
+        const prev=window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady=function(){try{prev?.();}catch(_){ }resolve()};
+        const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';tag.async=true;tag.onerror=()=>reject(new Error('Falha ao carregar a API do YouTube.'));document.head.appendChild(tag);
       });
       return ytApiPromise;
     }
     function playerContainer(panel){return panel?.querySelector('.ytPlayerHost')||null}
     function getYoutubePlayerVars(){
-      const vars={autoplay:1,controls:0,rel:0,playsinline:1,enablejsapi:1,fs:0,origin:location.origin};
+      const vars={autoplay:0,controls:1,rel:0,playsinline:1,enablejsapi:1};
       if(/^https?:$/.test(location.protocol))vars.origin=location.origin;
       return vars;
     }
     async function ensurePlayer(panel,videoId,autoplay){
       const host=playerContainer(panel);if(!host)return false;
-      if(videoId&&!youtubeId(videoId))throw new Error('ID do vídeo inválido. Cole o link completo do YouTube.');
-      videoId=videoId?youtubeId(videoId):null;
       try{await ensureYTApi()}catch(e){
-        const fb=panel.querySelector('.ytLocalFallback');
-        if(fb){fb.style.display='block';fb.textContent='Falha ao carregar a API do YouTube: '+(e?.message||'erro desconhecido');}
-        console.warn('[LUMATHHU áudio] Falha na API do YouTube:',e);
-        return false;
+        const fb=panel.querySelector('.ytLocalFallback');if(fb){fb.style.display='block';fb.textContent='Não foi possível carregar o player do YouTube. Abra a mesa pela URL HTTPS do Render.';}return false;
       }
       if(!player){
         host.innerHTML='';
         const iframeShell=document.createElement('div');iframeShell.id='yt-sync-player';iframeShell.style.cssText='width:100%;height:100%';host.appendChild(iframeShell);
         playerReady=false;
-        playerReadyPromise=new Promise((resolve,reject)=>{
-          let finished=false;
-          const finish=(ok,err)=>{
-            if(finished)return;finished=true;clearTimeout(readyTimer);
-            if(ok)resolve(true);else reject(err||new Error('O player do YouTube não ficou pronto.'));
-          };
-          const readyTimer=setTimeout(()=>finish(false,new Error('O iframe do YouTube foi criado, mas não respondeu em 12 segundos. Verifique se o navegador permite conteúdo incorporado.')),12000);
-          try{
-            player=new YT.Player('yt-sync-player',{
-              width:'100%',height:'100%',videoId:videoId||undefined,
-              host:'https://www.youtube.com',
-              playerVars:getYoutubePlayerVars(),
-              events:{
-                onReady:()=>{playerReady=true;try{masterLastPlayerState=Number(player.getPlayerState?.()??-1)}catch(_){masterLastPlayerState=-1}finish(true);if(autoplay)startCurrentVideo()},
-                onAutoplayBlocked:()=>{
-                  // O autoplay com áudio pode ser bloqueado. Mantemos a sincronização habilitada
-                  // e tentamos a reprodução silenciada; não exigimos que o jogador aperte Play.
-                  if(syncEnabled&&latestSyncEvent?.action==='play'&&latestSyncEvent?.item){
-                    const vid=youtubeId(latestSyncEvent.item.url);
-                    try{if(vid){player.mute();pendingSyncedUnmute=true;player.loadVideoById({videoId:vid,startSeconds:Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000)})}}catch(_){}
-                  }else updateSyncStatus(panel,'blocked');
-                },
-                onStateChange:(ev)=>{
-                  const state=ev?.data;
-                  // Espelha os controles nativos do próprio player do YouTube para toda a sala.
-                  // Ignora apenas mudanças imediatamente geradas pelos comandos da interface da mesa.
-                  if(roleIsMaster() && (state===YT.PlayerState.PLAYING || state===YT.PlayerState.PAUSED) && state!==masterLastPlayerState){
-                    const previous=masterLastPlayerState;masterLastPlayerState=state;
-                    const recentAppCommand=(Date.now()-masterLastUiCommandAt)<2200;
-                    if(!recentAppCommand && latestSyncEvent?.item){
-                      const nativeAction=state===YT.PlayerState.PLAYING?'play':'pause';
-                      const now=Date.now();
-                      const positionSeconds=state===YT.PlayerState.PLAYING?Math.max(0,Number(player?.getCurrentTime?.())||0):undefined;
-                      const commandId='native-'+now+'-'+Math.random().toString(36).slice(2,7);
-                      if(nativeAction==='play'){
-                        latestSyncEvent={...latestSyncEvent,action:'play',commandId,sourceClientId:clientId,startedAt:now,positionSeconds};
-                        lastLocalCommandId=commandId;
-                        sendRoomSoundCommand({action:'play',item:{id:latestSyncEvent.item.id,name:latestSyncEvent.item.name,url:latestSyncEvent.item.url},commandId,sourceClientId:clientId,startedAt:now,positionSeconds});
-                      }else{
-                        latestSyncEvent={...latestSyncEvent,action:'pause',commandId,sourceClientId:clientId,startedAt:now};
-                        sendRoomSoundCommand({action:'pause',commandId,sourceClientId:clientId,startedAt:now});
-                      }
-                    }
-                  }
-                  if(state===YT.PlayerState.PLAYING&&pendingSyncedUnmute){
-                    pendingSyncedUnmute=false;
-                    try{player.setVolume(100);player.unMute()}catch(_){}
-                    // Se o navegador permitiu o início silenciado, tenta liberar o áudio automaticamente.
-                    syncEnabled=true;try{localStorage.setItem(syncKey,'1')}catch(_){}
-                    updateSyncStatus(panel);
-                  }
-                },
-                onError:(ev)=>{const code=String(ev?.data??'sem código');updateSyncStatus(panel,'error',code);finish(false,new Error('O YouTube recusou o vídeo/player (código '+code+').'))}
-              }
-            });
-          }catch(err){finish(false,err)}
-        }).catch(err=>{
-          console.warn('[LUMATHHU áudio] Falha na inicialização do iframe:',err);
-          try{player?.destroy()}catch(_){}
-          player=null;playerReady=false;playerReadyPromise=null;
-          throw err;
+        playerReadyPromise=new Promise(resolve=>{
+          player=new YT.Player('yt-sync-player',{
+            width:'100%',height:'100%',videoId:videoId||undefined,
+            host:'https://www.youtube.com',
+            playerVars:getYoutubePlayerVars(),
+            events:{
+              onReady:()=>{playerReady=true;resolve(true);if(autoplay)startCurrentVideo()},
+              onAutoplayBlocked:()=>{syncEnabled=false;localStorage.setItem(syncKey,'0');updateSyncStatus(panel,'blocked')},
+              onError:(ev)=>{updateSyncStatus(panel,'error',String(ev?.data||''));resolve(false)}
+            }
+          });
         });
       }
       if(!playerReady&&playerReadyPromise){
-        try{const ok=await playerReadyPromise;if(!ok)return false}
-        catch(e){const fb=panel.querySelector('.ytLocalFallback');if(fb){fb.style.display='block';fb.textContent='Falha ao inicializar o player do YouTube: '+(e?.message||'erro desconhecido')}return false}
+        const ok=await playerReadyPromise;if(!ok)return false;
       }
-      if(videoId&&playerReady){if(autoplay)player.loadVideoById(videoId);else player.cueVideoById(videoId)}
+      if(videoId&&playerReady)player.loadVideoById(videoId);
       return true;
     }
     function startCurrentVideo(){
       if(!player||!playerReady||!latestSyncEvent?.item)return;
       const id=youtubeId(latestSyncEvent.item.url);if(!id)return;
-      try{player.unMute();player.setVolume(100);player.loadVideoById(id)}catch(e){}
+      try{player.unMute();player.setVolume(100);player.loadVideoById(id);player.playVideo()}catch(e){}
     }
-    // Inicia a faixa sincronizada com autoplay compatível: nos dispositivos dos jogadores,
-    // começa silenciado (permitido por mais navegadores) e libera o som assim que o vídeo
-    // realmente entra em reprodução. O Mestre continua iniciando com áudio pelo próprio clique.
-    let pendingSyncedUnmute=false;
-    let masterLastUiCommandAt=0;
-    let masterLastPlayerState=-1;
-    function playSyncedVideo(panel,videoId,startedAt,fromMaster=false){
-      if(!player||!playerReady||!videoId)return false;
-      const elapsed=Math.max(0,(Date.now()-(Number(startedAt)||Date.now()))/1000);
-      try{
-        player.setVolume(100);
-        if(fromMaster){
-          player.unMute();
-          player.loadVideoById({videoId,startSeconds:elapsed});
-          player.playVideo();
-          pendingSyncedUnmute=false;
-        }else{
-          // Não tentar iniciar com áudio antes do play: isso costuma ser bloqueado pelo navegador.
-          player.mute();
-          pendingSyncedUnmute=true;
-          player.loadVideoById({videoId,startSeconds:elapsed});
-          player.playVideo();
-        }
-        return true;
-      }catch(e){
-        console.warn('[LUMATHHU áudio] Falha ao iniciar reprodução sincronizada:',e);
-        return false;
-      }
-    }
+    function stopPlayback(){try{player?.stopVideo()}catch(e){}}
     function destroyPlayer(){try{player?.destroy()}catch(e){}player=null;playerReady=false;playerReadyPromise=null;}
     function showSyncStatus(panel,kind,msg){
       const box=panel?.querySelector('.ytSyncStatus');if(!box)return;
       box.innerHTML='';box.style.display='block';
       const text=document.createElement('div');text.style.cssText='font-size:11px;line-height:1.45';text.textContent=msg;box.appendChild(text);
-      if(kind==='activate'||kind==='blocked'||kind==='error'){
-        const b=document.createElement('button');b.type='button';b.className='btn ytEnableSync';b.style.cssText='width:100%;margin-top:7px';b.textContent=kind==='error'?'↻ Tentar carregar o player novamente':'🔊 Ativar áudio neste dispositivo';
-        b.onclick=()=>{
+      if(kind==='activate'||kind==='blocked'){
+        const b=document.createElement('button');b.type='button';b.className='btn ytEnableSync';b.style.cssText='width:100%;margin-top:7px';b.textContent='🔊 Ativar áudio neste dispositivo';
+        b.onclick=async()=>{
           syncEnabled=true;localStorage.setItem(syncKey,'1');
-          const item=latestSyncEvent?.item,id=item?youtubeId(item.url):null;
-          if(playerReady&&player){
-            try{if(id){const pos=Math.max(0,Number(latestSyncEvent.positionSeconds)||0);playSyncedVideo(panel,id,(Number(latestSyncEvent.startedAt)||Date.now())-pos*1000,false)}updateSyncStatus(panel);return}catch(e){}
-          }
-          b.disabled=true;b.textContent='Preparando áudio…';
-          ensurePlayer(panel,id,false).then(ok=>{
-            if(!ok){syncEnabled=false;localStorage.setItem(syncKey,'0');showSyncStatus(panel,'error','O player do YouTube não carregou. Confira a conexão ou bloqueador de anúncios e tente novamente.');return}
-            if(latestSyncEvent?.action==='play'){
-              try{const vid=youtubeId(latestSyncEvent.item?.url);const pos=Math.max(0,Number(latestSyncEvent.positionSeconds)||0);if(vid&&!playSyncedVideo(panel,vid,(Number(latestSyncEvent.startedAt)||Date.now())-pos*1000,false))showSyncStatus(panel,'blocked','O navegador bloqueou a reprodução automática. A mesa continuará sincronizando os comandos do Mestre.')}
-              catch(e){showSyncStatus(panel,'blocked','O navegador bloqueou a reprodução automática. A mesa continuará sincronizando os comandos do Mestre.')}
-            }
-            updateSyncStatus(panel);
-          }).catch(()=>{syncEnabled=false;localStorage.setItem(syncKey,'0');showSyncStatus(panel,'error','Falha ao iniciar o áudio. Tente novamente.')});
+          await ensurePlayer(panel,latestSyncEvent?.item?.url?youtubeId(latestSyncEvent.item.url):null,false);
+          if(latestSyncEvent?.action==='play')startCurrentVideo();
+          updateSyncStatus(panel);
         };box.appendChild(b);
       }
     }
     function updateSyncStatus(panel,forced){
       const p=panel||activeSoundPanel;if(!p)return;
       const label=p.querySelector('.ytSyncLabel');if(label)label.textContent=syncConnected?'● Servidor conectado':'○ Servidor não conectado';
-      if(forced==='error')showSyncStatus(p,'error','O YouTube recusou o player neste navegador. Use “Tentar carregar o player novamente” e confira se o navegador permite vídeos incorporados.');
+      if(forced==='error')showSyncStatus(p,'activate','O YouTube recusou o player neste navegador. Tente abrir a mesa pela URL HTTPS do Render e ative o áudio neste dispositivo.');
       else if(forced==='blocked'||(!syncEnabled&&syncConnected))showSyncStatus(p,'activate','O Mestre controla a reprodução para todos. Cada dispositivo precisa liberar o áudio uma vez para o navegador permitir a reprodução automática.');
       else if(syncEnabled&&syncConnected){const b=p.querySelector('.ytSyncStatus');b.style.borderColor='#3e7a54';b.style.background='#132219';b.textContent='🔊 Áudio sincronizado ativo — o Mestre controla a reprodução para todos.'}
       else if(!syncConnected){const b=p.querySelector('.ytSyncStatus');b.style.borderColor='#4a5260';b.style.background='#101318';b.textContent='○ Conectando ao servidor…'}
@@ -1212,24 +1095,13 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
         const actions=document.createElement('div');actions.style.cssText='display:flex;gap:5px';
         if(roleIsMaster()){
           const play=document.createElement('button');play.className='btn';play.textContent='▶ Tocar';
-          play.onclick=()=>{
-            const startedAt=Date.now();
-            masterLastUiCommandAt=startedAt;
-            const cmd='cmd-'+startedAt+'-'+Math.random().toString(36).slice(2,7);lastLocalCommandId=cmd;
-            latestSyncEvent={action:'play',item,commandId:cmd,sourceClientId:clientId,startedAt};
+          play.onclick=async()=>{
+            const cmd='cmd-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);lastLocalCommandId=cmd;latestSyncEvent={action:'play',item,commandId:cmd,sourceClientId:clientId};
             if(activeSoundPanel)updateNowPlaying(activeSoundPanel,item,'Reproduzindo para todos…');
-            // Envia o comando imediatamente: não espere a API do YouTube antes de sincronizar a sala.
-            const sent=sendRoomSoundCommand({action:'play',item:{id:item.id,name:item.name,url:item.url},commandId:cmd,sourceClientId:clientId,startedAt});
-            // Se o player já está pronto, iniciar dentro do próprio clique preserva a ativação do navegador.
-            if(playerReady&&player){
-              try{playSyncedVideo(activeSoundPanel,youtubeId(item.url),startedAt,true)}catch(e){console.warn('[LUMATHHU áudio] Não foi possível iniciar a faixa:',e)}
-            }else{
-              ensurePlayer(activeSoundPanel,youtubeId(item.url),false).then(ok=>{
-                if(!ok){showSyncStatus(activeSoundPanel,'error','O player ainda não está pronto. Tente novamente; o comando já foi enviado para a sala.');return}
-                try{playSyncedVideo(activeSoundPanel,youtubeId(item.url),startedAt,true)}catch(e){console.warn('[LUMATHHU áudio] Falha ao iniciar após carregar:',e)}
-              });
-            }
-            if(!sent)showSyncStatus(activeSoundPanel,'error','Conexão da sala indisponível. Reconecte à mesa e tente novamente.');
+            await ensurePlayer(activeSoundPanel,youtubeId(item.url),false);
+            try{player.unMute();player.setVolume(100);player.loadVideoById(youtubeId(item.url));player.playVideo()}catch(e){}
+            if(isServerMode())await postJson('/api/sound',{action:'play',item:{id:item.id,name:item.name,url:item.url},commandId:cmd,sourceClientId:clientId});
+            else if(!syncEnabled)showSyncStatus(activeSoundPanel,'activate','Ative o áudio neste dispositivo para reproduzir o YouTube.');
           };
           actions.appendChild(play);
         }else{
@@ -1264,7 +1136,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           <div class="ytSyncStatus" style="display:block;border:1px solid #4a5260;background:#101318;border-radius:8px;padding:9px;margin-bottom:9px"><b class="ytSyncLabel">○ Conectando ao servidor...</b></div>
           <div style="font-size:11px;color:#aeb7c5;margin-bottom:9px">O Mestre adiciona as músicas e, ao tocar, a reprodução é enviada para todos os jogadores conectados.</div>
           ${roleIsMaster()?'<div class="ytAddRow" style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:10px"><input class="ytName" placeholder="Nome do som (opcional)" style="background:#101318;color:#fff;border:1px solid #3b424e;border-radius:7px;padding:8px;box-sizing:border-box"><input class="ytUrl" placeholder="Cole aqui o link do YouTube" style="background:#101318;color:#fff;border:1px solid #3b424e;border-radius:7px;padding:8px;box-sizing:border-box"><button class="btn ytAdd">＋ Adicionar som</button></div>':''}
-          <div class="ytPlayerWrap" style="display:none;margin-bottom:10px"><div class="small" style="margin-bottom:5px">Reproduzindo</div><div class="ytNowPlaying" style="background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;font-size:12px;line-height:1.45"></div><div class="ytPlayerHost" style="width:100%;height:240px;border-radius:8px;overflow:hidden;background:#000;margin-top:7px"></div>${roleIsMaster()?'<div style="display:flex;gap:6px;margin-top:7px"><button type="button" class="btn ytPause" style="flex:1">⏸ Pausar todos</button><button type="button" class="btn ytStop" style="flex:1">⏹ Parar todos</button></div>':'<div class="ytListenerOnly" style="margin-top:6px;padding:8px;text-align:center;border:1px solid #343b46;border-radius:7px;color:#9ca5b3;font-size:11px">🔊 Som controlado pelo Mestre — você só escuta</div>'}<div class="ytLocalFallback" style="display:none;background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;margin-top:7px;font-size:12px;line-height:1.4"></div></div>
+          <div class="ytPlayerWrap" style="display:none;margin-bottom:10px"><div class="small" style="margin-bottom:5px">Reproduzindo</div><div class="ytNowPlaying" style="background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;font-size:12px;line-height:1.45"></div><div class="ytPlayerHost" style="width:100%;height:240px;border-radius:8px;overflow:hidden;background:#000;margin-top:7px"></div><div class="ytLocalFallback" style="display:none;background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;margin-top:7px;font-size:12px;line-height:1.4"></div><button class="btn ytStop" style="width:100%;margin-top:6px">⏹ Parar</button></div>
           <div class="ytList"></div>
         </div>`;
       document.body.appendChild(panel);
@@ -1284,8 +1156,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           title.textContent='🔊 Som / efeito';
         }
       };
-      const stopButton=panel.querySelector('.ytStop');if(stopButton)stopButton.onclick=()=>{if(!roleIsMaster())return;stopPlayback();const wrap=panel.querySelector('.ytPlayerWrap');if(wrap)wrap.style.display='none';const now=Date.now(),commandId='cmd-'+now+'-'+Math.random().toString(36).slice(2,7);masterLastUiCommandAt=now;lastLocalCommandId=commandId;sendRoomSoundCommand({action:'stop',commandId,sourceClientId:clientId,startedAt:now});};
-      const pauseButton=panel.querySelector('.ytPause');if(pauseButton)pauseButton.onclick=()=>{if(!roleIsMaster())return;try{player?.pauseVideo()}catch(e){}const now=Date.now(),commandId='cmd-'+now+'-'+Math.random().toString(36).slice(2,7);masterLastUiCommandAt=now;lastLocalCommandId=commandId;latestSyncEvent={...(latestSyncEvent||{}),action:'pause',commandId,sourceClientId:clientId,startedAt:now};sendRoomSoundCommand({action:'pause',commandId,sourceClientId:clientId,startedAt:now});};
+      panel.querySelector('.ytStop').onclick=async()=>{stopPlayback();const wrap=panel.querySelector('.ytPlayerWrap');wrap.style.display='none';if(roleIsMaster()&&isServerMode())await postJson('/api/sound',{action:'stop',commandId:'cmd-'+Date.now(),sourceClientId:clientId});};
       if(roleIsMaster()){
         const add=async()=>{
           const name=panel.querySelector('.ytName').value.trim(),url=panel.querySelector('.ytUrl').value.trim(),id=youtubeId(url);if(!id){alert('Cole um link válido do YouTube.');return}
@@ -1296,59 +1167,21 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
         };
         panel.querySelector('.ytAdd').onclick=add;panel.querySelector('.ytUrl').onkeydown=e=>{if(e.key==='Enter')add()};
       }
-      if(!syncEnabled&&syncConnected)showSyncStatus(panel,'activate','Cada jogador pode precisar liberar o áudio uma vez neste navegador. Depois disso, o Mestre controla Play/Pause para a sala; a reprodução tenta iniciar sem exigir que cada jogador aperte Play.');
-      // No dispositivo do Mestre, inicializa o iframe ao abrir o painel, não depois de clicar em Tocar.
-      // Assim o clique em uma faixa não fica preso a um await que pode perder a permissão de autoplay.
-      if(roleIsMaster()){
-        const wrap=panel.querySelector('.ytPlayerWrap'),now=panel.querySelector('.ytNowPlaying');
-        if(wrap&&now){wrap.style.display='none';now.innerHTML='<b>Player de áudio</b><div style="color:#9ca5b3;margin-top:3px">Escolha uma faixa para carregar o vídeo.</div>';}
-        ensurePlayer(panel,null,false).then(ok=>{
-          if(ok&&now)now.innerHTML='<b>Player pronto</b><div style="color:#9ca5b3;margin-top:3px">Escolha uma faixa. O Mestre controla a reprodução da sala.</div>';
-        }).catch(e=>console.warn('[LUMATHHU áudio] Pré-inicialização do player falhou:',e));
-      }
+      if(!syncEnabled&&syncConnected)showSyncStatus(panel,'activate','Cada jogador precisa clicar uma vez em “Ativar áudio neste dispositivo”. Depois disso, quando o Mestre tocar, o som poderá iniciar neste navegador.');
       return panel;
     }
     function handleSoundEvent(data){
       if((Number(data.seq)||0)<=lastSyncSeq)return;
       lastSyncSeq=Number(data.seq)||lastSyncSeq;latestSyncEvent=data;
       if(data.action==='stop'){stopPlayback();if(activeSoundPanel){const wrap=activeSoundPanel.querySelector('.ytPlayerWrap');wrap.style.display='none';updateSyncStatus(activeSoundPanel)}return}
-      if(data.action==='pause'){try{player?.pauseVideo()}catch(e){};return}
       if(data.action==='play'&&data.item){
         if(data.sourceClientId===clientId&&data.commandId===lastLocalCommandId){lastLocalCommandId=null;return}
         const p=activeSoundPanel||openSoundPanel();
         if(!p)return;
         updateNowPlaying(p,data.item,'Som sincronizado pelo Mestre.');
-        if(!syncEnabled){
-          // O jogador não controla a música: tenta começar automaticamente em modo silenciado
-          // e liberar o áudio assim que o YouTube confirmar que começou. Se o navegador bloquear,
-          // o botão de ativação fica disponível como alternativa, sem interromper a tentativa.
-          showSyncStatus(p,'activate','O Mestre controla o som da sala. Tentando iniciar automaticamente; se o navegador bloquear o áudio, ative-o uma única vez neste dispositivo.');
-          const activateButton=p.querySelector('.ytEnableSync');
-          if(activateButton){activateButton.disabled=true;activateButton.textContent='Preparando reprodução…'}
-        }
-        ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{
-          const id=youtubeId(data.item.url);if(!ok||!id){showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a conexão e tente novamente.');return}
-          const basePosition=Math.max(0,Number(data.positionSeconds)||0);
-          const adjustedStartedAt=(Number(data.startedAt)||Date.now())-basePosition*1000;
-          if(!playSyncedVideo(p,id,adjustedStartedAt,false))updateSyncStatus(p,'blocked');
-          else {const activateButton=p.querySelector('.ytEnableSync');if(activateButton){activateButton.disabled=false;activateButton.textContent='🔊 Ativar áudio neste dispositivo'}}
-        }).catch(()=>showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a conexão e tente novamente.'));
+        if(!syncEnabled){showSyncStatus(p,'activate','O Mestre iniciou este som. Ative o áudio neste dispositivo para ouvi-lo.');return}
+        ensurePlayer(p,youtubeId(data.item.url),false).then(()=>{try{const id=youtubeId(data.item.url);if(!id)return;player.unMute();player.setVolume(100);player.loadVideoById(id);player.playVideo()}catch(e){updateSyncStatus(p,'blocked')}});
       }
-    }
-    function bindRoomSoundSocket(){
-      const s=window.rpgForgeSocket;if(!s||s.__lumathhuSoundSyncBound)return;
-      s.__lumathhuSoundSyncBound=true;
-      s.on('rpg-sound-sync',data=>{try{handleSoundEvent(data||{})}catch(e){console.warn('Falha ao receber comando de som',e)}});
-      s.on('connect',()=>{syncConnected=true;updateSyncStatus(activeSoundPanel)});
-      s.on('disconnect',()=>{syncConnected=false;updateSyncStatus(activeSoundPanel)});
-      if(s.connected){syncConnected=true;updateSyncStatus(activeSoundPanel)}
-    }
-    window.addEventListener('lumathhu-room-ready',bindRoomSoundSocket);
-    window.addEventListener('rpgforge-room-ready',bindRoomSoundSocket);
-    function sendRoomSoundCommand(payload){
-      bindRoomSoundSocket();const s=window.rpgForgeSocket;const room=window.lumathhuRoomCode;
-      if(s&&s.connected&&room){s.emit('rpg-sound-sync',{...payload,sala:room});return true}
-      return false;
     }
     function connectSync(){
       if(!isServerMode()){syncConnected=false;return}
@@ -1435,9 +1268,6 @@ window.tool = window.tool || 'select';
     const off=grid.style.display==='none';
     grid.style.display=off?'block':'none';
     gridBtn.textContent='Grade: '+(off?'ligada':'desligada');
-    // A visibilidade também faz parte do estado da mesa: todos os jogadores veem igual.
-    window.dispatchEvent(new CustomEvent('lumathhu-grid-overlay-changed',{detail:{overlay:grid.dataset.overlay==='1',visible:off}}));
-    window.rpgForgeSyncMapNow?.();
   };
   snap.title='Ativa/desativa encaixe dos tokens na grade';
   const sizeBtn=document.createElement('button');
@@ -1453,26 +1283,15 @@ window.tool = window.tool || 'select';
   overlayBtn.className='btn';overlayBtn.id='gridOverlayToggle';
   function updateGridOverlay(){
     const on=grid.dataset.overlay==='1';
-    // A camada deve estar visível quando ligada e ficar sobre tokens/objetos,
-    // mas abaixo da névoa e dos efeitos climáticos.
-    grid.style.zIndex=on?'999999':'0';
+    grid.style.zIndex=on?'4':'0';
     grid.style.pointerEvents='none';
+    // No modo sobrepor, somente as linhas da grade ficam sobre o cenário.
+    // O fundo da grade precisa ficar transparente para não cobrir o mapa.
     grid.style.backgroundColor=on?'transparent':'';
-    grid.style.backgroundImage='linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';
-    grid.style.backgroundSize=grid.style.backgroundSize||'50px 50px';
     overlayBtn.textContent='Grade sobrepor: '+(on?'ligada':'desligada');
     overlayBtn.classList.toggle('active',on);
   }
-  overlayBtn.onclick=()=>{
-    grid.dataset.overlay=grid.dataset.overlay==='1'?'0':'1';
-    // Ligar a sobreposição também torna a grade visível; não deixa o display:none
-    // de um clique anterior apagar as linhas sem o usuário perceber.
-    if(grid.dataset.overlay==='1')grid.style.display='block';
-    gridBtn.textContent='Grade: '+(grid.style.display==='none'?'desligada':'ligada');
-    updateGridOverlay();
-    window.dispatchEvent(new CustomEvent('lumathhu-grid-overlay-changed',{detail:{overlay:grid.dataset.overlay==='1',visible:grid.style.display!=='none'}}));
-    window.rpgForgeSyncMapNow?.();
-  };
+  overlayBtn.onclick=()=>{grid.dataset.overlay=grid.dataset.overlay==='1'?'0':'1';updateGridOverlay()};
   updateGridOverlay();
   const toolsWrap=$('#mapToolsWrap'),toolsPanel=$('#mapToolsPanel'),toolsToggle=$('#mapToolsToggle');
   toolsToggle.onclick=e=>{e.stopPropagation();toolsWrap.classList.toggle('open');toolsToggle.title=toolsWrap.classList.contains('open')?'Fechar ferramentas do mapa':'Abrir ferramentas do mapa'};
@@ -1838,19 +1657,17 @@ window.tool = window.tool || 'select';
   uploadDrop.ondrop=e=>{e.preventDefault();uploadDrop.classList.remove('dragover');if(e.dataTransfer.files?.length)handleUploadFiles(e.dataTransfer.files);else{const id=e.dataTransfer.getData('rpg-object');const def=objects.find(o=>o[0]===id);if(def){const p=pos(e);makeObj(def,p[0]-24,p[1]-24);log(def[2]+' colocado no mapa.')}}};
   uploadInput.onchange=e=>{handleUploadFiles(e.target.files||[]);uploadInput.value=''};
   function bindObjElement(el,def){
-    // Snapshots da sala recriam os elementos via innerHTML: os atributos data-* são
-    // preservados, mas os listeners JavaScript não. Por isso sempre religamos os eventos.
-    if(!el||!def)return;
+    if(!el||!def||el.dataset.objBound==='1')return;
     el.dataset.objBound='1';
     el.dataset.name=def[2];
     if(!el.innerHTML.trim())el.innerHTML=objectIcon(def[0]);
     const rot=parseFloat(el.dataset.rotation||'0')||0;
     if(rot)el.style.transform='rotate('+rot+'deg)';
-    let dragging=false,off=[0,0],moveFrame=0;
+    let dragging=false,off=[0,0];
     el.onpointerdown=e=>{
       e.stopPropagation();
       if(tool!=='select')return;
-      dragging=true;el.dataset.localDragging='1';document.body.classList.add('rpg-token-dragging');
+      dragging=true;
       const p=pos(e);
       off=[p[0]-(parseFloat(el.style.left)||0),p[1]-(parseFloat(el.style.top)||0)];
       el.classList.add('selected');
@@ -1861,10 +1678,9 @@ window.tool = window.tool || 'select';
       const p=pos(e);
       el.style.left=(p[0]-off[0])+'px';
       el.style.top=(p[1]-off[1])+'px';
-      if(!moveFrame)moveFrame=requestAnimationFrame(()=>{moveFrame=0;if(dragging)window.rpgForgeSendObjectMove?.(el)});
+      window.rpgForgeSaveCurrentPage?.();
     };
-    el.onpointerup=e=>{dragging=false;delete el.dataset.localDragging;document.body.classList.remove('rpg-token-dragging');if(moveFrame){cancelAnimationFrame(moveFrame);moveFrame=0}try{el.releasePointerCapture?.(e.pointerId)}catch(_){};window.rpgForgeSendObjectMove?.(el);window.rpgForgeSaveCurrentPage?.()};
-    el.onpointercancel=el.onpointerup;
+    el.onpointerup=e=>{dragging=false;try{el.releasePointerCapture?.(e.pointerId)}catch(_){};window.rpgForgeSaveCurrentPage?.()};
     el.onclick=e=>{
       if(dragging)return;
       e.stopPropagation();
@@ -1929,8 +1745,6 @@ window.tool = window.tool || 'select';
   function makeObj(def,x=700,y=400){
     const el=document.createElement('div');
     el.className='forgeObj';
-    el.id='forge-object-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
-    el.dataset.objectInstanceId=el.id;
     el.dataset.obj=def[0];
     el.dataset.name=def[2];
     el.innerHTML=objectIcon(def[0]);
@@ -2037,20 +1851,20 @@ window.tool = window.tool || 'select';
   if(!stage || document.querySelector('#weatherBtn')) return;
   const style=document.createElement('style');
   style.textContent=`
-    .weatherOverlay{position:absolute;z-index:1000001;pointer-events:none;overflow:hidden;display:none;isolation:isolate;left:var(--weather-left,0px);top:var(--weather-top,0px);width:var(--weather-width,100%);height:var(--weather-height,100%);clip-path:inset(0);contain:strict;transform:translateZ(0)}
+    .weatherOverlay{position:absolute;z-index:5;pointer-events:none;overflow:hidden;display:none;isolation:isolate;left:var(--weather-left,0px);top:var(--weather-top,0px);width:var(--weather-width,100%);height:var(--weather-height,100%);clip-path:inset(0);contain:layout paint;transform:translateZ(0)}
     .weatherOverlay.active{display:block}
     .weatherShade{position:absolute;inset:0;background:rgba(20,25,35,var(--shade,.025));pointer-events:none;mix-blend-mode:soft-light;opacity:.9}
-    .weatherParticle{position:absolute;left:var(--px,50%);top:var(--py,50%);pointer-events:none;will-change:transform,opacity;mix-blend-mode:normal}
+    .weatherParticle{position:absolute;left:var(--px,50%);top:var(--py,50%);pointer-events:none;will-change:transform,opacity;mix-blend-mode:screen}
     .weatherRain{width:var(--rw,1.4px);height:var(--rh,28px);border-radius:999px;background:linear-gradient(to bottom,transparent 0%,rgba(190,220,240,.18) 18%,rgba(220,240,255,.92) 72%,rgba(245,250,255,.55) 100%);filter:blur(var(--rb,.15px));box-shadow:0 0 2px rgba(205,235,255,.22);transform:rotate(var(--angle,11deg));animation:weatherRain var(--dur) linear infinite var(--delay,0s);opacity:var(--op,.58)}
     .weatherSnow{width:var(--size,7px);height:var(--size,7px);border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0%,rgba(255,255,255,.96) 28%,rgba(225,240,248,.72) 58%,rgba(210,230,240,0) 78%);box-shadow:0 0 var(--glow,5px) rgba(235,248,255,.45);filter:blur(var(--blur,.1px));animation:weatherSnow var(--dur) ease-in-out infinite var(--delay,0s);opacity:var(--op,.78)}
     .weatherAsh{width:var(--size,4px);height:var(--size,4px);border-radius:50%;background:rgba(150,145,135,.58);filter:blur(.25px);animation:weatherAsh var(--dur) ease-in-out infinite;opacity:.45;mix-blend-mode:normal}
     .weatherDust{width:var(--dw,16px);height:var(--dh,3px);border-radius:999px;background:linear-gradient(90deg,transparent,rgba(205,177,125,.58),rgba(235,205,150,.30),transparent);filter:blur(var(--db,1.2px));animation:weatherDust var(--dur) linear infinite;opacity:var(--dop,.55);mix-blend-mode:normal}
     .weatherGust{position:absolute;left:-45%;width:190%;height:20%;border-radius:50%;background:linear-gradient(90deg,transparent,rgba(245,250,255,.13),rgba(225,235,240,.22),transparent);filter:blur(8px);transform:rotate(-9deg);animation:weatherGust var(--gustdur,2.8s) linear infinite;mix-blend-mode:screen;opacity:.65}
-    .weatherSnow{will-change:transform,opacity}.weatherOverlay[data-weather="blizzard"] .weatherSnow{filter:none;box-shadow:none}
-    .weatherFogBank{position:absolute;left:-25%;width:150%;height:34%;background:radial-gradient(ellipse,rgba(210,220,225,.16),rgba(205,215,220,.06) 38%,transparent 72%);filter:blur(8px);animation:weatherFog 16s ease-in-out infinite alternate;mix-blend-mode:screen;opacity:.7}
-    .weatherCloud{position:absolute;inset:-14%;background:radial-gradient(ellipse at 20% 12%,rgba(42,50,58,.18),transparent 46%),radial-gradient(ellipse at 72% 18%,rgba(32,39,48,.22),transparent 50%),radial-gradient(ellipse at 48% 42%,rgba(22,28,36,.12),transparent 58%);filter:blur(3px);animation:weatherCloud 24s ease-in-out infinite alternate;mix-blend-mode:multiply;opacity:.62}
+    .weatherSnow{will-change:transform,opacity}.weatherOverlay[data-weather="blizzard"] .weatherSnow{filter:blur(.2px);box-shadow:0 0 6px rgba(240,250,255,.5)}
+    .weatherFogBank{position:absolute;left:-25%;width:150%;height:34%;background:radial-gradient(ellipse,rgba(210,220,225,.16),rgba(205,215,220,.06) 38%,transparent 72%);filter:blur(22px);animation:weatherFog 16s ease-in-out infinite alternate;mix-blend-mode:screen;opacity:.7}
+    .weatherCloud{position:absolute;inset:-14%;background:radial-gradient(ellipse at 20% 12%,rgba(42,50,58,.18),transparent 46%),radial-gradient(ellipse at 72% 18%,rgba(32,39,48,.22),transparent 50%),radial-gradient(ellipse at 48% 42%,rgba(22,28,36,.12),transparent 58%);filter:blur(7px);animation:weatherCloud 24s ease-in-out infinite alternate;mix-blend-mode:multiply;opacity:.62}
     .weatherSun{position:absolute;right:10%;top:8%;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(255,246,194,.56) 0 12%,rgba(255,220,105,.22) 28%,rgba(255,220,105,.08) 48%,transparent 74%);filter:blur(3px);mix-blend-mode:screen;animation:weatherSun 7s ease-in-out infinite alternate}
-    .weatherAtmosphere{position:absolute;inset:-8%;background:radial-gradient(ellipse at 50% 110%,rgba(215,228,238,.06),transparent 58%),radial-gradient(ellipse at 15% 35%,rgba(120,165,190,.035),transparent 52%);filter:blur(6px);animation:weatherAtmosphere 18s ease-in-out infinite alternate;mix-blend-mode:soft-light;opacity:.9}
+    .weatherAtmosphere{position:absolute;inset:-8%;background:radial-gradient(ellipse at 50% 110%,rgba(215,228,238,.06),transparent 58%),radial-gradient(ellipse at 15% 35%,rgba(120,165,190,.035),transparent 52%);filter:blur(16px);animation:weatherAtmosphere 18s ease-in-out infinite alternate;mix-blend-mode:soft-light;opacity:.9}
     .weatherLightning{position:absolute;inset:0;background:rgba(235,245,255,0);animation:weatherFlash var(--flash,9s) infinite;mix-blend-mode:screen}.weatherBolt{position:absolute;top:-8%;width:5px;height:125%;opacity:0;filter:drop-shadow(0 0 5px rgba(220,245,255,.7));clip-path:polygon(48% 0,70% 0,57% 28%,78% 28%,35% 64%,48% 64%,18% 100%,29% 61%,8% 61%,43% 27%,25% 27%);background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,.82),rgba(180,225,255,.46));animation:weatherBolt var(--boltDur,850ms) ease-out forwards;z-index:3}.weatherGridFlash{position:absolute;inset:0;background:rgba(245,250,255,.38);opacity:0;z-index:2;pointer-events:none;animation:gridFlash 220ms ease-out forwards;mix-blend-mode:screen}
     .weatherPanel{position:fixed;right:18px;top:70px;width:min(330px,calc(100vw - 36px));z-index:120;background:#171a20ee;border:1px solid #444b57;border-radius:12px;padding:14px;box-shadow:0 18px 55px #000b;backdrop-filter:blur(8px)}
     .weatherPanel h2{margin:0 0 10px;font-size:17px}.weatherGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.weatherGrid label{font-size:11px;color:#aeb6c3}.weatherGrid select,.weatherGrid input{margin-top:4px}.weatherActions{display:flex;gap:7px;margin-top:10px}.weatherActions .btn{flex:1}.weatherStatus{margin-top:9px;color:#aeb6c3;font-size:12px}.weatherIntensity{display:flex;align-items:center;gap:8px}.weatherIntensity input{padding:0}
@@ -2106,9 +1920,6 @@ window.tool = window.tool || 'select';
   window.addEventListener('resize',syncWeatherBounds);
   if(window.ResizeObserver){const weatherBoundsObserver=new ResizeObserver(syncWeatherBounds);weatherBoundsObserver.observe(map);const grid=map.querySelector('.grid');if(grid)weatherBoundsObserver.observe(grid);}
   const visual=overlay.querySelector('#weatherVisual');
-  // Economiza CPU/GPU quando a aba não está visível; retoma automaticamente ao voltar.
-  const updateWeatherPlayback=()=>{overlay.style.animationPlayState=document.hidden?'paused':'running';visual.style.animationPlayState=document.hidden?'paused':'running';visual.querySelectorAll('*').forEach(el=>{el.style.animationPlayState=document.hidden?'paused':'running';});};
-  document.addEventListener('visibilitychange',updateWeatherPlayback);
   let state={type:'clear',intensity:55,wind:45,lightning:true};
   let lightningTimer=null;
   function stopLightning(){if(lightningTimer){clearInterval(lightningTimer);lightningTimer=null;} visual.querySelectorAll('.weatherBolt,.weatherGridFlash').forEach(e=>e.remove());}
@@ -2133,7 +1944,7 @@ window.tool = window.tool || 'select';
   }
 
   const weatherNames={clear:'Limpo',sun:'Sol forte',cloudy:'Nublado',rain:'Chuva',storm:'Tempestade',snow:'Neve',blizzard:'Nevasca',fog:'Névoa',sand:'Tempestade de areia',ash:'Cinzas vulcânicas',magic:'Chuva mágica'};
-  const particleCount=()=>Math.max(10,Math.min(48,Math.round(8+state.intensity*0.4)));
+  const particleCount=()=>Math.max(18,Math.min(260,Math.round(24+state.intensity*2.35)));
   function clearVisual(){visual.innerHTML='';}
   function particle(cls,props={}){const e=document.createElement('i');e.className='weatherParticle '+cls;Object.entries(props).forEach(([k,v])=>e.style.setProperty(k,v));visual.appendChild(e);}
   function build(){
@@ -2151,13 +1962,12 @@ window.tool = window.tool || 'select';
     if(state.type==='blizzard'){for(let i=0;i<6;i++){const g=document.createElement('div');g.className='weatherGust';g.style.top=(8+i*16)+'%';g.style.setProperty('--gustdur',(1.7+i*.28)+'s');g.style.animationDelay=(-Math.random()*3)+'s';visual.appendChild(g);}}
     if(state.type==='fog'){for(let i=0;i<3;i++){const f=document.createElement('div');f.className='weatherFogBank';f.style.top=(12+i*28)+'%';f.style.animationDelay=(-i*3)+'s';visual.appendChild(f);}}
     const n=particleCount();
-    if(document.hidden){visual.style.animationPlayState='paused';visual.querySelectorAll('*').forEach(el=>{el.style.animationPlayState='paused';});}
-    if(['rain','storm'].includes(state.type)) for(let i=0;i<n*(state.type==='storm'?1.1:1);i++){const heavy=Math.random()>.72; particle('weatherRain',{'--wind':(35+state.wind*2.8)+'px','--dur':(heavy?.28:.42)+Math.random()*.5+'s','--op':(heavy?.62:.42)+state.intensity/180,'--delay':(-Math.random()*2)+'s','--rw':(heavy?1.8:0.8+Math.random()*1.1)+'px','--rh':(heavy?34:18+Math.random()*25)+'px','--angle':(8+state.wind*.08+Math.random()*7)+'deg','--rb':(heavy?.05:.18)+'px','left':(Math.random()*100)+'%','top':(Math.random()*100)+'%'});}
+    if(['rain','storm'].includes(state.type)) for(let i=0;i<n*(state.type==='storm'?1.35:1);i++){const heavy=Math.random()>.72; particle('weatherRain',{'--wind':(35+state.wind*2.8)+'px','--dur':(heavy?.28:.42)+Math.random()*.5+'s','--op':(heavy?.62:.42)+state.intensity/180,'--delay':(-Math.random()*2)+'s','--rw':(heavy?1.8:0.8+Math.random()*1.1)+'px','--rh':(heavy?34:18+Math.random()*25)+'px','--angle':(8+state.wind*.08+Math.random()*7)+'deg','--rb':(heavy?.05:.18)+'px','left':(Math.random()*100)+'%','top':(Math.random()*100)+'%'});}
     if(state.type==='blizzard'){
       for(let i=0;i<5;i++){const f=document.createElement('div');f.className='weatherFogBank';f.style.top=(i*22-8)+'%';f.style.opacity=(.55+i*.06).toFixed(2);f.style.animationDuration=(10+i*2)+'s';visual.appendChild(f);}
     }
-    if(['snow','blizzard'].includes(state.type)) for(let i=0;i<n*(state.type==='blizzard'?1.05:1);i++) particle('weatherSnow',{'--sway':(-35+Math.random()*70)+'px','--sway2':(-45+Math.random()*90)+'px','--dur':(state.type==='blizzard'?.75:2.1)+Math.random()*(state.type==='blizzard'?1.15:2.7)+'s','--size':(state.type==='blizzard'?2.5+Math.random()*9:3+Math.random()*7)+'px','--glow':(state.type==='blizzard'?2+Math.random()*6:3+Math.random()*4)+'px','--blur':(Math.random()>.78?.35:.08)+'px','--op':(state.type==='blizzard'?.55+Math.random()*.4:.58+Math.random()*.3),'--delay':(-Math.random()*3)+'s','left':(Math.random()*100)+'%','top':(Math.random()*100)+'%'});
-    if(state.type==='sand') for(let i=0;i<n*1.15;i++){const travel=220+state.wind*7+Math.random()*520; particle('weatherDust',{'--travel':travel+'px','--rise':(-70+Math.random()*140)+'px','--dur':(.65+Math.random()*1.5)+'s','--dw':(6+Math.random()*32)+'px','--dh':(.7+Math.random()*3.5)+'px','--db':(.35+Math.random()*1.5)+'px','--dop':(.24+Math.random()*.5),'left':(Math.random()*100)+'%','top':(Math.random()*100)+'%'});}
+    if(['snow','blizzard'].includes(state.type)) for(let i=0;i<n*(state.type==='blizzard'?1.15:1);i++) particle('weatherSnow',{'--sway':(-35+Math.random()*70)+'px','--sway2':(-45+Math.random()*90)+'px','--dur':(state.type==='blizzard'?.75:2.1)+Math.random()*(state.type==='blizzard'?1.15:2.7)+'s','--size':(state.type==='blizzard'?2.5+Math.random()*9:3+Math.random()*7)+'px','--glow':(state.type==='blizzard'?2+Math.random()*6:3+Math.random()*4)+'px','--blur':(Math.random()>.78?.35:.08)+'px','--op':(state.type==='blizzard'?.55+Math.random()*.4:.58+Math.random()*.3),'--delay':(-Math.random()*3)+'s','left':(Math.random()*100)+'%','top':(Math.random()*100)+'%'});
+    if(state.type==='sand') for(let i=0;i<n*1.7;i++){const travel=220+state.wind*7+Math.random()*520; particle('weatherDust',{'--travel':travel+'px','--rise':(-70+Math.random()*140)+'px','--dur':(.65+Math.random()*1.5)+'s','--dw':(6+Math.random()*32)+'px','--dh':(.7+Math.random()*3.5)+'px','--db':(.35+Math.random()*1.5)+'px','--dop':(.24+Math.random()*.5),'left':(Math.random()*100)+'%','top':(Math.random()*100)+'%'});}
     if(state.type==='ash') for(let i=0;i<n;i++) particle('weatherAsh',{'--px':(Math.random()*100)+'%' ,'--py':(Math.random()*100)+'%' ,'--x':0 ,'--wind':(-50+state.wind*3)+'px','--dur':(2+Math.random()*4)+'s'});
     if(state.type==='magic') for(let i=0;i<n;i++){const e=document.createElement('i');e.className='weatherParticle';e.textContent=Math.random()>.5?'✦':'✧';e.style.cssText=`left:${Math.random()*100}%;top:-20px;color:#c7a8ff;font-size:${10+Math.random()*14}px;text-shadow:0 0 10px #8f6bff;animation:weatherRain ${1.8+Math.random()*2.4}s linear infinite;animation-delay:${-Math.random()*3}s;`;visual.appendChild(e)}
     if(state.type==='storm' && state.lightning){const l=document.createElement('div');l.className='weatherLightning';l.style.setProperty('--flash',(5+Math.random()*5)+'s');visual.appendChild(l); startLightning();}
@@ -2344,7 +2154,7 @@ window.tool = window.tool || 'select';
   function prepareToken(t){
     if(!t||t.dataset.tokenEnhanced==='1')return;
     t.dataset.tokenEnhanced='1';
-    if(!t.id)t.id='token-'+(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
+    if(!t.id)t.id='token-'+(++tokenSeq);
     if(!t.dataset.rotation)t.dataset.rotation='0';
     if(!t.dataset.flip)t.dataset.flip='0';
     if(!t.dataset.locked)t.dataset.locked='0';
@@ -2376,13 +2186,12 @@ window.tool = window.tool || 'select';
     });
 
     // Arraste independente do sistema global da mesa.
-    let moving=false, ox=0, oy=0, moveFrame=0;
-    const snapBtn=document.querySelector('#snap');
+    let moving=false, ox=0, oy=0;
     t.addEventListener('pointerdown',e=>{
       if(e.button!==0 || t.dataset.locked==='1' || !canMoveVisionToken(t))return;
       if(e.target.closest('button'))return;
       e.stopPropagation();
-      moving=true;t.dataset.localDragging='1';document.body.classList.add('rpg-token-dragging');
+      moving=true;
       const p=pos(e), left=parseFloat(t.style.left)||0, top=parseFloat(t.style.top)||0;
       ox=p[0]-left; oy=p[1]-top;
       t.classList.add('selected');
@@ -2393,17 +2202,17 @@ window.tool = window.tool || 'select';
     t.addEventListener('pointermove',e=>{
       if(!moving)return;
       const p=pos(e); let nx=p[0]-ox, ny=p[1]-oy;
+      const snapBtn=document.querySelector('#snap');
       if(snapBtn?.classList.contains('on')){nx=Math.round(nx/50)*50;ny=Math.round(ny/50)*50}
       t.style.left=nx+'px'; t.style.top=ny+'px';
-      // Coalesce fog/vision calculations and network updates to at most one per frame.
-      if(!moveFrame)moveFrame=requestAnimationFrame(()=>{moveFrame=0;if(!moving)return;updateVisionFocusRing();if(typeof window.rpgForgeUpdateFogVision==='function')window.rpgForgeUpdateFogVision();window.rpgForgeSendTokenMove?.(t)});
+      updateVisionFocusRing();
+      if(typeof window.rpgForgeUpdateFogVision==='function')window.rpgForgeUpdateFogVision();
     });
-    const stop=()=>{if(!moving)return;moving=false;delete t.dataset.localDragging;document.body.classList.remove('rpg-token-dragging');if(moveFrame){cancelAnimationFrame(moveFrame);moveFrame=0}window.rpgForgeSendTokenMove?.(t);window.rpgForgeSaveCurrentPageNow?.()};
+    const stop=()=>{moving=false};
     t.addEventListener('pointerup',stop); t.addEventListener('pointercancel',stop);
   }
 
   mapEl.querySelectorAll('.token').forEach(prepareToken);
-  window.addEventListener('lumathhu-map-rebuilt',()=>{mapEl.querySelectorAll('.token').forEach(t=>{t.dataset.tokenEnhanced='';prepareToken(t)});window.rpgForgeRebindObjects?.()});
 
   document.querySelectorAll('.tokenItem[data-kind]').forEach(item=>{
     item.draggable=true;
@@ -2417,7 +2226,7 @@ window.tool = window.tool || 'select';
     const name=e.dataTransfer.getData('rpg-token-name')||'Token';
     const p=pos(e);
     const el=document.createElement('div');
-    el.className='token '+kind; el.id='token-'+(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)); el.title=name; el.dataset.name=name;
+    el.className='token '+kind; el.id='token-'+(++tokenSeq); el.title=name; el.dataset.name=name;
     el.textContent=kind==='player'?'P':kind==='npc'?'N':'M';
     el.style.left=(p[0]-21)+'px'; el.style.top=(p[1]-21)+'px'; el.style.zIndex=4;
     mapEl.appendChild(el); prepareToken(el);
@@ -3176,7 +2985,7 @@ window.tool = window.tool || 'select';
   document.getElementById('rpgForgeDiceClose').addEventListener('click',()=>{clearTimeout(closeTimer);overlay.classList.remove('show')});
   window.addEventListener('rpgforge-room-ready',()=>{roomReady=true});
   async function roll(sides){
-    const countInput=document.getElementById('rpgForgeDiceCount');const requested=Number(countInput?.value);const count=Number.isFinite(requested)?Math.max(1,Math.min(10000,Math.floor(requested))):1; if(countInput && String(count)!==countInput.value) countInput.value=String(count); const results=Array.from({length:count},()=>Math.floor(Math.random()*sides)+1);const result=results[0];
+    const countInput=document.getElementById('rpgForgeDiceCount');const count=Math.max(1,Math.min(20,Number(countInput?.value)||1));const results=Array.from({length:count},()=>Math.floor(Math.random()*sides)+1);const result=results[0];
     const name=(document.querySelector('#playerName')?.value||document.querySelector('[data-player-name]')?.value||localStorage.getItem('rpgForgePlayerName')||'Jogador').trim()||'Jogador';
     const rollId=clientId+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
     const payload={action:'roll',type:'dice-roll',rollId,clientId,roller:name,sides,result,results,createdAt:new Date().toISOString()};
@@ -3225,24 +3034,16 @@ window.tool = window.tool || 'select';
  if(window.__lumathhuSharedMapSync)return;window.__lumathhuSharedMapSync=true;
  const map=document.getElementById('map');if(!map)return;
  let roomCode='',pageId='page-1',timer=0,applying=false,lastSent='';
- window.rpgForgeSendTokenMove=function(t){const s=window.rpgForgeSocket;const sala=String(window.lumathhuRoomCode||roomCode||'').toUpperCase();const currentPage=window.lumathhuCurrentPageId||pageId;if(!t||!t.id||!s||!s.connected||!sala||!currentPage)return;s.emit('rpg-token-move',{sala,pageId:currentPage,tokenId:t.id,left:parseFloat(t.style.left)||0,top:parseFloat(t.style.top)||0});};
- window.rpgForgeSendObjectMove=function(o){const s=window.rpgForgeSocket;if(!o||!s||!s.connected||!roomCode)return;s.emit('rpg-object-move',{sala:roomCode,pageId,objectId:o.dataset.objectInstanceId||o.dataset.instanceId||o.id,objKey:o.dataset.obj||'',left:parseFloat(o.style.left)||0,top:parseFloat(o.style.top)||0})};
- function bindMoveListener(){const s=window.rpgForgeSocket;if(!s||s.__lumathhuTokenMoveListener)return;s.__lumathhuTokenMoveListener=true;let visionRaf=0;s.on('rpg-token-move',d=>{const currentPage=window.lumathhuCurrentPageId||pageId;if(!d||d.pageId!==currentPage||!d.tokenId)return;const t=document.getElementById(d.tokenId);if(!t||!map.contains(t)||t.dataset.localDragging==='1')return;const nx=Number(d.left),ny=Number(d.top);if(!Number.isFinite(nx)||!Number.isFinite(ny))return;t.style.left=nx+'px';t.style.top=ny+'px';if(!visionRaf){visionRaf=requestAnimationFrame(()=>{visionRaf=0;try{window.rpgForgeUpdateFogVision?.()}catch(_){}})}});s.on('connect',()=>{if(window.lumathhuRoomCode)roomCode=window.lumathhuRoomCode;if(window.lumathhuCurrentPageId)pageId=window.lumathhuCurrentPageId;});}
- function bindObjectMoveListener(){const s=window.rpgForgeSocket;if(!s||s.__lumathhuObjectMoveListener)return;s.__lumathhuObjectMoveListener=true;s.on('rpg-object-move',d=>{if(!d||d.pageId!==pageId)return;const all=[...map.querySelectorAll('.forgeObj')];const o=all.find(x=>(x.dataset.objectInstanceId||x.dataset.instanceId||x.id)===d.objectId);if(!o||o.dataset.localDragging==='1')return;o.style.left=d.left+'px';o.style.top=d.top+'px'});}
- bindMoveListener();bindObjectMoveListener();
  const gridSelector='.grid';
  function getLocalGrid(){const g=map.querySelector(gridSelector);return g?g.cloneNode(true):null}
- function serializable(){const clone=map.cloneNode(true);clone.querySelectorAll('#weatherOverlay,.rpgFogVisionMask,#rpgFogLayer').forEach(x=>x.remove());clone.querySelectorAll('.spellResizeHandle').forEach(x=>x.remove());clone.querySelectorAll('.spellArea').forEach(x=>x.classList.remove('spellEditing','spellMoving'));const grid=clone.querySelector(gridSelector);if(grid){grid.dataset.overlay=grid.dataset.overlay==='1'?'1':'0';}return {html:clone.innerHTML}}
+ function serializable(){const clone=map.cloneNode(true);clone.querySelectorAll('#weatherOverlay,.rpgFogVisionMask,#rpgFogLayer').forEach(x=>x.remove());clone.querySelectorAll('.spellResizeHandle').forEach(x=>x.remove());clone.querySelectorAll('.spellArea').forEach(x=>x.classList.remove('spellEditing','spellMoving'));const grid=clone.querySelector(gridSelector);if(grid){grid.removeAttribute('style');grid.className='grid';}return {html:clone.innerHTML}}
  function send(){if(applying)return;const s=window.rpgForgeSocket;if(!s||!s.connected||!roomCode)return;const st=serializable();const raw=JSON.stringify(st);if(raw===lastSent)return;lastSent=raw;s.emit('lumathhu-map-sync',{sala:roomCode,pageId,state:st})}
  function queue(){if(applying)return;clearTimeout(timer);timer=setTimeout(send,180)}
- window.rpgForgeSyncMapNow=function(){if(applying)return;clearTimeout(timer);send()};
- function receive(e){const d=e.detail||{};if(!d.state||typeof d.state.html!=='string'||(d.pageId&&pageId&&d.pageId!==pageId))return;applying=true;try{const oldPositions=new Map();map.querySelectorAll('.token[id]').forEach(t=>oldPositions.set(t.id,{left:t.style.left,top:t.style.top}));const persistentLayers=[...map.querySelectorAll('#weatherOverlay,#rpgFogLayer')];const grid=getLocalGrid();const holder=document.createElement('div');holder.innerHTML=d.state.html;holder.querySelectorAll('#weatherOverlay,#rpgFogLayer,.rpgFogVisionMask').forEach(x=>x.remove());const incomingGrid=holder.querySelector(gridSelector);if(incomingGrid&&grid){grid.style.cssText=incomingGrid.style.cssText;grid.className=incomingGrid.className;grid.dataset.overlay=incomingGrid.dataset.overlay||'0';grid.style.zIndex=grid.dataset.overlay==='1'?'999999':'0';grid.style.pointerEvents='none';grid.style.backgroundColor=grid.dataset.overlay==='1'?'transparent':'';grid.style.display=incomingGrid.style.display||'';grid.style.backgroundImage='linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';incomingGrid.replaceWith(grid)}else if(grid&&!incomingGrid){holder.insertBefore(grid,holder.firstChild)}map.innerHTML=holder.innerHTML;const renderedGrid=map.querySelector(gridSelector);if(renderedGrid&&renderedGrid!==grid)renderedGrid.replaceWith(grid);persistentLayers.forEach(layer=>{if(!map.contains(layer))map.appendChild(layer)});try{window.rpgForgeUpdateWeatherBounds?.();window.rpgForgeUpdateFogVision?.()}catch(_){}map.querySelectorAll('.token[id]').forEach(t=>{t.style.transition='none'});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:map.innerHTML};window.dispatchEvent(new Event('lumathhu-map-rebuilt'));try{document.getElementById('gridOverlayToggle')?.classList.toggle('active',grid?.dataset.overlay==='1');const b=document.getElementById('gridOverlayToggle');if(b)b.textContent='Grade sobrepor: '+(grid?.dataset.overlay==='1'?'ligada':'desligada')}catch(_){}lastSent=JSON.stringify(serializable());}catch(err){console.warn('LUMATHHU: falha ao sincronizar mapa',err)}finally{setTimeout(()=>{applying=false},80)}}
- const obs=new MutationObserver(m=>{if(applying)return;let relevant=false;for(const x of m){if(x.type==='attributes'&&x.attributeName==='style'&&x.target?.matches?.('.token,.forgeObj,.monster'))continue;if(x.type==='attributes'&&x.attributeName==='style'&&x.target?.closest?.('.token,.forgeObj,.monster'))continue;relevant=true;break}if(relevant)queue()});obs.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['class','src','style','data-overlay','data-locked','data-item','data-obj','data-hidden-items']});
- // Durante o arraste, a posição usa eventos leves em tempo real. Salva o estado completo só ao soltar.
- document.addEventListener('pointerup',e=>{if(e.target?.closest?.('#map .token,#map .forgeObj,#map .monster')){clearTimeout(timer);timer=setTimeout(send,90)}},true);
+ function receive(e){const d=e.detail||{};if(!d.state||typeof d.state.html!=='string'||(d.pageId&&pageId&&d.pageId!==pageId))return;applying=true;try{const oldPositions=new Map();map.querySelectorAll('.token[id]').forEach(t=>oldPositions.set(t.id,{left:t.style.left,top:t.style.top}));const persistentLayers=[...map.querySelectorAll('#weatherOverlay,#rpgFogLayer')];const grid=getLocalGrid();const holder=document.createElement('div');holder.innerHTML=d.state.html;holder.querySelectorAll('#weatherOverlay,#rpgFogLayer,.rpgFogVisionMask').forEach(x=>x.remove());const incomingGrid=holder.querySelector(gridSelector);if(incomingGrid&&grid){incomingGrid.replaceWith(grid)}else if(grid&&!incomingGrid){holder.insertBefore(grid,holder.firstChild)}map.innerHTML=holder.innerHTML;persistentLayers.forEach(layer=>{if(!map.contains(layer))map.appendChild(layer)});try{window.rpgForgeUpdateWeatherBounds?.();window.rpgForgeUpdateFogVision?.()}catch(_){}map.querySelectorAll('.token[id]').forEach(t=>{const old=oldPositions.get(t.id);if(!old)return;const nextLeft=t.style.left,nextTop=t.style.top;if(old.left===nextLeft&&old.top===nextTop)return;t.style.transition='none';t.style.left=old.left;t.style.top=old.top;void t.offsetWidth;t.style.transition='left 120ms linear, top 120ms linear';requestAnimationFrame(()=>{t.style.left=nextLeft;t.style.top=nextTop})});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:map.innerHTML};lastSent=JSON.stringify(serializable());}catch(err){console.warn('LUMATHHU: falha ao sincronizar mapa',err)}finally{setTimeout(()=>{applying=false},80)}}
+ const obs=new MutationObserver(m=>{if(m.some(x=>x.type==='childList'||x.type==='attributes'))queue()});obs.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class','src','data-locked','data-item','data-obj','data-hidden-items']});
  document.addEventListener('input',e=>{if(e.target.closest?.('#map'))queue()});document.addEventListener('change',e=>{if(e.target.closest?.('#map'))queue()});
- window.addEventListener('lumathhu-map-sync',receive);window.addEventListener('lumathhu-page-changed',e=>{if(e.detail?.pageId){pageId=e.detail.pageId;window.lumathhuCurrentPageId=e.detail.pageId;}});
- function ready(e){const d=e.detail||{};roomCode=d.roomCode||window.lumathhuRoomCode||roomCode;pageId=d.currentPageId||window.lumathhuCurrentPageId||pageId;window.lumathhuRoomCode=roomCode;window.lumathhuCurrentPageId=pageId;const s=window.rpgForgeSocket;bindMoveListener();bindObjectMoveListener();if(s&&!s.__lumathhuMapSyncListener){s.__lumathhuMapSyncListener=true;s.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){pageId=d.pageId;queue()}})}if(s&&s.connected)setTimeout(()=>{if(roomCode)send()},900)}
+ window.addEventListener('lumathhu-map-sync',receive);window.addEventListener('lumathhu-page-changed',e=>{if(e.detail?.pageId)pageId=e.detail.pageId;});
+ function ready(e){const d=e.detail||{};roomCode=d.roomCode||roomCode;pageId=d.currentPageId||pageId;const s=window.rpgForgeSocket;if(s&&!s.__lumathhuMapSyncListener){s.__lumathhuMapSyncListener=true;s.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){pageId=d.pageId;queue()}})}if(s&&s.connected)setTimeout(()=>{if(roomCode)send()},900)}
  window.addEventListener('lumathhu-room-ready',ready);window.addEventListener('rpgforge-room-ready',ready);
  window.addEventListener('lumathhu-room-left',()=>{roomCode='';lastSent=''});
  const origEmit=window.rpgForgeSocket?.emit;
