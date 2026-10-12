@@ -1052,7 +1052,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       if(!playerReady&&playerReadyPromise){
         const ok=await playerReadyPromise;if(!ok)return false;
       }
-      if(videoId&&playerReady)player.loadVideoById(videoId);
+      if(videoId&&playerReady){if(autoplay)player.loadVideoById(videoId);else player.cueVideoById(videoId);}
       return true;
     }
     function startCurrentVideo(){
@@ -1068,11 +1068,21 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       const text=document.createElement('div');text.style.cssText='font-size:11px;line-height:1.45';text.textContent=msg;box.appendChild(text);
       if(kind==='activate'||kind==='blocked'){
         const b=document.createElement('button');b.type='button';b.className='btn ytEnableSync';b.style.cssText='width:100%;margin-top:7px';b.textContent='🔊 Ativar áudio neste dispositivo';
-        b.onclick=async()=>{
+        b.onclick=()=>{
           syncEnabled=true;localStorage.setItem(syncKey,'1');
-          await ensurePlayer(panel,latestSyncEvent?.item?.url?youtubeId(latestSyncEvent.item.url):null,false);
-          if(latestSyncEvent?.action==='play')startCurrentVideo();
-          updateSyncStatus(panel);
+          const item=latestSyncEvent?.item,id=item?youtubeId(item.url):null;
+          if(playerReady&&player){
+            try{player.unMute();player.setVolume(100);if(id){const elapsed=Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:id,startSeconds:elapsed});player.playVideo()}updateSyncStatus(panel);return}catch(e){}
+          }
+          b.disabled=true;b.textContent='Preparando áudio…';
+          ensurePlayer(panel,id,false).then(ok=>{
+            if(!ok){syncEnabled=false;localStorage.setItem(syncKey,'0');showSyncStatus(panel,'error','Não foi possível preparar o player. Confira a conexão e tente novamente.');return}
+            if(latestSyncEvent?.action==='play'){
+              try{player.unMute();player.setVolume(100);const vid=youtubeId(latestSyncEvent.item?.url);if(vid){const elapsed=Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:vid,startSeconds:elapsed});player.playVideo()}}
+              catch(e){showSyncStatus(panel,'blocked','O player foi preparado, mas o navegador bloqueou a reprodução. Clique novamente em ativar áudio.')}
+            }
+            updateSyncStatus(panel);
+          }).catch(()=>{syncEnabled=false;localStorage.setItem(syncKey,'0');showSyncStatus(panel,'error','Falha ao iniciar o áudio. Tente novamente.')});
         };box.appendChild(b);
       }
     }
@@ -1100,8 +1110,8 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
             if(activeSoundPanel)updateNowPlaying(activeSoundPanel,item,'Reproduzindo para todos…');
             await ensurePlayer(activeSoundPanel,youtubeId(item.url),false);
             try{player.unMute();player.setVolume(100);player.loadVideoById(youtubeId(item.url));player.playVideo()}catch(e){}
-            if(isServerMode())await postJson('/api/sound',{action:'play',item:{id:item.id,name:item.name,url:item.url},commandId:cmd,sourceClientId:clientId});
-            else if(!syncEnabled)showSyncStatus(activeSoundPanel,'activate','Ative o áudio neste dispositivo para reproduzir o YouTube.');
+            const sent=sendRoomSoundCommand({action:'play',item:{id:item.id,name:item.name,url:item.url},commandId:cmd,sourceClientId:clientId,startedAt:Date.now()});
+            if(!sent)showSyncStatus(activeSoundPanel,'error','Conexão da sala indisponível. Reconecte à mesa e tente novamente.');
           };
           actions.appendChild(play);
         }else{
@@ -1156,7 +1166,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           title.textContent='🔊 Som / efeito';
         }
       };
-      panel.querySelector('.ytStop').onclick=async()=>{stopPlayback();const wrap=panel.querySelector('.ytPlayerWrap');wrap.style.display='none';if(roleIsMaster()&&isServerMode())await postJson('/api/sound',{action:'stop',commandId:'cmd-'+Date.now(),sourceClientId:clientId});};
+      panel.querySelector('.ytStop').onclick=()=>{stopPlayback();const wrap=panel.querySelector('.ytPlayerWrap');wrap.style.display='none';if(roleIsMaster())sendRoomSoundCommand({action:'stop',commandId:'cmd-'+Date.now(),sourceClientId:clientId,startedAt:Date.now()});};
       if(roleIsMaster()){
         const add=async()=>{
           const name=panel.querySelector('.ytName').value.trim(),url=panel.querySelector('.ytUrl').value.trim(),id=youtubeId(url);if(!id){alert('Cole um link válido do YouTube.');return}
@@ -1179,9 +1189,34 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
         const p=activeSoundPanel||openSoundPanel();
         if(!p)return;
         updateNowPlaying(p,data.item,'Som sincronizado pelo Mestre.');
-        if(!syncEnabled){showSyncStatus(p,'activate','O Mestre iniciou este som. Ative o áudio neste dispositivo para ouvi-lo.');return}
-        ensurePlayer(p,youtubeId(data.item.url),false).then(()=>{try{const id=youtubeId(data.item.url);if(!id)return;player.unMute();player.setVolume(100);player.loadVideoById(id);player.playVideo()}catch(e){updateSyncStatus(p,'blocked')}});
+        if(!syncEnabled){
+          showSyncStatus(p,'activate','O som está pronto. Clique em “Ativar áudio neste dispositivo” uma vez para liberar a reprodução neste navegador.');
+          // Prepara o iframe antes do clique do jogador, para que o clique possa iniciar o áudio diretamente.
+          const activateButton=p.querySelector('.ytEnableSync');
+          if(activateButton){activateButton.disabled=true;activateButton.textContent='Preparando áudio…'}
+          ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{
+            if(!ok){showSyncStatus(p,'error','Não consegui preparar o player do YouTube. Confira a conexão e tente novamente.');return}
+            const readyButton=p.querySelector('.ytEnableSync');if(readyButton){readyButton.disabled=false;readyButton.textContent='🔊 Ativar áudio neste dispositivo'}
+          }).catch(()=>showSyncStatus(p,'error','Não consegui preparar o player do YouTube. Confira a conexão e tente novamente.'));
+          return;
+        }
+        ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{try{const id=youtubeId(data.item.url);if(!ok||!id)return;player.unMute();player.setVolume(100);const target=Math.max(0,(Date.now()-(Number(data.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:id,startSeconds:target});player.playVideo()}catch(e){updateSyncStatus(p,'blocked')}});
       }
+    }
+    function bindRoomSoundSocket(){
+      const s=window.rpgForgeSocket;if(!s||s.__lumathhuSoundSyncBound)return;
+      s.__lumathhuSoundSyncBound=true;
+      s.on('rpg-sound-sync',data=>{try{handleSoundEvent(data||{})}catch(e){console.warn('Falha ao receber comando de som',e)}});
+      s.on('connect',()=>{syncConnected=true;updateSyncStatus(activeSoundPanel)});
+      s.on('disconnect',()=>{syncConnected=false;updateSyncStatus(activeSoundPanel)});
+      if(s.connected){syncConnected=true;updateSyncStatus(activeSoundPanel)}
+    }
+    window.addEventListener('lumathhu-room-ready',bindRoomSoundSocket);
+    window.addEventListener('rpgforge-room-ready',bindRoomSoundSocket);
+    function sendRoomSoundCommand(payload){
+      bindRoomSoundSocket();const s=window.rpgForgeSocket;const room=window.lumathhuRoomCode;
+      if(s&&s.connected&&room){s.emit('rpg-sound-sync',{...payload,sala:room});return true}
+      return false;
     }
     function connectSync(){
       if(!isServerMode()){syncConnected=false;return}
@@ -1663,11 +1698,11 @@ window.tool = window.tool || 'select';
     if(!el.innerHTML.trim())el.innerHTML=objectIcon(def[0]);
     const rot=parseFloat(el.dataset.rotation||'0')||0;
     if(rot)el.style.transform='rotate('+rot+'deg)';
-    let dragging=false,off=[0,0];
+    let dragging=false,off=[0,0],moveFrame=0;
     el.onpointerdown=e=>{
       e.stopPropagation();
       if(tool!=='select')return;
-      dragging=true;el.dataset.localDragging='1';
+      dragging=true;el.dataset.localDragging='1';document.body.classList.add('rpg-token-dragging');
       const p=pos(e);
       off=[p[0]-(parseFloat(el.style.left)||0),p[1]-(parseFloat(el.style.top)||0)];
       el.classList.add('selected');
@@ -1678,9 +1713,9 @@ window.tool = window.tool || 'select';
       const p=pos(e);
       el.style.left=(p[0]-off[0])+'px';
       el.style.top=(p[1]-off[1])+'px';
-      window.rpgForgeSendObjectMove?.(el);
+      if(!moveFrame)moveFrame=requestAnimationFrame(()=>{moveFrame=0;if(dragging)window.rpgForgeSendObjectMove?.(el)});
     };
-    el.onpointerup=e=>{dragging=false;delete el.dataset.localDragging;try{el.releasePointerCapture?.(e.pointerId)}catch(_){};window.rpgForgeSendObjectMove?.(el);window.rpgForgeSaveCurrentPage?.()};
+    el.onpointerup=e=>{dragging=false;delete el.dataset.localDragging;document.body.classList.remove('rpg-token-dragging');if(moveFrame){cancelAnimationFrame(moveFrame);moveFrame=0}try{el.releasePointerCapture?.(e.pointerId)}catch(_){};window.rpgForgeSendObjectMove?.(el);window.rpgForgeSaveCurrentPage?.()};
     el.onpointercancel=el.onpointerup;
     el.onclick=e=>{
       if(dragging)return;
@@ -1950,7 +1985,7 @@ window.tool = window.tool || 'select';
   }
 
   const weatherNames={clear:'Limpo',sun:'Sol forte',cloudy:'Nublado',rain:'Chuva',storm:'Tempestade',snow:'Neve',blizzard:'Nevasca',fog:'Névoa',sand:'Tempestade de areia',ash:'Cinzas vulcânicas',magic:'Chuva mágica'};
-  const particleCount=()=>Math.max(12,Math.min(90,Math.round(10+state.intensity*0.8)));
+  const particleCount=()=>Math.max(10,Math.min(48,Math.round(8+state.intensity*0.4)));
   function clearVisual(){visual.innerHTML='';}
   function particle(cls,props={}){const e=document.createElement('i');e.className='weatherParticle '+cls;Object.entries(props).forEach(([k,v])=>e.style.setProperty(k,v));visual.appendChild(e);}
   function build(){
@@ -2193,12 +2228,13 @@ window.tool = window.tool || 'select';
     });
 
     // Arraste independente do sistema global da mesa.
-    let moving=false, ox=0, oy=0;
+    let moving=false, ox=0, oy=0, moveFrame=0;
+    const snapBtn=document.querySelector('#snap');
     t.addEventListener('pointerdown',e=>{
       if(e.button!==0 || t.dataset.locked==='1' || !canMoveVisionToken(t))return;
       if(e.target.closest('button'))return;
       e.stopPropagation();
-      moving=true;
+      moving=true;t.dataset.localDragging='1';document.body.classList.add('rpg-token-dragging');
       const p=pos(e), left=parseFloat(t.style.left)||0, top=parseFloat(t.style.top)||0;
       ox=p[0]-left; oy=p[1]-top;
       t.classList.add('selected');
@@ -2209,15 +2245,12 @@ window.tool = window.tool || 'select';
     t.addEventListener('pointermove',e=>{
       if(!moving)return;
       const p=pos(e); let nx=p[0]-ox, ny=p[1]-oy;
-      const snapBtn=document.querySelector('#snap');
       if(snapBtn?.classList.contains('on')){nx=Math.round(nx/50)*50;ny=Math.round(ny/50)*50}
       t.style.left=nx+'px'; t.style.top=ny+'px';
-      updateVisionFocusRing();
-      if(typeof window.rpgForgeUpdateFogVision==='function')window.rpgForgeUpdateFogVision();
-      // Envia cada posição durante o arraste, sem esperar a sincronização do mapa inteiro.
-      window.rpgForgeSendTokenMove?.(t);
+      // Coalesce fog/vision calculations and network updates to at most one per frame.
+      if(!moveFrame)moveFrame=requestAnimationFrame(()=>{moveFrame=0;if(!moving)return;updateVisionFocusRing();if(typeof window.rpgForgeUpdateFogVision==='function')window.rpgForgeUpdateFogVision();window.rpgForgeSendTokenMove?.(t)});
     });
-    const stop=()=>{if(!moving)return;moving=false;window.rpgForgeSaveCurrentPageNow?.()};
+    const stop=()=>{if(!moving)return;moving=false;delete t.dataset.localDragging;document.body.classList.remove('rpg-token-dragging');if(moveFrame){cancelAnimationFrame(moveFrame);moveFrame=0}window.rpgForgeSendTokenMove?.(t);window.rpgForgeSaveCurrentPageNow?.()};
     t.addEventListener('pointerup',stop); t.addEventListener('pointercancel',stop);
   }
 
@@ -3044,8 +3077,8 @@ window.tool = window.tool || 'select';
  if(window.__lumathhuSharedMapSync)return;window.__lumathhuSharedMapSync=true;
  const map=document.getElementById('map');if(!map)return;
  let roomCode='',pageId='page-1',timer=0,applying=false,lastSent='';
- window.rpgForgeSendTokenMove=function(t){const s=window.rpgForgeSocket;if(!t||!s||!s.connected||!roomCode)return;s.volatile.emit('rpg-token-move',{sala:roomCode,pageId,tokenId:t.id,left:parseFloat(t.style.left)||0,top:parseFloat(t.style.top)||0})};
- window.rpgForgeSendObjectMove=function(o){const s=window.rpgForgeSocket;if(!o||!s||!s.connected||!roomCode)return;s.volatile.emit('rpg-object-move',{sala:roomCode,pageId,objectId:o.dataset.objectInstanceId||o.dataset.instanceId||o.id,objKey:o.dataset.obj||'',left:parseFloat(o.style.left)||0,top:parseFloat(o.style.top)||0})};
+ window.rpgForgeSendTokenMove=function(t){const s=window.rpgForgeSocket;if(!t||!s||!s.connected||!roomCode)return;s.emit('rpg-token-move',{sala:roomCode,pageId,tokenId:t.id,left:parseFloat(t.style.left)||0,top:parseFloat(t.style.top)||0})};
+ window.rpgForgeSendObjectMove=function(o){const s=window.rpgForgeSocket;if(!o||!s||!s.connected||!roomCode)return;s.emit('rpg-object-move',{sala:roomCode,pageId,objectId:o.dataset.objectInstanceId||o.dataset.instanceId||o.id,objKey:o.dataset.obj||'',left:parseFloat(o.style.left)||0,top:parseFloat(o.style.top)||0})};
  function bindMoveListener(){const s=window.rpgForgeSocket;if(!s||s.__lumathhuTokenMoveListener)return;s.__lumathhuTokenMoveListener=true;let visionRaf=0;s.on('rpg-token-move',d=>{if(!d||d.pageId!==pageId||!d.tokenId)return;const t=document.getElementById(d.tokenId);if(!t||!map.contains(t)||t.dataset.localDragging==='1')return;t.style.left=d.left+'px';t.style.top=d.top+'px';if(!visionRaf){visionRaf=requestAnimationFrame(()=>{visionRaf=0;try{window.rpgForgeUpdateFogVision?.()}catch(_){}})}});}
  function bindObjectMoveListener(){const s=window.rpgForgeSocket;if(!s||s.__lumathhuObjectMoveListener)return;s.__lumathhuObjectMoveListener=true;s.on('rpg-object-move',d=>{if(!d||d.pageId!==pageId)return;const all=[...map.querySelectorAll('.forgeObj')];const o=all.find(x=>(x.dataset.objectInstanceId||x.dataset.instanceId||x.id)===d.objectId);if(!o||o.dataset.localDragging==='1')return;o.style.left=d.left+'px';o.style.top=d.top+'px'});}
  bindMoveListener();bindObjectMoveListener();

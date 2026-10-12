@@ -61,7 +61,7 @@ io.on('connection',socket=>{
    const code=String(sala||socket.data.room||'').toUpperCase(),room=rooms.get(code),me=room?.players.get(socket.id);
    if(!room||!me||socket.data.room!==code||!objectId||!pageId||me.pageId!==pageId)return;
    const x=Number(left),y=Number(top);if(!Number.isFinite(x)||!Number.isFinite(y)||Math.abs(x)>100000||Math.abs(y)>100000)return;
-   socket.to(code).volatile.emit('rpg-object-move',{pageId,objectId:String(objectId).slice(0,160),objKey:String(objKey||'').slice(0,160),left:x,top:y,clientId:me.clientId});
+   socket.to(code).emit('rpg-object-move',{pageId,objectId:String(objectId).slice(0,160),objKey:String(objKey||'').slice(0,160),left:x,top:y,clientId:me.clientId});
  });
  socket.on('lumathhu-map-sync',({sala,pageId,state}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);const pg=room?.pages.find(p=>p.id===pageId);if(!room||!me||!pg||!state||typeof state.html!=='string'||state.html.length>6000000)return;if(me.role!=='gm'&&me.pageId!==pg.id)return;pg.sharedMapState=state;for(const p of room.players.values())if(p.pageId===pg.id&&p.socketId!==socket.id)io.to(p.socketId).emit('lumathhu-map-sync',{pageId:pg.id,state})});
   socket.on('pagina-criar',({sala,name}={})=>{const room=rooms.get(String(sala||'').toUpperCase());if(!room||!gm(socket,room))return socket.emit('sala-erro','Apenas o Mestre pode criar mapas.');const id='page-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);room.pages.push(newPage(id,cleanName(name||`Mapa ${room.pages.length+1}`)));broadcast(room);socket.emit('pagina-troca-confirmada',{pageId:id})});
@@ -72,6 +72,19 @@ io.on('connection',socket=>{
  socket.on('modo-role',({sala,role}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);if(!room||!me)return;if(me.clientId!==room.ownerClientId){me.role='player';socket.emit('sala-erro','Apenas o dono da sala pode ser Mestre.');broadcast(room);return;}me.role='gm';broadcast(room)});
  socket.on('rpg-efeito-clima',({sala,type,intensity,wind,lightning,pageId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);if(!room||!me||me.role!=='gm')return socket.emit('sala-erro','Apenas o Mestre pode alterar o clima.');const effect={type:type||'clear',intensity:Number(intensity)||55,wind:Number(wind)||45,lightning:lightning!==false,pageId:pageId||me.pageId};room.weatherEffect=effect;for(const p of room.players.values())io.to(p.socketId).emit('rpg-efeito-clima',effect);});
  socket.on('rpg-efeito-fumaca',({sala,active,opacity,color,visionRadius,locked,cloudStyle,gmSeeThrough,pageId}={})=>{const room=rooms.get(String(sala||'').toUpperCase());const me=room?.players.get(socket.id);if(!room||!me||me.role!=='gm')return socket.emit('sala-erro','Apenas o Mestre pode alterar a fumaça.');const pg=room.pages.find(p=>p.id===pageId)||room.pages.find(p=>p.id===me.pageId);if(!pg)return;const effect={active:!!active,opacity:Number(opacity)||72,color:color||'#dfe5ee',visionRadius:Number(visionRadius)||2,locked:!!locked,cloudStyle:cloudStyle||'',gmSeeThrough:!!gmSeeThrough,pageId:pg.id};pg.fogEffect=effect;for(const p of room.players.values())if(p.pageId===pg.id)io.to(p.socketId).emit('rpg-efeito-fumaca',effect);});
+ socket.on('rpg-sound-sync',(payload={})=>{
+   const code=String(payload.sala||socket.data.room||'').toUpperCase(),room=rooms.get(code),me=room?.players.get(socket.id);
+   if(!room||!me||socket.data.room!==code)return;
+   if(me.role!=='gm')return socket.emit('sala-erro','Apenas o Mestre pode controlar o som compartilhado.');
+   const action=payload.action==='stop'?'stop':payload.action==='play'?'play':null;if(!action)return;
+   const event={action,seq:++soundSeq,commandId:String(payload.commandId||('sound-'+Date.now())).slice(0,160),sourceClientId:me.clientId,startedAt:Number(payload.startedAt)||Date.now()};
+   if(action==='play'){
+     const item=payload.item||{},url=String(item.url||'').slice(0,1000);
+     if(!url)return;
+     event.item={id:String(item.id||'').slice(0,160),name:String(item.name||'Som do YouTube').slice(0,120),url};
+   }
+   io.to(code).emit('rpg-sound-sync',event);
+ });
  socket.on('rpg-dice-roll',(payload={})=>{const code=String(payload.sala||socket.data.room||'').toUpperCase(),room=rooms.get(code),me=room?.players.get(socket.id);if(!room||!me||socket.data.room!==code)return;const sides=Math.max(2,Math.min(1000,Number(payload.sides)||20));const result=Math.max(1,Math.min(sides,Number(payload.result)||1));const rollId=String(payload.rollId||('roll-'+Date.now()+'-'+Math.random().toString(36).slice(2,7))).slice(0,160);const results=Array.isArray(payload.results)?payload.results.slice(0,20).map(n=>Math.max(1,Math.min(sides,Number(n)||1))):[result];const event={action:'roll',type:'dice-roll',rollId,clientId:String(payload.clientId||('dice-'+socket.id)),roller:cleanName(payload.roller||me.name),sides,result,results,createdAt:new Date().toISOString(),sala:code};io.to(code).emit('rpg-dice-roll',event)});
  socket.on('sair-sala',()=>{const code=socket.data.room,room=rooms.get(code);if(!room)return;room.players.delete(socket.id);socket.leave(code);socket.data.room=null;if(room.players.size>0)broadcast(room)});
  socket.on('disconnect',()=>{const code=socket.data.room,room=rooms.get(code);if(!room)return;room.players.delete(socket.id);if(room.players.size>0)broadcast(room)});
