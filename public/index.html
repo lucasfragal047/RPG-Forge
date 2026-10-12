@@ -485,7 +485,7 @@ function updateVisionFocusRing(){const t=visionFocusTokenId&&document.getElement
 function render(){map.style.transform=`translate(${x}px,${y}px) scale(${scale})`;document.querySelector('#zoomLabel').textContent=Math.round(scale*100)+'%'}render();
 document.querySelectorAll('.tool:not(#rpgPageTool)').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tool').forEach(q=>q.classList.remove('active'));b.classList.add('active');tool=b.dataset.tool});
 function pos(e){let r=stage.getBoundingClientRect();return [(e.clientX-r.left-x)/scale,(e.clientY-r.top-y)/scale]}
-map.querySelectorAll('.token').forEach(t=>{t.onpointerdown=e=>{if(tool!=='select'||!canMoveVisionToken(t))return;e.stopPropagation();dragging=t;let p=pos(e),left=parseFloat(t.style.left),top=parseFloat(t.style.top);offset=[p[0]-left,p[1]-top];t.classList.add('selected');document.querySelectorAll('.token').forEach(q=>{if(q!==t)q.classList.remove('selected')});t.setPointerCapture(e.pointerId)};t.onpointermove=e=>{if(!dragging||dragging!==t)return;let p=pos(e),nx=p[0]-offset[0],ny=p[1]-offset[1];if(document.querySelector('#snap').classList.contains('on')){const cell=window.rpgForgeGridCellSize?.()||{x:50,y:50};nx=Math.round(nx/cell.x)*cell.x;ny=Math.round(ny/cell.y)*cell.y}t.style.left=nx+'px';t.style.top=ny+'px';updateVisionFocusRing()};t.onpointerup=()=>dragging=null});
+// Tokens são tratados pelo sistema de interação aprimorado abaixo, sem handlers duplicados.
 stage.onpointerdown=e=>{if(e.target.closest('.token')||e.target.closest('.toolbar'))return;if(tool==='select'){pan=true;panStart=[e.clientX,e.clientY];origin=[x,y];stage.setPointerCapture(e.pointerId)}else if(tool==='ping'){let p=pos(e),m=document.createElement('div');m.textContent='✦';m.className='rpgPingMarker';m.style.cssText=`position:absolute;left:${p[0]}px;top:${p[1]}px;z-index:8;color:${pingColor};font-size:30px;text-shadow:0 0 12px ${pingColor};pointer-events:none`;map.appendChild(m);setTimeout(()=>m.remove(),1000)}else if(tool==='fog'){let p=pos(e),f=document.createElement('div');f.className='fog';f.style.cssText=`left:${p[0]-75}px;top:${p[1]-75}px;width:150px;height:150px;border-radius:50%;background:${fogColor}dd;box-shadow:0 0 18px ${fogColor}88`;map.appendChild(f)}};stage.onpointermove=e=>{if(pan){x=origin[0]+e.clientX-panStart[0];y=origin[1]+e.clientY-panStart[1];render()}};stage.onpointerup=()=>pan=false;stage.addEventListener('wheel',e=>{e.preventDefault();zoom(scale+(e.deltaY<0?.1:-.1))},{passive:false});
 function zoom(z){scale=Math.max(.25,Math.min(3,z));render()}document.querySelector('#zoomIn').onclick=()=>zoom(scale+.1);document.querySelector('#zoomOut').onclick=()=>zoom(scale-.1);document.querySelector('#zoomLabel').onclick=()=>zoom(1);document.querySelector('#reset').onclick=()=>{scale=1;x=0;y=0;render()};document.querySelector('#snap').onclick=e=>e.currentTarget.classList.toggle('on');
 // Importar/exportar mapa funcional
@@ -1283,7 +1283,7 @@ window.tool = window.tool || 'select';
   overlayBtn.className='btn';overlayBtn.id='gridOverlayToggle';
   function updateGridOverlay(){
     const on=grid.dataset.overlay==='1';
-    grid.style.zIndex=on?'999999':'0';
+    grid.style.zIndex=on?'6':'0';
     grid.style.pointerEvents='none';
     // No modo sobrepor, somente as linhas da grade ficam sobre o cenário.
     // O fundo da grade precisa ficar transparente para não cobrir o mapa.
@@ -2192,13 +2192,14 @@ window.tool = window.tool || 'select';
     });
 
     // Arraste independente do sistema global da mesa.
-    let moving=false, ox=0, oy=0;
+    let moving=false, moved=false, startX=0, startY=0, ox=0, oy=0;
     t.addEventListener('pointerdown',e=>{
       if(e.button!==0 || t.dataset.locked==='1' || !canMoveVisionToken(t))return;
       if(e.target.closest('button'))return;
       e.stopPropagation();
-      moving=true;
-      const p=pos(e), left=parseFloat(t.style.left)||0, top=parseFloat(t.style.top)||0;
+      moving=true; moved=false;
+      const p=pos(e); startX=p[0]; startY=p[1];
+      const left=parseFloat(t.style.left)||0, top=parseFloat(t.style.top)||0;
       ox=p[0]-left; oy=p[1]-top;
       t.classList.add('selected');
       document.querySelectorAll('.token').forEach(q=>{if(q!==t)q.classList.remove('selected')});
@@ -2207,14 +2208,14 @@ window.tool = window.tool || 'select';
     });
     t.addEventListener('pointermove',e=>{
       if(!moving)return;
-      const p=pos(e); let nx=p[0]-ox, ny=p[1]-oy;
+      const p=pos(e); if(Math.abs(p[0]-startX)+Math.abs(p[1]-startY)>2)moved=true; let nx=p[0]-ox, ny=p[1]-oy;
       const snapBtn=document.querySelector('#snap');
       if(snapBtn?.classList.contains('on')){nx=Math.round(nx/50)*50;ny=Math.round(ny/50)*50}
       t.style.left=nx+'px'; t.style.top=ny+'px';
       updateVisionFocusRing();
       if(typeof window.rpgForgeUpdateFogVision==='function')window.rpgForgeUpdateFogVision();
     });
-    const stop=()=>{moving=false};
+    const stop=()=>{if(moving&&moved)window.rpgForgeSaveCurrentPageNow?.();moving=false;moved=false};
     t.addEventListener('pointerup',stop); t.addEventListener('pointercancel',stop);
   }
 
@@ -3045,17 +3046,8 @@ window.tool = window.tool || 'select';
  function serializable(){const clone=map.cloneNode(true);clone.querySelectorAll('#weatherOverlay,.rpgFogVisionMask,#rpgFogLayer').forEach(x=>x.remove());clone.querySelectorAll('.spellResizeHandle').forEach(x=>x.remove());clone.querySelectorAll('.spellArea').forEach(x=>x.classList.remove('spellEditing','spellMoving'));const grid=clone.querySelector(gridSelector);if(grid){grid.removeAttribute('style');grid.className='grid';}return {html:clone.innerHTML}}
  function send(){if(applying)return;const s=window.rpgForgeSocket;if(!s||!s.connected||!roomCode)return;const st=serializable();const raw=JSON.stringify(st);if(raw===lastSent)return;lastSent=raw;s.emit('lumathhu-map-sync',{sala:roomCode,pageId,state:st})}
  function queue(){if(applying)return;clearTimeout(timer);timer=setTimeout(send,180)}
- function receive(e){const d=e.detail||{};if(!d.state||typeof d.state.html!=='string'||(d.pageId&&pageId&&d.pageId!==pageId))return;applying=true;try{const oldPositions=new Map();map.querySelectorAll('.token[id]').forEach(t=>oldPositions.set(t.id,{left:t.style.left,top:t.style.top}));const persistentLayers=[...map.querySelectorAll('#weatherOverlay,#rpgFogLayer')];const grid=getLocalGrid();const holder=document.createElement('div');holder.innerHTML=d.state.html;holder.querySelectorAll('#weatherOverlay,#rpgFogLayer,.rpgFogVisionMask').forEach(x=>x.remove());const incomingGrid=holder.querySelector(gridSelector);if(incomingGrid&&grid){incomingGrid.replaceWith(grid)}else if(grid&&!incomingGrid){holder.insertBefore(grid,holder.firstChild)}map.innerHTML=holder.innerHTML;persistentLayers.forEach(layer=>{if(!map.contains(layer))map.appendChild(layer)});try{window.rpgForgeUpdateWeatherBounds?.();window.rpgForgeUpdateFogVision?.()}catch(_){}map.querySelectorAll('.token[id]').forEach(t=>{const old=oldPositions.get(t.id);if(!old)return;const nextLeft=t.style.left,nextTop=t.style.top;if(old.left===nextLeft&&old.top===nextTop)return;t.style.transition='none';t.style.left=old.left;t.style.top=old.top;void t.offsetWidth;t.style.transition='left 120ms linear, top 120ms linear';requestAnimationFrame(()=>{t.style.left=nextLeft;t.style.top=nextTop})});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:map.innerHTML};lastSent=JSON.stringify(serializable());}catch(err){console.warn('LUMATHHU: falha ao sincronizar mapa',err)}finally{setTimeout(()=>{applying=false},80)}}
- const obs=new MutationObserver(m=>{
-  // Não retransmite o mapa inteiro a cada pixel do arraste. Posições de tokens/objetos
-  // são sincronizadas pelo evento leve rpg-map-element-move; re-renderizar o mapa aqui
-  // interrompia o pointer capture do jogador remoto e causava travamentos.
-  const relevant=m.some(x=>{
-    if(x.type==='attributes' && x.target?.matches?.('.token,.forgeObj,.mapImageObject') && (x.attributeName==='style'||x.attributeName==='class'))return false;
-    return x.type==='childList'||x.type==='attributes';
-  });
-  if(relevant)queue();
-});obs.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class','src','data-locked','data-item','data-obj','data-hidden-items']});
+ function receive(e){const d=e.detail||{};if(!d.state||typeof d.state.html!=='string'||(d.pageId&&pageId&&d.pageId!==pageId))return;applying=true;try{const incoming=document.createElement('div');incoming.innerHTML=d.state.html;const liveMovables=[...map.querySelectorAll('.forgeObj[id],.mapImageObject[id],.token[id]')];const nextMovables=[...incoming.querySelectorAll('.forgeObj[id],.mapImageObject[id],.token[id]')];const liveById=new Map(liveMovables.map(n=>[n.id,n]));const nextById=new Map(nextMovables.map(n=>[n.id,n]));const sameMovables=liveMovables.length>0&&liveMovables.length===nextMovables.length&&liveMovables.every(n=>nextById.has(n.id));if(sameMovables){nextMovables.forEach(next=>{const live=liveById.get(next.id);if(!live)return;for(const prop of ['left','top']){const value=next.style[prop];if(value&&live.style[prop]!==value){live.style.transition='none';live.style[prop]=value;requestAnimationFrame(()=>{live.style.transition=''})}}if(next.getAttribute('class')!==live.getAttribute('class')){const keepSelected=live.classList.contains('selected');live.className=next.className;if(keepSelected)live.classList.add('selected')}for(const attr of ['data-rotation','data-name','data-obj','data-locked','title']){const value=next.getAttribute(attr);if(value===null)live.removeAttribute(attr);else live.setAttribute(attr,value)}});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:d.state.html};lastSent=JSON.stringify(serializable());return;}const oldPositions=new Map();map.querySelectorAll('.token[id]').forEach(t=>oldPositions.set(t.id,{left:t.style.left,top:t.style.top}));const persistentLayers=[...map.querySelectorAll('#weatherOverlay,#rpgFogLayer')];const grid=getLocalGrid();const holder=document.createElement('div');holder.innerHTML=d.state.html;holder.querySelectorAll('#weatherOverlay,#rpgFogLayer,.rpgFogVisionMask').forEach(x=>x.remove());const incomingGrid=holder.querySelector(gridSelector);if(incomingGrid&&grid){incomingGrid.replaceWith(grid)}else if(grid&&!incomingGrid){holder.insertBefore(grid,holder.firstChild)}map.innerHTML=holder.innerHTML;persistentLayers.forEach(layer=>{if(!map.contains(layer))map.appendChild(layer)});try{window.rpgForgeUpdateWeatherBounds?.();window.rpgForgeUpdateFogVision?.()}catch(_){}map.querySelectorAll('.token[id]').forEach(t=>{const old=oldPositions.get(t.id);if(!old)return;const nextLeft=t.style.left,nextTop=t.style.top;if(old.left===nextLeft&&old.top===nextTop)return;t.style.transition='none';t.style.left=old.left;t.style.top=old.top;void t.offsetWidth;t.style.transition='left 120ms linear, top 120ms linear';requestAnimationFrame(()=>{t.style.left=nextLeft;t.style.top=nextTop})});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:map.innerHTML};lastSent=JSON.stringify(serializable());}catch(err){console.warn('LUMATHHU: falha ao sincronizar mapa',err)}finally{setTimeout(()=>{applying=false},80)}}
+ const obs=new MutationObserver(m=>{if(m.some(x=>x.type==='childList'||x.type==='attributes'))queue()});obs.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class','src','data-locked','data-item','data-obj','data-hidden-items']});
  document.addEventListener('input',e=>{if(e.target.closest?.('#map'))queue()});document.addEventListener('change',e=>{if(e.target.closest?.('#map'))queue()});
  window.addEventListener('lumathhu-map-sync',receive);window.addEventListener('lumathhu-page-changed',e=>{if(e.detail?.pageId)pageId=e.detail.pageId;});
  function ready(e){const d=e.detail||{};roomCode=d.roomCode||roomCode;pageId=d.currentPageId||pageId;const s=window.rpgForgeSocket;if(s&&!s.__lumathhuMapSyncListener){s.__lumathhuMapSyncListener=true;s.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){pageId=d.pageId;queue()}})}if(s&&s.connected)setTimeout(()=>{if(roomCode)send()},900)}
@@ -3098,52 +3090,48 @@ window.tool = window.tool || 'select';
 // Sincronização contínua de movimento de tokens e objetos, por sala e mapa.
 (function(){
   const clientId=(window.rpgForgeClientId||window.lumathhuClientId||'client-'+Math.random().toString(36).slice(2));
-  let lastSent=0, applyingRemote=false, active=null, dragStart=null, hasMoved=false;
+  let lastSent=0, applyingRemote=false, active=null;
   function getSocket(){return window.rpgForgeSocket||null}
   function room(){return window.lumathhuRoomCode||window.rpgForgeRoomCode||''}
   function page(){return window.lumathhuCurrentPageId||'page-1'}
   function ensureId(el){
     if(!el.id){
-      const seq=el.dataset.tokenId||el.dataset.objectId||el.dataset.objId||el.dataset.mapObjectId;
-      if(seq)el.id=(el.classList.contains('token')?'token-':(el.classList.contains('mapImageObject')?'map-image-':'forge-object-'))+seq;
+      const seq=el.dataset.tokenId||el.dataset.objectId||el.dataset.objId;
+      if(seq)el.id=(el.classList.contains('token')?'token-':'forge-object-')+seq;
       else return '';
     }
-    if(!el.dataset.lumathhuSyncId)el.dataset.lumathhuSyncId=el.id;
     return el.id;
   }
   function coords(el){return {left:parseFloat(el.style.left)||0,top:parseFloat(el.style.top)||0}}
   document.addEventListener('pointerdown',e=>{
-    const el=e.target.closest?.('.token,.forgeObj,.mapImageObject');
+    const el=e.target.closest?.('.token,.forgeObj');
     if(!el||e.button!==0)return;
     active=el;
-    dragStart={x:e.clientX,y:e.clientY}; hasMoved=false;
     ensureId(el);
   },true);
   document.addEventListener('pointermove',e=>{
     if(!active||applyingRemote)return;
     const el=active;
-    if(!el.isConnected){active=null;dragStart=null;return}
-    if(!hasMoved&&dragStart&&Math.abs(e.clientX-dragStart.x)+Math.abs(e.clientY-dragStart.y)<3)return;
-    hasMoved=true;
+    if(!el.isConnected){active=null;return}
     const socket=getSocket(),code=room();
     if(!socket||!socket.connected||!code)return;
     const now=performance.now(); if(now-lastSent<35)return; lastSent=now;
     const p=coords(el),id=ensureId(el); if(!id)return;
     socket.emit('rpg-map-element-move',{sala:code,pageId:page(),elementId:id,left:p.left,top:p.top,clientId});
   });
-  const stop=()=>{active=null;dragStart=null;hasMoved=false};
+  const stop=()=>{active=null};
   document.addEventListener('pointerup',stop,true);
   document.addEventListener('pointercancel',stop,true);
   window.addEventListener('rpg-map-element-move',ev=>{
     const d=ev.detail||{}; if(d.pageId!==page())return;
-    const el=document.getElementById(d.elementId)||[...document.querySelectorAll('.token,.forgeObj,.mapImageObject')].find(n=>n.dataset.lumathhuSyncId===d.elementId); if(!el||!el.matches('.token,.forgeObj,.mapImageObject'))return;
+    const el=document.getElementById(d.elementId); if(!el||!el.matches('.token,.forgeObj'))return;
     applyingRemote=true;
     el.style.left=d.left+'px'; el.style.top=d.top+'px';
     requestAnimationFrame(()=>{applyingRemote=false});
   });
   // Mantém os objetos e tokens já existentes elegíveis para cliques repetidos.
   document.addEventListener('click',e=>{
-    const el=e.target.closest?.('.token,.forgeObj,.mapImageObject');
+    const el=e.target.closest?.('.token,.forgeObj');
     if(!el)return;
     ensureId(el);
   },true);
