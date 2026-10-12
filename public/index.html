@@ -993,15 +993,21 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     function saveLocal(){try{localStorage.setItem(storageKey,JSON.stringify(sounds))}catch(e){}}
     function youtubeId(value){
       const raw=String(value||'').trim();if(!raw)return null;
+      const valid=id=>{id=String(id||'').split(/[?&#/\s]/)[0];return /^[A-Za-z0-9_-]{11}$/.test(id)?id:null};
+      const direct=valid(raw);if(direct)return direct;
       try{
-        const u=new URL(raw),host=u.hostname.replace(/^www\./,'').toLowerCase();
-        if(host==='youtu.be')return u.pathname.split('/').filter(Boolean)[0]||null;
-        if(host.endsWith('youtube.com')){
-          const q=u.searchParams.get('v');if(q)return q;
-          const m=u.pathname.match(/^\/(?:embed|shorts|live)\/([^\/?#]+)/i);if(m)return m[1];
+        const normalized=/^[a-z]+:\/\//i.test(raw)?raw:'https://'+raw;
+        const u=new URL(normalized),host=u.hostname.replace(/^www\./,'').toLowerCase();
+        if(['youtu.be','youtube.com','m.youtube.com','music.youtube.com','youtube-nocookie.com','www.youtube-nocookie.com'].includes(host)){
+          const q=valid(u.searchParams.get('v'));if(q)return q;
+          const parts=u.pathname.split('/').filter(Boolean);
+          if(host==='youtu.be'&&parts.length)return valid(parts[0]);
+          const marker=parts.findIndex(x=>['embed','shorts','live','v'].includes(x.toLowerCase()));
+          if(marker>=0&&parts[marker+1])return valid(parts[marker+1]);
         }
       }catch(e){}
-      const m=raw.match(/(?:v=|youtu\.be\/|youtube\.com\/(?:embed|shorts|live)\/)([A-Za-z0-9_-]{6,})/i);return m?m[1]:null;
+      const m=raw.match(/(?:[?&]v=|youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed|shorts|live|v)\/)([A-Za-z0-9_-]{11})(?:[^A-Za-z0-9_-]|$)/i);
+      return m?valid(m[1]):null;
     }
     async function getSounds(){
       if(!isServerMode())return;
@@ -1039,12 +1045,14 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     }
     function playerContainer(panel){return panel?.querySelector('.ytPlayerHost')||null}
     function getYoutubePlayerVars(){
-      const vars={autoplay:0,controls:roleIsMaster()?1:0,rel:0,playsinline:1,enablejsapi:1};
+      const vars={autoplay:0,controls:0,rel:0,playsinline:1,enablejsapi:1,fs:0};
       if(/^https?:$/.test(location.protocol))vars.origin=location.origin;
       return vars;
     }
     async function ensurePlayer(panel,videoId,autoplay){
       const host=playerContainer(panel);if(!host)return false;
+      if(videoId&&!youtubeId(videoId))throw new Error('ID do vídeo inválido. Cole o link completo do YouTube.');
+      videoId=videoId?youtubeId(videoId):null;
       try{await ensureYTApi()}catch(e){
         const fb=panel.querySelector('.ytLocalFallback');
         if(fb){fb.style.display='block';fb.textContent='Falha ao carregar a API do YouTube: '+(e?.message||'erro desconhecido');}
@@ -1253,7 +1261,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           <div class="ytSyncStatus" style="display:block;border:1px solid #4a5260;background:#101318;border-radius:8px;padding:9px;margin-bottom:9px"><b class="ytSyncLabel">○ Conectando ao servidor...</b></div>
           <div style="font-size:11px;color:#aeb7c5;margin-bottom:9px">O Mestre adiciona as músicas e, ao tocar, a reprodução é enviada para todos os jogadores conectados.</div>
           ${roleIsMaster()?'<div class="ytAddRow" style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:10px"><input class="ytName" placeholder="Nome do som (opcional)" style="background:#101318;color:#fff;border:1px solid #3b424e;border-radius:7px;padding:8px;box-sizing:border-box"><input class="ytUrl" placeholder="Cole aqui o link do YouTube" style="background:#101318;color:#fff;border:1px solid #3b424e;border-radius:7px;padding:8px;box-sizing:border-box"><button class="btn ytAdd">＋ Adicionar som</button></div>':''}
-          <div class="ytPlayerWrap" style="display:none;margin-bottom:10px"><div class="small" style="margin-bottom:5px">Reproduzindo</div><div class="ytNowPlaying" style="background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;font-size:12px;line-height:1.45"></div><div class="ytPlayerHost" style="width:100%;height:240px;border-radius:8px;overflow:hidden;background:#000;margin-top:7px"></div><div class="ytLocalFallback" style="display:none;background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;margin-top:7px;font-size:12px;line-height:1.4"></div>${roleIsMaster()?'<button class="btn ytStop" style="width:100%;margin-top:6px">⏹ Parar</button>':'<div class="ytListenerOnly" style="margin-top:6px;padding:8px;text-align:center;border:1px solid #343b46;border-radius:7px;color:#9ca5b3;font-size:11px">🔊 Som controlado pelo Mestre — você só escuta</div>'}</div>
+          <div class="ytPlayerWrap" style="display:none;margin-bottom:10px"><div class="small" style="margin-bottom:5px">Reproduzindo</div><div class="ytNowPlaying" style="background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;font-size:12px;line-height:1.45"></div><div class="ytPlayerHost" style="width:100%;height:240px;border-radius:8px;overflow:hidden;background:#000;margin-top:7px"></div>${roleIsMaster()?'<div style="display:flex;gap:6px;margin-top:7px"><button type="button" class="btn ytPause" style="flex:1">⏸ Pausar todos</button><button type="button" class="btn ytStop" style="flex:1">⏹ Parar todos</button></div>':'<div class="ytListenerOnly" style="margin-top:6px;padding:8px;text-align:center;border:1px solid #343b46;border-radius:7px;color:#9ca5b3;font-size:11px">🔊 Som controlado pelo Mestre — você só escuta</div>'}<div class="ytLocalFallback" style="display:none;background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;margin-top:7px;font-size:12px;line-height:1.4"></div></div>
           <div class="ytList"></div>
         </div>`;
       document.body.appendChild(panel);
@@ -1273,7 +1281,8 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           title.textContent='🔊 Som / efeito';
         }
       };
-      const stopButton=panel.querySelector('.ytStop');if(stopButton)stopButton.onclick=()=>{stopPlayback();const wrap=panel.querySelector('.ytPlayerWrap');wrap.style.display='none';if(roleIsMaster())sendRoomSoundCommand({action:'stop',commandId:'cmd-'+Date.now(),sourceClientId:clientId,startedAt:Date.now()});};
+      const stopButton=panel.querySelector('.ytStop');if(stopButton)stopButton.onclick=()=>{if(!roleIsMaster())return;stopPlayback();const wrap=panel.querySelector('.ytPlayerWrap');if(wrap)wrap.style.display='none';const now=Date.now(),commandId='cmd-'+now+'-'+Math.random().toString(36).slice(2,7);masterLastUiCommandAt=now;lastLocalCommandId=commandId;sendRoomSoundCommand({action:'stop',commandId,sourceClientId:clientId,startedAt:now});};
+      const pauseButton=panel.querySelector('.ytPause');if(pauseButton)pauseButton.onclick=()=>{if(!roleIsMaster())return;try{player?.pauseVideo()}catch(e){}const now=Date.now(),commandId='cmd-'+now+'-'+Math.random().toString(36).slice(2,7);masterLastUiCommandAt=now;lastLocalCommandId=commandId;latestSyncEvent={...(latestSyncEvent||{}),action:'pause',commandId,sourceClientId:clientId,startedAt:now};sendRoomSoundCommand({action:'pause',commandId,sourceClientId:clientId,startedAt:now});};
       if(roleIsMaster()){
         const add=async()=>{
           const name=panel.querySelector('.ytName').value.trim(),url=panel.querySelector('.ytUrl').value.trim(),id=youtubeId(url);if(!id){alert('Cole um link válido do YouTube.');return}
