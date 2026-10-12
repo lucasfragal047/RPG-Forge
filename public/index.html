@@ -1015,9 +1015,19 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       if(window.YT?.Player)return Promise.resolve();
       if(ytApiPromise)return ytApiPromise;
       ytApiPromise=new Promise((resolve,reject)=>{
+        let settled=false;
+        const finish=(err)=>{
+          if(settled)return;settled=true;clearTimeout(timer);
+          if(err){ytApiPromise=null;reject(err)}else resolve();
+        };
         const prev=window.onYouTubeIframeAPIReady;
-        window.onYouTubeIframeAPIReady=function(){try{prev?.();}catch(_){ }resolve()};
-        const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';tag.async=true;tag.onerror=()=>reject(new Error('Falha ao carregar a API do YouTube.'));document.head.appendChild(tag);
+        window.onYouTubeIframeAPIReady=function(){try{if(typeof prev==='function')prev()}catch(_){};finish(window.YT?.Player?null:new Error('A API do YouTube carregou sem disponibilizar o player.'))};
+        let tag=document.querySelector('script[data-rpg-youtube-api="1"]');
+        if(!tag){tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';tag.async=true;tag.dataset.rpgYoutubeApi='1';document.head.appendChild(tag)}
+        tag.onerror=()=>{tag.remove();finish(new Error('O navegador não conseguiu baixar a API do YouTube. Verifique conexão, bloqueador de anúncios ou políticas de rede.'))};
+        const timer=setTimeout(()=>finish(new Error('Tempo esgotado ao carregar a API do YouTube.')),15000);
+        // Alguns navegadores carregam a API antes deste trecho registrar o callback.
+        if(window.YT?.Player)finish();
       });
       return ytApiPromise;
     }
@@ -1066,8 +1076,8 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       const box=panel?.querySelector('.ytSyncStatus');if(!box)return;
       box.innerHTML='';box.style.display='block';
       const text=document.createElement('div');text.style.cssText='font-size:11px;line-height:1.45';text.textContent=msg;box.appendChild(text);
-      if(kind==='activate'||kind==='blocked'){
-        const b=document.createElement('button');b.type='button';b.className='btn ytEnableSync';b.style.cssText='width:100%;margin-top:7px';b.textContent='🔊 Ativar áudio neste dispositivo';
+      if(kind==='activate'||kind==='blocked'||kind==='error'){
+        const b=document.createElement('button');b.type='button';b.className='btn ytEnableSync';b.style.cssText='width:100%;margin-top:7px';b.textContent=kind==='error'?'↻ Tentar carregar o player novamente':'🔊 Ativar áudio neste dispositivo';
         b.onclick=()=>{
           syncEnabled=true;localStorage.setItem(syncKey,'1');
           const item=latestSyncEvent?.item,id=item?youtubeId(item.url):null;
@@ -1076,7 +1086,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           }
           b.disabled=true;b.textContent='Preparando áudio…';
           ensurePlayer(panel,id,false).then(ok=>{
-            if(!ok){syncEnabled=false;localStorage.setItem(syncKey,'0');showSyncStatus(panel,'error','Não foi possível preparar o player. Confira a conexão e tente novamente.');return}
+            if(!ok){syncEnabled=false;localStorage.setItem(syncKey,'0');showSyncStatus(panel,'error','O player do YouTube não carregou. Confira a conexão ou bloqueador de anúncios e tente novamente.');return}
             if(latestSyncEvent?.action==='play'){
               try{player.unMute();player.setVolume(100);const vid=youtubeId(latestSyncEvent.item?.url);if(vid){const elapsed=Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:vid,startSeconds:elapsed});player.playVideo()}}
               catch(e){showSyncStatus(panel,'blocked','O player foi preparado, mas o navegador bloqueou a reprodução. Clique novamente em ativar áudio.')}
@@ -1195,9 +1205,9 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           const activateButton=p.querySelector('.ytEnableSync');
           if(activateButton){activateButton.disabled=true;activateButton.textContent='Preparando áudio…'}
           ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{
-            if(!ok){showSyncStatus(p,'error','Não consegui preparar o player do YouTube. Confira a conexão e tente novamente.');return}
+            if(!ok){showSyncStatus(p,'error','A API do YouTube não carregou. Verifique conexão, bloqueador de anúncios ou políticas de rede; depois tente novamente.');return}
             const readyButton=p.querySelector('.ytEnableSync');if(readyButton){readyButton.disabled=false;readyButton.textContent='🔊 Ativar áudio neste dispositivo'}
-          }).catch(()=>showSyncStatus(p,'error','Não consegui preparar o player do YouTube. Confira a conexão e tente novamente.'));
+          }).catch(()=>showSyncStatus(p,'error','A API do YouTube não carregou. Verifique conexão, bloqueador de anúncios ou políticas de rede; depois tente novamente.'));
           return;
         }
         ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{try{const id=youtubeId(data.item.url);if(!ok||!id)return;player.unMute();player.setVolume(100);const target=Math.max(0,(Date.now()-(Number(data.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:id,startSeconds:target});player.playVideo()}catch(e){updateSyncStatus(p,'blocked')}});
