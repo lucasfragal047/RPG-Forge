@@ -1039,7 +1039,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     }
     function playerContainer(panel){return panel?.querySelector('.ytPlayerHost')||null}
     function getYoutubePlayerVars(){
-      const vars={autoplay:0,controls:1,rel:0,playsinline:1,enablejsapi:1};
+      const vars={autoplay:0,controls:roleIsMaster()?1:0,rel:0,playsinline:1,enablejsapi:1};
       if(/^https?:$/.test(location.protocol))vars.origin=location.origin;
       return vars;
     }
@@ -1099,9 +1099,12 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
                       }
                     }
                   }
-                  if(state===YT.PlayerState.PLAYING&&pendingSyncedUnmute&&syncEnabled){
+                  if(state===YT.PlayerState.PLAYING&&pendingSyncedUnmute){
                     pendingSyncedUnmute=false;
                     try{player.setVolume(100);player.unMute()}catch(_){}
+                    // Se o navegador permitiu o início silenciado, tenta liberar o áudio automaticamente.
+                    syncEnabled=true;try{localStorage.setItem(syncKey,'1')}catch(_){}
+                    updateSyncStatus(panel);
                   }
                 },
                 onError:(ev)=>{const code=String(ev?.data??'sem código');updateSyncStatus(panel,'error',code);finish(false,new Error('O YouTube recusou o vídeo/player (código '+code+').'))}
@@ -1250,7 +1253,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           <div class="ytSyncStatus" style="display:block;border:1px solid #4a5260;background:#101318;border-radius:8px;padding:9px;margin-bottom:9px"><b class="ytSyncLabel">○ Conectando ao servidor...</b></div>
           <div style="font-size:11px;color:#aeb7c5;margin-bottom:9px">O Mestre adiciona as músicas e, ao tocar, a reprodução é enviada para todos os jogadores conectados.</div>
           ${roleIsMaster()?'<div class="ytAddRow" style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:10px"><input class="ytName" placeholder="Nome do som (opcional)" style="background:#101318;color:#fff;border:1px solid #3b424e;border-radius:7px;padding:8px;box-sizing:border-box"><input class="ytUrl" placeholder="Cole aqui o link do YouTube" style="background:#101318;color:#fff;border:1px solid #3b424e;border-radius:7px;padding:8px;box-sizing:border-box"><button class="btn ytAdd">＋ Adicionar som</button></div>':''}
-          <div class="ytPlayerWrap" style="display:none;margin-bottom:10px"><div class="small" style="margin-bottom:5px">Reproduzindo</div><div class="ytNowPlaying" style="background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;font-size:12px;line-height:1.45"></div><div class="ytPlayerHost" style="width:100%;height:240px;border-radius:8px;overflow:hidden;background:#000;margin-top:7px"></div><div class="ytLocalFallback" style="display:none;background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;margin-top:7px;font-size:12px;line-height:1.4"></div><button class="btn ytStop" style="width:100%;margin-top:6px">⏹ Parar</button></div>
+          <div class="ytPlayerWrap" style="display:none;margin-bottom:10px"><div class="small" style="margin-bottom:5px">Reproduzindo</div><div class="ytNowPlaying" style="background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;font-size:12px;line-height:1.45"></div><div class="ytPlayerHost" style="width:100%;height:240px;border-radius:8px;overflow:hidden;background:#000;margin-top:7px"></div><div class="ytLocalFallback" style="display:none;background:#101318;border:1px solid #343b46;border-radius:8px;padding:10px;margin-top:7px;font-size:12px;line-height:1.4"></div>${roleIsMaster()?'<button class="btn ytStop" style="width:100%;margin-top:6px">⏹ Parar</button>':'<div class="ytListenerOnly" style="margin-top:6px;padding:8px;text-align:center;border:1px solid #343b46;border-radius:7px;color:#9ca5b3;font-size:11px">🔊 Som controlado pelo Mestre — você só escuta</div>'}</div>
           <div class="ytList"></div>
         </div>`;
       document.body.appendChild(panel);
@@ -1270,7 +1273,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           title.textContent='🔊 Som / efeito';
         }
       };
-      panel.querySelector('.ytStop').onclick=()=>{stopPlayback();const wrap=panel.querySelector('.ytPlayerWrap');wrap.style.display='none';if(roleIsMaster())sendRoomSoundCommand({action:'stop',commandId:'cmd-'+Date.now(),sourceClientId:clientId,startedAt:Date.now()});};
+      const stopButton=panel.querySelector('.ytStop');if(stopButton)stopButton.onclick=()=>{stopPlayback();const wrap=panel.querySelector('.ytPlayerWrap');wrap.style.display='none';if(roleIsMaster())sendRoomSoundCommand({action:'stop',commandId:'cmd-'+Date.now(),sourceClientId:clientId,startedAt:Date.now()});};
       if(roleIsMaster()){
         const add=async()=>{
           const name=panel.querySelector('.ytName').value.trim(),url=panel.querySelector('.ytUrl').value.trim(),id=youtubeId(url);if(!id){alert('Cole um link válido do YouTube.');return}
@@ -1304,17 +1307,20 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
         if(!p)return;
         updateNowPlaying(p,data.item,'Som sincronizado pelo Mestre.');
         if(!syncEnabled){
-          showSyncStatus(p,'activate','O som está pronto. Se este navegador bloquear a primeira reprodução, clique uma vez em “Ativar áudio neste dispositivo”; depois o Mestre controla as faixas.');
-          // Prepara o iframe antes do clique do jogador, para que o clique possa iniciar o áudio diretamente.
+          // O jogador não controla a música: tenta começar automaticamente em modo silenciado
+          // e liberar o áudio assim que o YouTube confirmar que começou. Se o navegador bloquear,
+          // o botão de ativação fica disponível como alternativa, sem interromper a tentativa.
+          showSyncStatus(p,'activate','O Mestre controla o som da sala. Tentando iniciar automaticamente; se o navegador bloquear o áudio, ative-o uma única vez neste dispositivo.');
           const activateButton=p.querySelector('.ytEnableSync');
-          if(activateButton){activateButton.disabled=true;activateButton.textContent='Preparando áudio…'}
-          ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{
-            if(!ok){showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a mensagem técnica exibida no painel e tente novamente.');return}
-            const readyButton=p.querySelector('.ytEnableSync');if(readyButton){readyButton.disabled=false;readyButton.textContent='🔊 Ativar áudio neste dispositivo'}
-          }).catch(()=>showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a mensagem técnica exibida no painel e tente novamente.'));
-          return;
+          if(activateButton){activateButton.disabled=true;activateButton.textContent='Preparando reprodução…'}
         }
-        ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{const id=youtubeId(data.item.url);if(!ok||!id)return;const basePosition=Math.max(0,Number(data.positionSeconds)||0);const adjustedStartedAt=(Number(data.startedAt)||Date.now())-basePosition*1000;if(!playSyncedVideo(p,id,adjustedStartedAt,false))updateSyncStatus(p,'blocked')});
+        ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{
+          const id=youtubeId(data.item.url);if(!ok||!id){showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a conexão e tente novamente.');return}
+          const basePosition=Math.max(0,Number(data.positionSeconds)||0);
+          const adjustedStartedAt=(Number(data.startedAt)||Date.now())-basePosition*1000;
+          if(!playSyncedVideo(p,id,adjustedStartedAt,false))updateSyncStatus(p,'blocked');
+          else {const activateButton=p.querySelector('.ytEnableSync');if(activateButton){activateButton.disabled=false;activateButton.textContent='🔊 Ativar áudio neste dispositivo'}}
+        }).catch(()=>showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a conexão e tente novamente.'));
       }
     }
     function bindRoomSoundSocket(){
