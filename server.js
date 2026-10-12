@@ -15,7 +15,7 @@ const CODE='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 function makeCode(){let c='';do{c='';for(let i=0;i<4;i++)c+=CODE[Math.floor(Math.random()*CODE.length)]}while(rooms.has(c));return c}
 function newPage(id,name){return{id,name,locked:false,allowedPlayers:[],state:null,sharedMapState:null,weatherEffect:null,fogEffect:null}}
 function cleanName(v){return String(v||'Jogador').trim().slice(0,40)||'Jogador'}
-function roomState(room,me){return{role:me?.role||'player',roomCode:room.code,currentPageId:me?.pageId||room.pages[0].id,pages:room.pages.map(p=>({id:p.id,name:p.name,locked:p.locked,allowedPlayers:p.allowedPlayers.slice()})),players:[...room.players.values()].map(p=>({id:p.clientId,name:p.name,role:p.role,pageId:p.pageId}))}}
+function roomState(room,me){return{role:me?.role||'player',isRoomCreator:!!me&&me.clientId===room.ownerClientId,roomCode:room.code,currentPageId:me?.pageId||room.pages[0].id,pages:room.pages.map(p=>({id:p.id,name:p.name,locked:p.locked,allowedPlayers:p.allowedPlayers.slice()})),players:[...room.players.values()].map(p=>({id:p.clientId,name:p.name,role:p.role,pageId:p.pageId}))}}
 function broadcast(room){for(const p of room.players.values())io.to(p.socketId).emit('pagina-atualizada',roomState(room,p))}
 function gm(socket,room){const p=room.players.get(socket.id);return !!p&&p.role==='gm'}
 function defaultPage(room){return room.pages.find(p=>!p.locked)||room.pages[0]}
