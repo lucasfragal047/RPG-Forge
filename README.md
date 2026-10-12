@@ -1,25 +1,15 @@
-# RPG Forge · LUMATHHU — reprodução sincronizada do YouTube
+# LUMATHHU SOM — correção de névoa e grade
 
-Esta versão ajusta o fluxo de reprodução sincronizada do som compartilhado.
+Esta versão mantém a estrutura do projeto integrado e corrige:
 
-## Alteração
-- O Mestre continua enviando o comando de reprodução para a sala imediatamente.
-- Nos dispositivos dos jogadores, a reprodução tenta iniciar silenciada para contornar políticas de autoplay do navegador e libera o som quando o player confirma que começou a tocar.
-- Um bloqueio de autoplay com áudio não desativa imediatamente a sincronização da sala.
-- Mantém o restante dos arquivos e recursos da versão de origem.
+- A névoa e seus ajustes de ativação, posição, tamanho, cor e opacidade ficam sob controle do Mestre. O servidor já valida as alterações da névoa e rejeita comandos enviados por jogadores comuns.
+- A grade mantém o tamanho de célula selecionado (25, 50, 75 ou 100 px) quando a proporção horizontal/vertical é alterada.
+- Os controles de proporção horizontal e vertical atualizam as dimensões da grade sem redefinir o tamanho das células.
+- As dimensões e o tamanho da grade são sincronizados com o mapa e reaplicados quando chega uma atualização remota.
 
-## Limitação importante
-Navegadores podem exigir uma interação do usuário para permitir áudio automático. Nenhum site consegue garantir que todo navegador/dispositivo reproduza som audível sem essa autorização. Se o navegador bloquear até a reprodução silenciada ou exigir ativação inicial, o jogador pode precisar liberar o áudio uma vez; não deve precisar apertar Play a cada faixa quando a autorização e o player estiverem funcionando.
-
-## Publicação
-1. Faça backup da versão atual.
-2. Substitua os arquivos do projeto pelos arquivos deste ZIP, mantendo a estrutura de pastas.
-3. Envie as alterações ao GitHub e aguarde o deploy do Render.
-4. Recarregue a mesa em todos os dispositivos e teste com uma faixa curta.
-
-A sintaxe do servidor e dos scripts inline foi verificada. A reprodução real entre dispositivos ainda precisa ser testada na sala publicada.
-
-
-## Sistema de som integrado
-
-Esta versão mantém o projeto LUMATHHU SOM e substitui somente o bloco do painel de som/efeitos pelo sistema de som da versão LUMATHHU DADOS. O restante da mesa foi preservado. O sistema usa a API HTTP `/api/sounds`, `/api/sound` e os eventos SSE `/api/sound/events` já presentes no servidor.
+## Atualização
+1. Extraia o ZIP.
+2. Substitua os arquivos correspondentes no repositório local.
+3. Faça commit e push para o GitHub.
+4. Aguarde o Render concluir a implantação.
+5. Teste com o Mestre e pelo menos um jogador na mesma sala.

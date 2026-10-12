@@ -1276,11 +1276,16 @@ window.tool = window.tool || 'select';
   const sizeBtn=document.createElement('button');
   sizeBtn.className='btn';sizeBtn.textContent='Grade 50px';
   snap.parentNode.insertBefore(sizeBtn,snap.nextSibling);
+  function refreshGridSizeLabel(){const n=parseInt(grid.style.backgroundSize)||50;sizeBtn.textContent='Grade '+n+'px'}
   sizeBtn.onclick=()=>{
     const sizes=[25,50,75,100],cur=parseInt(grid.style.backgroundSize)||50;
     const n=sizes[(sizes.indexOf(cur)+1)%sizes.length];
     grid.style.backgroundSize=n+'px '+n+'px';sizeBtn.textContent='Grade '+n+'px';
+    window.dispatchEvent(new CustomEvent('lumathhu-grid-cell-size-changed',{detail:{cell:n}}));
+    window.rpgForgeSyncMapNow?.();window.rpgForgeSaveCurrentPageNow?.();
   };
+  refreshGridSizeLabel();
+  window.addEventListener('lumathhu-map-rebuilt',refreshGridSizeLabel);
   // A grade pode ficar por cima do cenário, sem bloquear cliques.
   const overlayBtn=document.createElement('button');
   overlayBtn.className='btn';overlayBtn.id='gridOverlayToggle';
@@ -2273,6 +2278,9 @@ window.tool = window.tool || 'select';
   const resize=document.getElementById('rpgFogResize'),center=document.getElementById('rpgFogCenter'),big=document.getElementById('rpgFogBig'),small=document.getElementById('rpgFogSmall'),lock=document.getElementById('rpgFogLock');
   const sizeValue=document.getElementById('rpgFogSizeValue'),visionRadius=document.getElementById('rpgFogVisionRadius'),visionValue=document.getElementById('rpgFogVisionValue');
   const gmView=document.getElementById('rpgFogGMView');
+  function isMaster(){return !!(window.rpgForgeRole?.isGM?.() || window.lumathhuRoomRole==='gm')}
+  function applyFogPermissionUI(){const panel=document.getElementById('rpgGridFogAdjustments');const ids=['rpgFogToggle','rpgFogClear','rpgFogOpacity','rpgFogColor','rpgFogVisionRadius','rpgFogCenter','rpgFogBig','rpgFogSmall','rpgFogLock','rpgFogResize','rpgGridFogReset','rpgFogPosX','rpgFogPosY'];ids.forEach(id=>{const el=document.getElementById(id);if(el){el.disabled=!isMaster();el.style.opacity=isMaster()?'':'0.55';el.title=isMaster()?'':'Somente o Mestre pode alterar a névoa e seus ajustes'}});if(panel){panel.style.opacity=isMaster()?'':'0.7';panel.title=isMaster()?'':'Somente o Mestre pode alterar estes ajustes'}}
+  window.addEventListener('lumathhu-room-ready',applyFogPermissionUI);window.addEventListener('lumathhu-role-changed',applyFogPermissionUI);setTimeout(applyFogPermissionUI,0);
   function applyScenarioFogState(st){
     st=st||{};
     const currentFog=document.getElementById('rpgFogLayer'), currentCloud=document.getElementById('rpgFogCloud');
@@ -2434,6 +2442,7 @@ window.tool = window.tool || 'select';
   // Usamos captura no documento porque a névoa normalmente fica com
   // pointer-events:none para não bloquear tokens/objetos por baixo.
   function handleFogDoubleClick(e){
+    if(!isMaster())return;
     if(fogEditor && fogEditor.contains(e.target))return;
     // A névoa só assume o duplo clique quando o clique foi realmente no
     // fundo do mapa/grade. Elementos do mapa continuam recebendo o próprio
@@ -2457,7 +2466,7 @@ window.tool = window.tool || 'select';
   cloud.style.pointerEvents='none';
   function syncFogPointer(){cloud.style.pointerEvents='none';}
   document.addEventListener('pointerdown',e=>{
-    if(fogLocked||!fogMoveMode||e.button!==0)return;
+    if(!isMaster()||fogLocked||!fogMoveMode||e.button!==0)return;
     if(e.target.closest?.('.token,.mapImageObject,.forgeObj,.spellArea,.room,.toolbar,.imageEditor,.forgePanel'))return;
     if(!pointInsideFog(e))return;
     const r=cloud.getBoundingClientRect();
@@ -2786,11 +2795,12 @@ window.tool = window.tool || 'select';
   };
   if(!map||!grid||!fog||!cloud||!controls.cols||!controls.rows||!controls.x||!controls.y)return;
   const KEY='rpgForgeLocalGridFogAdjustmentsV2';
-  const CELL=50;
+  function cellSize(){const raw=String(grid.style.backgroundSize||'50px 50px').split(/\s+/);const n=parseFloat(raw[0]);return Number.isFinite(n)&&n>=10&&n<=200?n:50}
+  function currentGrid(){return map.querySelector('.grid')||grid;}
   function safeRead(){try{return JSON.parse(localStorage.getItem(KEY)||'null')}catch(_){return null}}
   function safeSave(state){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(_){}}
   function clampCount(value,fallback){const n=Math.round(Number(value));return Number.isFinite(n)?Math.max(1,Math.min(200,n)):fallback}
-  function gridOrigin(){return {x:grid.offsetLeft||0,y:grid.offsetTop||0}}
+  function gridOrigin(){const g=currentGrid();return {x:g.offsetLeft||0,y:g.offsetTop||0}}
   function setFogOffset(x,y){
     const g=gridOrigin();
     cloud.style.left=(g.x+Number(x)-(fog.offsetLeft||0))+'px';
@@ -2802,12 +2812,13 @@ window.tool = window.tool || 'select';
   }
   function state(){return {cols:clampCount(controls.cols.value,48),rows:clampCount(controls.rows.value,32),x:Number(controls.x.value)||0,y:Number(controls.y.value)||0}}
   function applyGrid(){
-    const cols=clampCount(controls.cols.value,48), rows=clampCount(controls.rows.value,32);
+    const cols=clampCount(controls.cols.value,48), rows=clampCount(controls.rows.value,32), g=currentGrid(), cell=cellSize();
     controls.cols.value=String(cols); controls.rows.value=String(rows);
-    grid.style.width=(cols*CELL)+'px'; grid.style.height=(rows*CELL)+'px';
-    grid.style.backgroundSize=CELL+'px '+CELL+'px';
+    g.style.width=(cols*cell)+'px'; g.style.height=(rows*cell)+'px';
+    g.style.backgroundSize=cell+'px '+cell+'px';
     controls.colsv.textContent=cols+' quadrados'; controls.rowsv.textContent=rows+' quadrados';
     safeSave(state());
+    window.rpgForgeSyncMapNow?.();window.rpgForgeSaveCurrentPageNow?.();
   }
   function applyPosition(){setFogOffset(controls.x.value,controls.y.value);safeSave(state());try{window.rpgForgeUpdateFogVision?.()}catch(_){}}
   function load(){
@@ -2832,9 +2843,11 @@ window.tool = window.tool || 'select';
     controls.cols.value='48';controls.rows.value='32';controls.x.value='0';controls.y.value='0';
     applyGrid();applyPosition();
   });
-  window.rpgForgeGridCellSize=()=>({x:CELL,y:CELL});
+  window.rpgForgeGridCellSize=()=>({x:cellSize(),y:cellSize()});
   window.rpgForgeGridDimensions=()=>({columns:clampCount(controls.cols.value,48),rows:clampCount(controls.rows.value,32)});
   load();
+  window.addEventListener('lumathhu-grid-cell-size-changed',()=>{applyGrid()});
+  window.addEventListener('lumathhu-map-rebuilt',()=>{const g=currentGrid(),cell=cellSize();const w=parseFloat(g.style.width)||2400,h=parseFloat(g.style.height)||1600;controls.cols.value=String(clampCount(Math.round(w/cell),48));controls.rows.value=String(clampCount(Math.round(h/cell),32));controls.colsv.textContent=controls.cols.value+' quadrados';controls.rowsv.textContent=controls.rows.value+' quadrados';});
 })();
 </script>
 
@@ -3100,7 +3113,7 @@ window.tool = window.tool || 'select';
  function playerName(){const n=$('lhPlayerName').value.trim().slice(0,40)||'Aventureiro';try{localStorage.setItem('lumathhuPlayerName',n)}catch(e){}return n}
  function ensureSocket(){if(socket&&socket.connected)return socket;if(typeof window.io!=='function'){say('Não foi possível carregar a conexão. Abra pelo endereço do Render ou pelo servidor Node, não pelo arquivo HTML.');return null}if(!socket){socket=window.io({transports:['websocket','polling']});window.rpgForgeSocket=socket;socket.on('connect',()=>{if(!lobby.hidden)say('Conectado. Crie uma sala ou informe um código para entrar.')});socket.on('connect_error',()=>{if(!lobby.hidden)say('Não consegui conectar ao servidor. Confira se o serviço do Render está ativo.')});socket.on('disconnect',()=>{if(!lobby.hidden)say('Conexão interrompida. Tentando reconectar...');else say('Conexão perdida. O navegador tentará reconectar automaticamente.')});socket.on('sala-erro',msg=>say(String(msg||'Não foi possível acessar a sala.')));socket.on('sala-criada',d=>{if(d&&d.sala)currentCode=d.sala});socket.on('sala-estado',state=>enterRoom(state));socket.on('pagina-atualizada',state=>updateRoom(state));socket.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){window.lumathhuCurrentPageId=d.pageId;window.dispatchEvent(new CustomEvent('lumathhu-page-changed',{detail:d}))}});socket.on('pagina-estado',e=>{window.dispatchEvent(new CustomEvent('lumathhu-page-state',{detail:e}))});socket.on('lumathhu-map-sync',e=>{window.dispatchEvent(new CustomEvent('lumathhu-map-sync',{detail:e}))});socket.on('rpg-efeito-clima',e=>window.dispatchEvent(new CustomEvent('lumathhu-weather',{detail:e})));socket.on('rpg-efeito-fumaca',e=>window.dispatchEvent(new CustomEvent('lumathhu-fog',{detail:e})));}
  return socket}
- function enterRoom(state){if(!state||!state.roomCode)return;currentCode=state.roomCode;window.lumathhuRoomCode=currentCode;window.lumathhuCurrentPageId=state.currentPageId||window.lumathhuCurrentPageId||'page-1';roomInfo=state;try{let list=JSON.parse(localStorage.getItem('lumathhuRecentRooms')||'[]');list=[{code:currentCode,name:'Mesa '+currentCode,at:Date.now()},...list.filter(x=>x.code!==currentCode)].slice(0,10);localStorage.setItem('lumathhuRecentRooms',JSON.stringify(list))}catch(e){}lobby.hidden=true;$('lumathhuRoomChip').style.display='flex';document.querySelectorAll('.session').forEach(el=>{el.textContent='LUMATHHU · Sala '+currentCode});updateRoom(state);window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:state}));window.dispatchEvent(new CustomEvent('lumathhu-room-ready',{detail:state}));setTimeout(()=>window.dispatchEvent(new Event('resize')),100);}
+ function enterRoom(state){if(!state||!state.roomCode)return;window.lumathhuRoomRole=state.role||'player';window.dispatchEvent(new Event('lumathhu-role-changed'));currentCode=state.roomCode;window.lumathhuRoomCode=currentCode;window.lumathhuCurrentPageId=state.currentPageId||window.lumathhuCurrentPageId||'page-1';roomInfo=state;try{let list=JSON.parse(localStorage.getItem('lumathhuRecentRooms')||'[]');list=[{code:currentCode,name:'Mesa '+currentCode,at:Date.now()},...list.filter(x=>x.code!==currentCode)].slice(0,10);localStorage.setItem('lumathhuRecentRooms',JSON.stringify(list))}catch(e){}lobby.hidden=true;$('lumathhuRoomChip').style.display='flex';document.querySelectorAll('.session').forEach(el=>{el.textContent='LUMATHHU · Sala '+currentCode});updateRoom(state);window.dispatchEvent(new CustomEvent('rpgforge-room-ready',{detail:state}));window.dispatchEvent(new CustomEvent('lumathhu-room-ready',{detail:state}));setTimeout(()=>window.dispatchEvent(new Event('resize')),100);}
  function updateRoom(state){if(!state)return;if(state.roomCode)currentCode=state.roomCode;if(state.players)roomInfo=state;if(state.players){window.lumathhuConnectedPlayers=state.players.map(p=>({name:String(p.name||'Jogador'),role:String(p.role||'player')}));window.dispatchEvent(new CustomEvent('lumathhu-players-updated',{detail:window.lumathhuConnectedPlayers}));}const players=(state.players||[]).length;const names=(state.players||[]).map(p=>p.name).filter(Boolean);$('lhRoomChipText').innerHTML='Sala <span class="lh-code">'+esc(currentCode)+'</span> · '+players+' jogador'+(players===1?'':'es')+(names.length?' · '+names.map(esc).join(', '):'');}
  function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
  function createRoom(){const s=ensureSocket();if(!s)return;say('Criando sua sala...');if(!s.connected){say('Conectando ao servidor...');s.once('connect',()=>s.emit('criar-sala',{clientId,nome:playerName()}));return}s.emit('criar-sala',{clientId,nome:playerName()})}
