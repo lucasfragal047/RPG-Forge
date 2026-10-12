@@ -2849,8 +2849,8 @@ window.tool = window.tool || 'select';
 <style id="rpgForgeDiceCornerPosition">
 /* Rolagem de dados em painel discreto no canto inferior direito */
 #rpgForgeDiceOverlay{
-  inset: auto 24px 24px auto !important;
-  width: min(320px, calc(100vw - 32px)) !important;
+  inset: auto 28px 28px auto !important;
+  width: min(430px, calc(100vw - 36px)) !important;
   height: auto !important;
   display: flex !important;
   align-items: flex-end !important;
@@ -2867,6 +2867,8 @@ window.tool = window.tool || 'select';
 #rpgForgeDiceCard{
   width: 100% !important;
   min-height: 0 !important;
+  background:linear-gradient(145deg,#76502f 0%,#24180f 25%,#132e26 26%,#0d241d 100%) !important;
+  border:1px solid #d7aa6b !important;
   padding: 14px 14px 12px !important;
   gap: 7px !important;
   border-radius: 16px !important;
@@ -2874,7 +2876,7 @@ window.tool = window.tool || 'select';
   pointer-events: auto !important;
 }
 #rpgForgeDiceTitle{font-size:10px !important;letter-spacing:.14em !important}
-#rpgForgeDieStage{height:135px !important;width:100% !important;max-width:260px !important}
+#rpgForgeDieStage{height:205px !important;width:100% !important;max-width:390px !important}
 #rpgForgeDie{transform:scale(.82);transform-origin:center}
 #rpgForgeDiceResult{font-size:clamp(28px,4vw,38px) !important}
 #rpgForgeDiceMeta{font-size:11px !important;min-height:14px !important}
@@ -2947,10 +2949,39 @@ window.tool = window.tool || 'select';
     if(s===6)plane.position.copy(normal.clone().multiplyScalar(.778));else plane.position.copy(face.center).add(normal.clone().multiplyScalar(.012));
     plane.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),normal);plane.renderOrder=3;plane.userData.dieValue=label;mesh.add(plane);
    });
-   scene.add(mesh);meshes.push(mesh);mesh.rotation.set(.45+index*.12,.5+index*.19,.08);const spacing=total<=3?1.95:total<=5?1.48:1.12;mesh.position.x=(index-(total-1)/2)*spacing;mesh.scale.setScalar(total>6?.52:total>4?.60:total>2?.72:1);fromQ=mesh.quaternion.clone();const faceToCamera=new THREE.Quaternion().setFromUnitVectors(resultDirection.clone().normalize(),new THREE.Vector3(0,0,1));const twist=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),Math.random()*Math.PI*2);mesh.userData.toQ=twist.multiply(faceToCamera);mesh.userData.spinStart=performance.now();mesh.userData.settleStart=mesh.userData.spinStart+1450;mesh.userData.rollingUntil=mesh.userData.spinStart+2050;mesh.userData.rollSeed=Math.random()*1000;
+   scene.add(mesh);meshes.push(mesh);mesh.rotation.set(.45+index*.12,.5+index*.19,.08);const spacing=total<=3?1.95:total<=5?1.48:1.12;mesh.position.x=(index-(total-1)/2)*spacing;mesh.userData.baseX=mesh.position.x;mesh.position.z=(Math.random()-.5)*.8;mesh.userData.rollSeed=Math.random()*20;mesh.userData.lastImpact=-1;mesh.scale.setScalar(total>6?.52:total>4?.60:total>2?.72:1);fromQ=mesh.quaternion.clone();const faceToCamera=new THREE.Quaternion().setFromUnitVectors(resultDirection.clone().normalize(),new THREE.Vector3(0,0,1));const twist=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),Math.random()*Math.PI*2);mesh.userData.toQ=twist.multiply(faceToCamera);mesh.userData.spinStart=performance.now();mesh.userData.settleStart=mesh.userData.spinStart+2100;mesh.userData.rollingUntil=mesh.userData.spinStart+3000;mesh.userData.rollSeed=Math.random()*1000;
   }
 
-  function animate(now){raf=requestAnimationFrame(animate);if(!renderer||!scene)return;meshes.forEach(m=>{const elapsed=now-(m.userData.spinStart||now),settle=m.userData.settleStart||now,until=m.userData.rollingUntil||now,to=m.userData.toQ||m.quaternion;if(now<settle){if(lastSides===6){const dq=new THREE.Quaternion().setFromEuler(new THREE.Euler(.105,.137,.091,'XYZ'));m.quaternion.multiply(dq).normalize();}else{m.rotation.x+=.105;m.rotation.y+=.137;m.rotation.z+=.091;}m.position.y=Math.abs(Math.sin(elapsed*.012))*.36;m.position.x+=(m.userData.baseX||m.position.x)*0;}else if(now<until){const t=Math.min(1,(now-settle)/(until-settle));const eased=1-Math.pow(1-t,3);m.quaternion.slerp(to,eased);m.position.y=Math.abs(Math.sin(t*Math.PI*2))*.10*(1-t);}else{m.quaternion.slerp(to,.18);m.position.y+=(0-m.position.y)*.22;}});renderer.render(scene,camera);}
+  function animate(now){
+    raf=requestAnimationFrame(animate);if(!renderer||!scene)return;
+    meshes.forEach(m=>{
+      const elapsed=now-(m.userData.spinStart||now),settle=m.userData.settleStart||now,until=m.userData.rollingUntil||now,to=m.userData.toQ||m.quaternion;
+      const t=Math.max(0,elapsed/1000);
+      if(now<settle){
+        const fade=Math.max(.12,1-elapsed/2300);
+        m.position.x += Math.sin(elapsed*.006+m.userData.rollSeed)*.009*fade;
+        m.position.z += Math.cos(elapsed*.007+m.userData.rollSeed)*.008*fade;
+        m.position.y=Math.abs(Math.sin(elapsed*.0095+m.userData.rollSeed))*Math.max(.06,.42*(1-elapsed/2600));
+        m.rotation.x+=.13*fade;m.rotation.y+=.17*fade;m.rotation.z+=.105*fade;
+        if(elapsed>160 && Math.floor(elapsed/160)!==m.userData.lastImpact){
+          m.userData.lastImpact=Math.floor(elapsed/160);
+          m.userData.recoil= Math.max(0, .16*(1-elapsed/2600));
+        }
+      }else if(now<until){
+        const u=Math.min(1,(now-settle)/(until-settle)),eased=1-Math.pow(1-u,3);
+        m.quaternion.slerp(to,eased);
+        m.position.y=Math.abs(Math.sin(u*Math.PI*3))*.12*(1-u);
+        m.position.x+=(m.userData.baseX-m.position.x)*.035;
+        m.position.z+=(0-m.position.z)*.035;
+      }else{
+        m.quaternion.slerp(to,.12);
+        m.position.y+=(0-m.position.y)*.20;
+        m.position.x+=(m.userData.baseX-m.position.x)*.16;
+        m.position.z+=(0-m.position.z)*.16;
+      }
+    });
+    renderer.render(scene,camera);
+  }
   function resize(){if(!renderer)return;const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
   window.addEventListener('resize',resize);new ResizeObserver(resize).observe(stage);stage.classList.add('rpg-three-ready');createDie(20,20);raf=requestAnimationFrame(animate);
   window.__rpgForgeRealDieRoll=function(s,v){if(!renderer)return;createDie(Number(s)||20,Number(v)||1);};
