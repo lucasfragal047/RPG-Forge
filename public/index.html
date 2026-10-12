@@ -1091,7 +1091,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     function startCurrentVideo(){
       if(!player||!playerReady||!latestSyncEvent?.item)return;
       const id=youtubeId(latestSyncEvent.item.url);if(!id)return;
-      try{player.unMute();player.setVolume(100);player.loadVideoById(id);player.playVideo()}catch(e){}
+      try{player.unMute();player.setVolume(100);player.loadVideoById(id)}catch(e){}
     }
     function stopPlayback(){try{player?.stopVideo()}catch(e){}}
     function destroyPlayer(){try{player?.destroy()}catch(e){}player=null;playerReady=false;playerReadyPromise=null;}
@@ -1105,13 +1105,13 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           syncEnabled=true;localStorage.setItem(syncKey,'1');
           const item=latestSyncEvent?.item,id=item?youtubeId(item.url):null;
           if(playerReady&&player){
-            try{player.unMute();player.setVolume(100);if(id){const elapsed=Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:id,startSeconds:elapsed});player.playVideo()}updateSyncStatus(panel);return}catch(e){}
+            try{player.unMute();player.setVolume(100);if(id){const elapsed=Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:id,startSeconds:elapsed})}updateSyncStatus(panel);return}catch(e){}
           }
           b.disabled=true;b.textContent='Preparando áudio…';
           ensurePlayer(panel,id,false).then(ok=>{
             if(!ok){syncEnabled=false;localStorage.setItem(syncKey,'0');showSyncStatus(panel,'error','O player do YouTube não carregou. Confira a conexão ou bloqueador de anúncios e tente novamente.');return}
             if(latestSyncEvent?.action==='play'){
-              try{player.unMute();player.setVolume(100);const vid=youtubeId(latestSyncEvent.item?.url);if(vid){const elapsed=Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:vid,startSeconds:elapsed});player.playVideo()}}
+              try{player.unMute();player.setVolume(100);const vid=youtubeId(latestSyncEvent.item?.url);if(vid){const elapsed=Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:vid,startSeconds:elapsed})}}
               catch(e){showSyncStatus(panel,'blocked','O player foi preparado, mas o navegador bloqueou a reprodução. Clique novamente em ativar áudio.')}
             }
             updateSyncStatus(panel);
@@ -1138,12 +1138,22 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
         const actions=document.createElement('div');actions.style.cssText='display:flex;gap:5px';
         if(roleIsMaster()){
           const play=document.createElement('button');play.className='btn';play.textContent='▶ Tocar';
-          play.onclick=async()=>{
-            const cmd='cmd-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);lastLocalCommandId=cmd;latestSyncEvent={action:'play',item,commandId:cmd,sourceClientId:clientId};
+          play.onclick=()=>{
+            const startedAt=Date.now();
+            const cmd='cmd-'+startedAt+'-'+Math.random().toString(36).slice(2,7);lastLocalCommandId=cmd;
+            latestSyncEvent={action:'play',item,commandId:cmd,sourceClientId:clientId,startedAt};
             if(activeSoundPanel)updateNowPlaying(activeSoundPanel,item,'Reproduzindo para todos…');
-            await ensurePlayer(activeSoundPanel,youtubeId(item.url),false);
-            try{player.unMute();player.setVolume(100);player.loadVideoById(youtubeId(item.url));player.playVideo()}catch(e){}
-            const sent=sendRoomSoundCommand({action:'play',item:{id:item.id,name:item.name,url:item.url},commandId:cmd,sourceClientId:clientId,startedAt:Date.now()});
+            // Envia o comando imediatamente: não espere a API do YouTube antes de sincronizar a sala.
+            const sent=sendRoomSoundCommand({action:'play',item:{id:item.id,name:item.name,url:item.url},commandId:cmd,sourceClientId:clientId,startedAt});
+            // Se o player já está pronto, iniciar dentro do próprio clique preserva a ativação do navegador.
+            if(playerReady&&player){
+              try{player.unMute();player.setVolume(100);player.loadVideoById(youtubeId(item.url))}catch(e){console.warn('[LUMATHHU áudio] Não foi possível iniciar a faixa:',e)}
+            }else{
+              ensurePlayer(activeSoundPanel,youtubeId(item.url),false).then(ok=>{
+                if(!ok){showSyncStatus(activeSoundPanel,'error','O player ainda não está pronto. Tente novamente; o comando já foi enviado para a sala.');return}
+                try{player.unMute();player.setVolume(100);player.loadVideoById(youtubeId(item.url))}catch(e){console.warn('[LUMATHHU áudio] Falha ao iniciar após carregar:',e)}
+              });
+            }
             if(!sent)showSyncStatus(activeSoundPanel,'error','Conexão da sala indisponível. Reconecte à mesa e tente novamente.');
           };
           actions.appendChild(play);
@@ -1211,6 +1221,15 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
         panel.querySelector('.ytAdd').onclick=add;panel.querySelector('.ytUrl').onkeydown=e=>{if(e.key==='Enter')add()};
       }
       if(!syncEnabled&&syncConnected)showSyncStatus(panel,'activate','Cada jogador precisa clicar uma vez em “Ativar áudio neste dispositivo”. Depois disso, quando o Mestre tocar, o som poderá iniciar neste navegador.');
+      // No dispositivo do Mestre, inicializa o iframe ao abrir o painel, não depois de clicar em Tocar.
+      // Assim o clique em uma faixa não fica preso a um await que pode perder a permissão de autoplay.
+      if(roleIsMaster()){
+        const wrap=panel.querySelector('.ytPlayerWrap'),now=panel.querySelector('.ytNowPlaying');
+        if(wrap&&now){wrap.style.display='block';now.innerHTML='<b>Player de áudio</b><div style="color:#9ca5b3;margin-top:3px">Preparando o player para iniciar as faixas sem atraso…</div>';}
+        ensurePlayer(panel,null,false).then(ok=>{
+          if(ok&&now)now.innerHTML='<b>Player pronto</b><div style="color:#9ca5b3;margin-top:3px">Escolha uma faixa. O Mestre controla a reprodução da sala.</div>';
+        }).catch(e=>console.warn('[LUMATHHU áudio] Pré-inicialização do player falhou:',e));
+      }
       return panel;
     }
     function handleSoundEvent(data){
@@ -1233,7 +1252,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           }).catch(()=>showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a mensagem técnica exibida no painel e tente novamente.'));
           return;
         }
-        ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{try{const id=youtubeId(data.item.url);if(!ok||!id)return;player.unMute();player.setVolume(100);const target=Math.max(0,(Date.now()-(Number(data.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:id,startSeconds:target});player.playVideo()}catch(e){updateSyncStatus(p,'blocked')}});
+        ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{try{const id=youtubeId(data.item.url);if(!ok||!id)return;player.unMute();player.setVolume(100);const target=Math.max(0,(Date.now()-(Number(data.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:id,startSeconds:target})}catch(e){updateSyncStatus(p,'blocked')}});
       }
     }
     function bindRoomSoundSocket(){
