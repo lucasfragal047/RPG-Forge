@@ -1077,7 +1077,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
               host:'https://www.youtube.com',
               playerVars:getYoutubePlayerVars(),
               events:{
-                onReady:()=>{playerReady=true;finish(true);if(autoplay)startCurrentVideo()},
+                onReady:()=>{playerReady=true;try{masterLastPlayerState=Number(player.getPlayerState?.()??-1)}catch(_){masterLastPlayerState=-1}finish(true);if(autoplay)startCurrentVideo()},
                 onAutoplayBlocked:()=>{
                   // O autoplay com áudio pode ser bloqueado. Mantemos a sincronização habilitada
                   // e tentamos a reprodução silenciada; não exigimos que o jogador aperte Play.
@@ -1088,12 +1088,12 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
                 },
                 onStateChange:(ev)=>{
                   const state=ev?.data;
-                  // Se o Mestre usar os controles nativos do próprio YouTube, espelhar Play/Pause
-                  // para a sala. Ignora mudanças geradas pelo comando do botão da mesa para não reiniciar a faixa.
+                  // Espelha os controles nativos do próprio player do YouTube para toda a sala.
+                  // Ignora apenas mudanças imediatamente geradas pelos comandos da interface da mesa.
                   if(roleIsMaster() && (state===YT.PlayerState.PLAYING || state===YT.PlayerState.PAUSED) && state!==masterLastPlayerState){
                     const previous=masterLastPlayerState;masterLastPlayerState=state;
                     const recentAppCommand=(Date.now()-masterLastUiCommandAt)<2200;
-                    if(!recentAppCommand && previous!==-1 && latestSyncEvent?.item){
+                    if(!recentAppCommand && latestSyncEvent?.item){
                       const nativeAction=state===YT.PlayerState.PLAYING?'play':'pause';
                       const now=Date.now();
                       const positionSeconds=state===YT.PlayerState.PLAYING?Math.max(0,Number(player?.getCurrentTime?.())||0):undefined;
@@ -1301,7 +1301,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       // Assim o clique em uma faixa não fica preso a um await que pode perder a permissão de autoplay.
       if(roleIsMaster()){
         const wrap=panel.querySelector('.ytPlayerWrap'),now=panel.querySelector('.ytNowPlaying');
-        if(wrap&&now){wrap.style.display='block';now.innerHTML='<b>Player de áudio</b><div style="color:#9ca5b3;margin-top:3px">Preparando o player para iniciar as faixas sem atraso…</div>';}
+        if(wrap&&now){wrap.style.display='none';now.innerHTML='<b>Player de áudio</b><div style="color:#9ca5b3;margin-top:3px">Escolha uma faixa para carregar o vídeo.</div>';}
         ensurePlayer(panel,null,false).then(ok=>{
           if(ok&&now)now.innerHTML='<b>Player pronto</b><div style="color:#9ca5b3;margin-top:3px">Escolha uma faixa. O Mestre controla a reprodução da sala.</div>';
         }).catch(e=>console.warn('[LUMATHHU áudio] Pré-inicialização do player falhou:',e));
