@@ -4,7 +4,7 @@
   "private": true,
   "main": "server.js",
   "scripts": {
-    "start": "node setup-dice.js && node server.js",
+    "start": "node server.js",
     "build:dice": "node setup-dice.js"
   },
   "dependencies": {
