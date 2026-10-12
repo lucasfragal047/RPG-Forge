@@ -572,18 +572,19 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       const gl=parseFloat(grid.style.left)||-400, gt=parseFloat(grid.style.top)||-300;
       const left=parseFloat(el.style.left)||0, top=parseFloat(el.style.top)||0;
       const w=parseFloat(el.style.width)||600, h=parseFloat(el.style.height)||400;
-      const src=img.src.replace(/\\/g,'\\\\').replace(/"/g,'%22');
-      grid.dataset.backgroundImage=src;
-      grid.dataset.backgroundWidth=String(w); grid.dataset.backgroundHeight=String(h);
-      grid.dataset.backgroundX=String(left-gl); grid.dataset.backgroundY=String(top-gt);
-      const cell=grid.style.backgroundSize||'50px 50px';
-      grid.style.backgroundImage='url("'+src+'"),linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';
-      grid.style.backgroundSize=w+'px '+h+'px,'+cell+','+cell;
-      grid.style.backgroundPosition=(left-gl)+'px '+(top-gt)+'px,0 0,0 0';
-      grid.style.backgroundRepeat='no-repeat,repeat,repeat';
+      const src=img.src;
+      // A imagem fica numa camada própria ATRÁS das linhas do grid, nunca como parte da grade.
+      let bg=mapEl.querySelector('.gridMapBackground');
+      if(!bg){bg=document.createElement('div');bg.className='gridMapBackground';bg.style.cssText='position:absolute;pointer-events:none;z-index:0;background-repeat:no-repeat;background-size:100% 100%;';mapEl.insertBefore(bg,grid);}
+      bg.style.left=(gl+(left-gl))+'px'; bg.style.top=(gt+(top-gt))+'px';
+      bg.style.width=w+'px'; bg.style.height=h+'px'; bg.style.backgroundImage='url("'+src.replace(/\\/g,'\\\\').replace(/"/g,'%22')+'")';
+      bg.dataset.image=src; bg.dataset.width=String(w); bg.dataset.height=String(h); bg.dataset.left=bg.style.left; bg.dataset.top=bg.style.top;
+      grid.dataset.backgroundImage=''; grid.dataset.backgroundWidth=''; grid.dataset.backgroundHeight=''; grid.dataset.backgroundX=''; grid.dataset.backgroundY='';
+      const cell=(grid.style.backgroundSize||'50px 50px').split(',').slice(-1)[0].trim()||'50px 50px';
+      grid.style.backgroundColor='transparent'; grid.style.backgroundImage='linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)'; grid.style.backgroundSize=cell; grid.style.backgroundPosition='0 0'; grid.style.backgroundRepeat='repeat'; grid.style.zIndex=grid.dataset.overlay==='1'?'999999':'1';
       el.remove(); selectedImage=null; removeEditor();
       window.rpgForgeSyncMapNow?.(); window.rpgForgeSaveCurrentPageNow?.();
-      message('Imagem anexada ao grid como fundo.');
+      message('Imagem anexada atrás da grade.');
     });
     add('↔ Aumentar largura',()=>{el.style.width=(Math.max(30,parseFloat(el.style.width)||30)+25)+'px'; removeEditor()});
     add('↔ Diminuir largura',()=>{el.style.width=Math.max(30,(parseFloat(el.style.width)||30)-25)+'px'; removeEditor()});
@@ -3148,6 +3149,55 @@ window.tool = window.tool || 'select';
  async function loadRecent(){recentPanel.style.display='block';$('lhRecentList').innerHTML='<div class="lh-empty">Carregando salas...</div>';let serverRooms=[];try{const r=await fetch('/api/rooms',{cache:'no-store'});if(r.ok){const d=await r.json();serverRooms=d.rooms||[]}}catch(e){}let local=[];try{local=JSON.parse(localStorage.getItem('lumathhuRecentRooms')||'[]')}catch(e){}const map=new Map();local.forEach(r=>map.set(r.code,{code:r.code,name:r.name||('Mesa '+r.code),players:null,local:true,createdAt:r.at||0}));serverRooms.forEach(r=>map.set(r.code,{...map.get(r.code),...r,local:!!map.get(r.code)}));const rooms=[...map.values()].sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0)).slice(0,10);if(!rooms.length){$('lhRecentList').innerHTML='<div class="lh-empty">Nenhuma sala recente encontrada. Crie uma sala ou entre usando um código.</div>';return}$('lhRecentList').innerHTML=rooms.map(r=>'<div class="lh-room"><div><strong>'+esc(r.name||('Mesa '+r.code))+' <span class="lh-code">'+esc(r.code)+'</span></strong><small>'+(r.players===null?'Visitada neste navegador':(r.players+' conectado(s)'))+'</small></div><button data-join-code="'+esc(r.code)+'">Entrar</button></div>').join('');$('lhRecentList').querySelectorAll('[data-join-code]').forEach(b=>b.addEventListener('click',()=>joinRoom(b.getAttribute('data-join-code'))))}
  $('lhCreate').addEventListener('click',createRoom);$('lhShowJoin').addEventListener('click',()=>{joinPanel.hidden=false;recentPanel.style.display='none';$('lhRoomCode').focus();say('Digite o código que o Mestre compartilhou com você.')});$('lhJoin').addEventListener('click',()=>joinRoom($('lhRoomCode').value));$('lhRoomCode').addEventListener('keydown',e=>{if(e.key==='Enter')joinRoom($('lhRoomCode').value)});$('lhRoomCode').addEventListener('input',()=>{$('lhRoomCode').value=$('lhRoomCode').value.toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g,'').slice(0,4)});$('lhBackJoin').addEventListener('click',()=>{joinPanel.hidden=true;say('Escolha uma opção para continuar.')});$('lhShowRecent').addEventListener('click',()=>{joinPanel.hidden=true;loadRecent()});$('lhBackRecent').addEventListener('click',()=>{recentPanel.style.display='none';say('Escolha uma opção para continuar.')});$('lhCopyCode').addEventListener('click',async()=>{const chip=$('lumathhuRoomChip');try{await navigator.clipboard.writeText(currentCode);say('Código '+currentCode+' copiado.');}catch(e){say('Código da sala: '+currentCode)}chip.style.display='none';});$('lhOpenLobby').addEventListener('click',()=>{if(socket&&socket.connected)socket.emit('sair-sala');window.lumathhuRoomCode='';lobby.hidden=false;$('lumathhuRoomChip').style.display='none';joinPanel.hidden=true;recentPanel.style.display='none';say('Você saiu da visualização da sala. Pode criar ou acessar outra sala.');window.dispatchEvent(new CustomEvent('lumathhu-room-left'))});
  ensureSocket();
+})();
+</script>
+
+<script id="lumathhuRemoveGridBackgroundMasterOnly">
+(function(){
+  const isMaster=()=>{
+    if(window.lumathhuRoomCode) return window.lumathhuRoomRole==='gm';
+    return !!window.rpgForgeRole?.isGM?.();
+  };
+  function getGrid(){return document.querySelector('#map .grid, .canvasWrap .grid, .grid');}
+  function syncVisibility(){
+    const b=document.getElementById('removeGridBackgroundTool');
+    if(b) b.hidden=!isMaster();
+  }
+  function clearBackground(){
+    if(!isMaster()){syncVisibility();return;}
+    const grid=getGrid();
+    if(!grid){alert('Não foi possível encontrar a grade.');return;}
+    document.querySelectorAll('#map .gridMapBackground').forEach(el=>el.remove());
+    grid.dataset.backgroundImage='';
+    grid.dataset.backgroundWidth=''; grid.dataset.backgroundHeight='';
+    grid.dataset.backgroundX=''; grid.dataset.backgroundY='';
+    const size=grid.style.backgroundSize||'50px 50px';
+    const cell=size.split(',').slice(-1)[0].trim()||'50px 50px';
+    grid.style.backgroundImage='linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)';
+    grid.style.backgroundSize=cell; grid.style.backgroundPosition='0 0'; grid.style.backgroundRepeat='repeat'; grid.style.backgroundColor=''; grid.style.zIndex=grid.dataset.overlay==='1'?'999999':'0';
+    window.rpgForgeSyncMapNow?.(); window.rpgForgeSaveCurrentPageNow?.();
+    window.dispatchEvent(new Event('lumathhu-map-rebuilt'));
+  }
+  function setup(){
+    const toolgrid=document.querySelector('.side .section .toolgrid');
+    if(toolgrid&&!document.getElementById('removeGridBackgroundTool')){
+      const b=document.createElement('button'); b.type='button'; b.id='removeGridBackgroundTool'; b.className='tool';
+      b.textContent='🗑️ Remover fundo do grid'; b.title='Remove somente a imagem de fundo anexada à grade'; b.hidden=true;
+      b.style.gridColumn='1 / -1'; b.addEventListener('click',clearBackground); toolgrid.appendChild(b);
+    }
+    syncVisibility();
+  }
+  window.addEventListener('lumathhu-room-ready',syncVisibility);
+  window.addEventListener('lumathhu-role-changed',syncVisibility);
+  window.addEventListener('rpgforge-room-ready',syncVisibility);
+  document.addEventListener('DOMContentLoaded',setup);
+  setTimeout(setup,300); setTimeout(syncVisibility,900);
+})();
+</script>
+<script id="lumathhuGridBackgroundLayerOrder">
+(function(){
+ function order(){const map=document.getElementById('map');if(!map)return;const grid=map.querySelector('.grid');const bg=map.querySelector('.gridMapBackground');if(bg){bg.style.zIndex='0';bg.style.pointerEvents='none'}if(grid){grid.style.backgroundColor=bg?'transparent':(grid.dataset.overlay==='1'?'transparent':'');grid.style.zIndex=grid.dataset.overlay==='1'?'999999':(bg?'1':'0');grid.style.pointerEvents='none';}}
+ window.addEventListener('lumathhu-map-rebuilt',order);document.addEventListener('DOMContentLoaded',order);setTimeout(order,500);
 })();
 </script>
 </body></html>
