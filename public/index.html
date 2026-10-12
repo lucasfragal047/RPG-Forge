@@ -58,7 +58,7 @@
 .spell-waterWall .spellFx:after{left:0;right:0;bottom:-4%;height:42%;background:radial-gradient(ellipse at center,rgba(180,245,255,.65),transparent 70%);animation:fxWaterPulse .8s ease-in-out infinite alternate}
 .spellLabel{position:absolute;left:7px;bottom:5px;padding:2px 5px;border-radius:5px;background:#101216bb;color:#fff;font-size:10px;z-index:19}.measure{position:absolute;z-index:6;border-top:2px dashed var(--accent);transform-origin:left center;pointer-events:none}.badge{position:absolute;top:-18px;right:-8px;background:#111;color:#fff;border:1px solid var(--line);padding:2px 5px;border-radius:5px;font-size:10px}.card{background:#1b1f27;border:1px solid var(--line);border-radius:9px;padding:10px;margin-bottom:8px}.row{display:flex;justify-content:space-between;gap:8px;margin:6px 0}.muted{color:var(--muted)}.hpbar{height:7px;background:#333;border-radius:99px;overflow:hidden;margin-top:8px}.hpbar i{display:block;height:100%;background:var(--good)}.init{display:flex;align-items:center;gap:8px}.init strong{margin-left:auto}.small{font-size:11px;color:var(--muted)}input,select{background:#12151a;border:1px solid var(--line);color:var(--text);border-radius:6px;padding:6px;width:100%}.dice{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.dice button{padding:9px 3px;background:#242a33;border:1px solid var(--line);border-radius:7px;color:#fff;cursor:pointer}.log{max-height:115px;overflow:auto;font-size:12px;color:var(--muted)}.mode{color:var(--good);font-weight:700}.hidden{display:none}@keyframes magicPulse{from{transform:scale(.96);opacity:.72}to{transform:scale(1.04);opacity:1}}@keyframes particleFall{from{transform:translateY(-15px) rotate(0deg);opacity:0}15%{opacity:1}to{transform:translateY(230px) rotate(260deg);opacity:0}}@keyframes flame{from{transform:scale(.85) rotate(var(--rot));opacity:.65}to{transform:scale(1.12) rotate(calc(var(--rot) + 4deg));opacity:1}}@keyframes fxBoomRing{0%{transform:scale(.35);opacity:0}20%{opacity:1}100%{transform:scale(1.8);opacity:0}}@keyframes fxBoomCore{from{transform:scale(.7);opacity:.65}to{transform:scale(1.2);opacity:1}}@keyframes fxBeamSweep{from{transform:translateX(-20%) rotate(-18deg)}to{transform:translateX(20%) rotate(-18deg)}}@keyframes fxIceSpin{to{transform:rotate(360deg)}}@keyframes fxLightning{0%,72%,100%{opacity:0}73%,79%,84%{opacity:1}77%,81%,88%{opacity:.2}}@keyframes fxLightningGlow{from{opacity:.12;transform:scale(.9)}to{opacity:.65;transform:scale(1.08)}}@keyframes fxArcaneSpin{to{transform:rotate(360deg)}}@keyframes fxArcaneSpinReverse{to{transform:rotate(-360deg)}}@keyframes fxPortalSpin{to{transform:rotate(360deg) scale(1.05)}}@keyframes fxPortalSpinReverse{to{transform:rotate(-360deg) scale(.92)}}@keyframes fxAuraPulse{from{transform:scale(.9);opacity:.4}to{transform:scale(1.08);opacity:1}}@keyframes fxAuraSpin{to{transform:rotate(360deg)}}@keyframes fxVortexSpin{to{transform:rotate(360deg) scale(.98)}}@keyframes fxVortexSpinReverse{to{transform:rotate(-360deg) scale(1.03)}}@keyframes fxCloudDrift{from{transform:translateX(-5%) scale(.95)}to{transform:translateX(6%) scale(1.05)}}@keyframes fxCloudPulse{from{transform:scale(.85);opacity:.25}to{transform:scale(1.15);opacity:.7}}@keyframes fxDarkSpin{to{transform:rotate(360deg)}}@keyframes fxDarkPulse{from{transform:scale(.9);opacity:.2}to{transform:scale(1.1);opacity:.7}}@keyframes fxShockWave{0%{transform:scale(.3);opacity:.9}100%{transform:scale(1.8);opacity:0}}@keyframes fxShockCore{from{transform:scale(.7);opacity:.4}to{transform:scale(1.15);opacity:1}}@keyframes fxSnowSpin{to{transform:rotate(360deg)}}@keyframes fxRainSweep{to{transform:translateX(28px) skewX(-8deg)}}@keyframes fxRipplePulse{from{transform:scale(.75);opacity:.15}to{transform:scale(1.3);opacity:.75}}@keyframes fxBubbles{0%{transform:translateY(14px);opacity:.2}45%{opacity:1}100%{transform:translateY(-40px);opacity:0}}@keyframes fxPoisonPulse{from{transform:scale(.86);opacity:.25}to{transform:scale(1.08);opacity:.72}}@keyframes fxHealCross{0%,100%{transform:translateY(9px) scale(.72);opacity:.3}50%{transform:translateY(-8px) scale(1.05);opacity:1}}@keyframes fxHealRing{from{transform:scale(.5);opacity:.9}to{transform:scale(1.25);opacity:0}}@keyframes fxWaterSlide{to{background-position:38px 0}}@keyframes fxWaterPulse{from{transform:scaleX(.82);opacity:.3}to{transform:scaleX(1.12);opacity:.85}}@media(max-width:900px){.main{grid-template-columns:190px 1fr}.right{display:none}}
 /* Névoa animada — nuvem redimensionável */
-.rpgFogLayer{position:absolute;left:-400px;top:-300px;width:2400px;height:1600px;z-index:1000000!important;pointer-events:none;overflow:visible;display:none}
+.rpgFogLayer{position:absolute;left:-400px;top:-300px;width:2400px;height:1600px;z-index:1000001!important;pointer-events:none;overflow:visible;display:none}
 .rpgFogLayer.active{display:block}
 .rpgFogCloud{--fog-color:#dfe5ee;position:absolute;left:0;top:0;width:100%;height:100%;min-width:260px;min-height:180px;pointer-events:auto;cursor:grab;overflow:visible;filter:blur(.2px);transform-origin:center center;background:var(--fog-color)}
 .rpgFogCloud:active{cursor:grabbing}
@@ -1283,7 +1283,7 @@ window.tool = window.tool || 'select';
   overlayBtn.className='btn';overlayBtn.id='gridOverlayToggle';
   function updateGridOverlay(){
     const on=grid.dataset.overlay==='1';
-    grid.style.zIndex=on?'4':'0';
+    grid.style.zIndex=on?'999999':'0';
     grid.style.pointerEvents='none';
     // No modo sobrepor, somente as linhas da grade ficam sobre o cenário.
     // O fundo da grade precisa ficar transparente para não cobrir o mapa.
@@ -1663,26 +1663,31 @@ window.tool = window.tool || 'select';
     if(!el.innerHTML.trim())el.innerHTML=objectIcon(def[0]);
     const rot=parseFloat(el.dataset.rotation||'0')||0;
     if(rot)el.style.transform='rotate('+rot+'deg)';
-    let dragging=false,off=[0,0];
+    let dragging=false,moved=false,off=[0,0],downAt=[0,0];
     el.onpointerdown=e=>{
+      if(e.button!==0 || tool!=='select')return;
       e.stopPropagation();
-      if(tool!=='select')return;
-      dragging=true;
-      const p=pos(e);
+      dragging=true;moved=false;
+      const p=pos(e); downAt=p;
       off=[p[0]-(parseFloat(el.style.left)||0),p[1]-(parseFloat(el.style.top)||0)];
+      document.querySelectorAll('.mapImageObject,.forgeObj').forEach(q=>{if(q!==el)q.classList.remove('selected')});
       el.classList.add('selected');
-      el.setPointerCapture?.(e.pointerId);
+      try{el.setPointerCapture(e.pointerId)}catch(_){}
+      e.preventDefault();
     };
     el.onpointermove=e=>{
       if(!dragging)return;
       const p=pos(e);
+      if(Math.abs(p[0]-downAt[0])+Math.abs(p[1]-downAt[1])>3)moved=true;
+      if(!moved)return;
       el.style.left=(p[0]-off[0])+'px';
       el.style.top=(p[1]-off[1])+'px';
-      window.rpgForgeSaveCurrentPage?.();
+      if(typeof window.rpgForgeSyncObjectPosition==='function')window.rpgForgeSyncObjectPosition(el);
     };
-    el.onpointerup=e=>{dragging=false;try{el.releasePointerCapture?.(e.pointerId)}catch(_){};window.rpgForgeSaveCurrentPage?.()};
+    el.onpointerup=e=>{const wasMoved=moved;dragging=false;try{el.releasePointerCapture(e.pointerId)}catch(_){};if(wasMoved)window.rpgForgeSaveCurrentPageNow?.();setTimeout(()=>{moved=false},0)};
+    el.onpointercancel=()=>{dragging=false;moved=false};
     el.onclick=e=>{
-      if(dragging)return;
+      if(moved)return;
       e.stopPropagation();
       document.querySelectorAll('.objMenu').forEach(q=>q.remove());
       const menu=document.createElement('div');
@@ -1852,7 +1857,7 @@ window.tool = window.tool || 'select';
   if(!stage || document.querySelector('#weatherBtn')) return;
   const style=document.createElement('style');
   style.textContent=`
-    .weatherOverlay{position:absolute;z-index:5;pointer-events:none;overflow:hidden;display:none;isolation:isolate;left:var(--weather-left,0px);top:var(--weather-top,0px);width:var(--weather-width,100%);height:var(--weather-height,100%);clip-path:inset(0);contain:layout paint;transform:translateZ(0)}
+    .weatherOverlay{position:absolute;z-index:1000000;pointer-events:none;overflow:hidden;display:none;isolation:isolate;left:var(--weather-left,0px);top:var(--weather-top,0px);width:var(--weather-width,100%);height:var(--weather-height,100%);clip-path:inset(0);contain:layout paint;transform:translateZ(0)}
     .weatherOverlay.active{display:block}
     .weatherShade{position:absolute;inset:0;background:rgba(20,25,35,var(--shade,.025));pointer-events:none;mix-blend-mode:soft-light;opacity:.9}
     .weatherParticle{position:absolute;left:var(--px,50%);top:var(--py,50%);pointer-events:none;will-change:transform,opacity;mix-blend-mode:screen}
