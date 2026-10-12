@@ -3109,4 +3109,20 @@ window.tool = window.tool || 'select';
  ensureSocket();
 })();
 </script>
+
+<style id="lumathhu-dice-panel-position-fix">
+/* Correção: a mesa deixa de cobrir a tela e fica no canto inferior direito. */
+#rpgForgeDiceOverlay{inset:auto 26px 26px auto !important;width:min(430px,calc(100vw - 32px)) !important;height:auto !important;min-height:0 !important;display:flex !important;align-items:stretch !important;justify-content:flex-end !important;background:transparent !important;backdrop-filter:none !important;opacity:0;visibility:hidden;pointer-events:none;overflow:visible !important;transition:opacity .22s ease,visibility .22s ease !important}
+#rpgForgeDiceOverlay.show{opacity:1 !important;visibility:visible !important;pointer-events:auto !important}
+#rpgForgeDiceOverlay:before{display:none !important}
+#rpgForgeDiceCard{width:100% !important;min-height:0 !important;max-height:min(72vh,560px);overflow:hidden;padding:14px 14px 12px !important;gap:8px !important;border-radius:17px !important;box-shadow:0 16px 50px #000c,0 0 0 1px #e0b66b44,inset 0 1px #ffffff20 !important;animation:none}
+#rpgForgeDiceOverlay.show #rpgForgeDiceCard{animation:lumathhuDicePanelIn .24s cubic-bezier(.2,.85,.25,1) both}
+#rpgForgeDieStage{height:210px !important;min-height:150px !important;perspective:1000px}
+#rpgForgeDie{transform:scale(.95) !important;transform-origin:center}
+#rpgForgeDiceResult{font-size:clamp(24px,3vw,34px) !important}
+#rpgForgeDiceClose{padding:7px 13px !important;margin-top:0 !important}
+@keyframes lumathhuDicePanelIn{0%{opacity:0;transform:translate(18px,18px) scale(.94)}100%{opacity:1;transform:translate(0,0) scale(1)}}
+@media(max-width:600px){#rpgForgeDiceOverlay{inset:auto 12px 72px 12px !important;width:auto !important}#rpgForgeDiceCard{padding:10px !important;gap:5px !important}#rpgForgeDieStage{height:165px !important;min-height:130px !important}}
+</style>
+
 </body></html>
