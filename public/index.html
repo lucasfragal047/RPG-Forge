@@ -1039,7 +1039,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     }
     function playerContainer(panel){return panel?.querySelector('.ytPlayerHost')||null}
     function getYoutubePlayerVars(){
-      const vars={autoplay:0,controls:1,rel:0,playsinline:1,enablejsapi:1};
+      const vars={autoplay:1,controls:1,rel:0,playsinline:1,enablejsapi:1};
       if(/^https?:$/.test(location.protocol))vars.origin=location.origin;
       return vars;
     }
@@ -1069,7 +1069,13 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
               playerVars:getYoutubePlayerVars(),
               events:{
                 onReady:()=>{playerReady=true;finish(true);if(autoplay)startCurrentVideo()},
-                onAutoplayBlocked:()=>{syncEnabled=false;localStorage.setItem(syncKey,'0');updateSyncStatus(panel,'blocked')},
+                onAutoplayBlocked:()=>{
+                  // O navegador pode bloquear áudio automático em iframes remotos.
+                  // Mantém o vídeo em reprodução silenciosa e pede uma única interação para liberar o som.
+                  syncEnabled=false;localStorage.setItem(syncKey,'0');
+                  try{if(player){player.mute();player.setVolume(0);player.playVideo()}}catch(_){}
+                  updateSyncStatus(panel,'blocked');
+                },
                 onError:(ev)=>{const code=String(ev?.data??'sem código');updateSyncStatus(panel,'error',code);finish(false,new Error('O YouTube recusou o vídeo/player (código '+code+').'))}
               }
             });
@@ -1241,18 +1247,19 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
         const p=activeSoundPanel||openSoundPanel();
         if(!p)return;
         updateNowPlaying(p,data.item,'Som sincronizado pelo Mestre.');
-        if(!syncEnabled){
-          showSyncStatus(p,'activate','O som está pronto. Clique em “Ativar áudio neste dispositivo” uma vez para liberar a reprodução neste navegador.');
-          // Prepara o iframe antes do clique do jogador, para que o clique possa iniciar o áudio diretamente.
-          const activateButton=p.querySelector('.ytEnableSync');
-          if(activateButton){activateButton.disabled=true;activateButton.textContent='Preparando áudio…'}
-          ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{
-            if(!ok){showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a mensagem técnica exibida no painel e tente novamente.');return}
-            const readyButton=p.querySelector('.ytEnableSync');if(readyButton){readyButton.disabled=false;readyButton.textContent='🔊 Ativar áudio neste dispositivo'}
-          }).catch(()=>showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a mensagem técnica exibida no painel e tente novamente.'));
-          return;
-        }
-        ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{try{const id=youtubeId(data.item.url);if(!ok||!id)return;player.unMute();player.setVolume(100);const target=Math.max(0,(Date.now()-(Number(data.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:id,startSeconds:target})}catch(e){updateSyncStatus(p,'blocked')}});
+        const id=youtubeId(data.item.url);
+        if(!syncEnabled)showSyncStatus(p,'activate','O Mestre iniciou a faixa. Se o navegador bloquear o som automático, o vídeo tocará sem áudio até você liberar o som uma vez neste dispositivo.');
+        // Não usar cueVideoById no evento remoto: ele deixa a miniatura pausada. Carrega e toca diretamente.
+        ensurePlayer(p,null,false).then(ok=>{
+          if(!ok||!id)return;
+          const target=Math.max(0,(Date.now()-(Number(data.startedAt)||Date.now()))/1000);
+          try{
+            if(syncEnabled){player.unMute();player.setVolume(100)}
+            else{player.mute();player.setVolume(0)}
+            player.loadVideoById({videoId:id,startSeconds:target});
+            player.playVideo();
+          }catch(e){updateSyncStatus(p,'blocked')}
+        }).catch(()=>showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a conexão e tente novamente.'));
       }
     }
     function bindRoomSoundSocket(){
