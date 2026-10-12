@@ -2154,7 +2154,7 @@ window.tool = window.tool || 'select';
   function prepareToken(t){
     if(!t||t.dataset.tokenEnhanced==='1')return;
     t.dataset.tokenEnhanced='1';
-    if(!t.id)t.id='token-'+(++tokenSeq);
+    if(!t.id)t.id='token-'+(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
     if(!t.dataset.rotation)t.dataset.rotation='0';
     if(!t.dataset.flip)t.dataset.flip='0';
     if(!t.dataset.locked)t.dataset.locked='0';
@@ -2207,12 +2207,15 @@ window.tool = window.tool || 'select';
       t.style.left=nx+'px'; t.style.top=ny+'px';
       updateVisionFocusRing();
       if(typeof window.rpgForgeUpdateFogVision==='function')window.rpgForgeUpdateFogVision();
+      // Envia cada posição durante o arraste, sem esperar a sincronização do mapa inteiro.
+      window.rpgForgeSendTokenMove?.(t);
     });
-    const stop=()=>{moving=false};
+    const stop=()=>{if(!moving)return;moving=false;window.rpgForgeSaveCurrentPageNow?.()};
     t.addEventListener('pointerup',stop); t.addEventListener('pointercancel',stop);
   }
 
   mapEl.querySelectorAll('.token').forEach(prepareToken);
+  window.addEventListener('lumathhu-map-rebuilt',()=>mapEl.querySelectorAll('.token').forEach(t=>{t.dataset.tokenEnhanced='';prepareToken(t)}));
 
   document.querySelectorAll('.tokenItem[data-kind]').forEach(item=>{
     item.draggable=true;
@@ -2226,7 +2229,7 @@ window.tool = window.tool || 'select';
     const name=e.dataTransfer.getData('rpg-token-name')||'Token';
     const p=pos(e);
     const el=document.createElement('div');
-    el.className='token '+kind; el.id='token-'+(++tokenSeq); el.title=name; el.dataset.name=name;
+    el.className='token '+kind; el.id='token-'+(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2)); el.title=name; el.dataset.name=name;
     el.textContent=kind==='player'?'P':kind==='npc'?'N':'M';
     el.style.left=(p[0]-21)+'px'; el.style.top=(p[1]-21)+'px'; el.style.zIndex=4;
     mapEl.appendChild(el); prepareToken(el);
@@ -3034,16 +3037,19 @@ window.tool = window.tool || 'select';
  if(window.__lumathhuSharedMapSync)return;window.__lumathhuSharedMapSync=true;
  const map=document.getElementById('map');if(!map)return;
  let roomCode='',pageId='page-1',timer=0,applying=false,lastSent='';
+ window.rpgForgeSendTokenMove=function(t){const s=window.rpgForgeSocket;if(!t||!s||!s.connected||!roomCode)return;s.volatile.emit('rpg-token-move',{sala:roomCode,pageId,tokenId:t.id,left:parseFloat(t.style.left)||0,top:parseFloat(t.style.top)||0})};
+ function bindMoveListener(){const s=window.rpgForgeSocket;if(!s||s.__lumathhuTokenMoveListener)return;s.__lumathhuTokenMoveListener=true;s.on('rpg-token-move',d=>{if(!d||d.pageId!==pageId||!d.tokenId)return;const t=[...map.querySelectorAll('.token')].find(x=>x.id===d.tokenId);if(!t||t.dataset.localDragging==='1')return;t.style.left=d.left+'px';t.style.top=d.top+'px';try{window.rpgForgeUpdateFogVision?.();window.rpgForgeUpdateWeatherBounds?.()}catch(_){}});}
+ bindMoveListener();
  const gridSelector='.grid';
  function getLocalGrid(){const g=map.querySelector(gridSelector);return g?g.cloneNode(true):null}
  function serializable(){const clone=map.cloneNode(true);clone.querySelectorAll('#weatherOverlay,.rpgFogVisionMask,#rpgFogLayer').forEach(x=>x.remove());clone.querySelectorAll('.spellResizeHandle').forEach(x=>x.remove());clone.querySelectorAll('.spellArea').forEach(x=>x.classList.remove('spellEditing','spellMoving'));const grid=clone.querySelector(gridSelector);if(grid){grid.dataset.overlay=grid.dataset.overlay==='1'?'1':'0';}return {html:clone.innerHTML}}
  function send(){if(applying)return;const s=window.rpgForgeSocket;if(!s||!s.connected||!roomCode)return;const st=serializable();const raw=JSON.stringify(st);if(raw===lastSent)return;lastSent=raw;s.emit('lumathhu-map-sync',{sala:roomCode,pageId,state:st})}
  function queue(){if(applying)return;clearTimeout(timer);timer=setTimeout(send,45)}
- function receive(e){const d=e.detail||{};if(!d.state||typeof d.state.html!=='string'||(d.pageId&&pageId&&d.pageId!==pageId))return;applying=true;try{const oldPositions=new Map();map.querySelectorAll('.token[id]').forEach(t=>oldPositions.set(t.id,{left:t.style.left,top:t.style.top}));const persistentLayers=[...map.querySelectorAll('#weatherOverlay,#rpgFogLayer')];const grid=getLocalGrid();const holder=document.createElement('div');holder.innerHTML=d.state.html;holder.querySelectorAll('#weatherOverlay,#rpgFogLayer,.rpgFogVisionMask').forEach(x=>x.remove());const incomingGrid=holder.querySelector(gridSelector);if(incomingGrid&&grid){grid.style.cssText=incomingGrid.style.cssText;grid.className=incomingGrid.className;grid.dataset.overlay=incomingGrid.dataset.overlay||'0';incomingGrid.replaceWith(grid)}else if(grid&&!incomingGrid){holder.insertBefore(grid,holder.firstChild)}map.innerHTML=holder.innerHTML;const renderedGrid=map.querySelector(gridSelector);if(renderedGrid&&renderedGrid!==grid)renderedGrid.replaceWith(grid);persistentLayers.forEach(layer=>{if(!map.contains(layer))map.appendChild(layer)});try{window.rpgForgeUpdateWeatherBounds?.();window.rpgForgeUpdateFogVision?.()}catch(_){}map.querySelectorAll('.token[id]').forEach(t=>{const old=oldPositions.get(t.id);if(!old)return;const nextLeft=t.style.left,nextTop=t.style.top;if(old.left===nextLeft&&old.top===nextTop)return;t.style.transition='none';t.style.left=old.left;t.style.top=old.top;void t.offsetWidth;t.style.transition='left 55ms linear, top 55ms linear';requestAnimationFrame(()=>{t.style.left=nextLeft;t.style.top=nextTop})});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:map.innerHTML};lastSent=JSON.stringify(serializable());}catch(err){console.warn('LUMATHHU: falha ao sincronizar mapa',err)}finally{setTimeout(()=>{applying=false},80)}}
- const obs=new MutationObserver(m=>{if(m.some(x=>x.type==='childList'||x.type==='attributes'))queue()});obs.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class','src','data-locked','data-item','data-obj','data-hidden-items']});
+ function receive(e){const d=e.detail||{};if(!d.state||typeof d.state.html!=='string'||(d.pageId&&pageId&&d.pageId!==pageId))return;applying=true;try{const oldPositions=new Map();map.querySelectorAll('.token[id]').forEach(t=>oldPositions.set(t.id,{left:t.style.left,top:t.style.top}));const persistentLayers=[...map.querySelectorAll('#weatherOverlay,#rpgFogLayer')];const grid=getLocalGrid();const holder=document.createElement('div');holder.innerHTML=d.state.html;holder.querySelectorAll('#weatherOverlay,#rpgFogLayer,.rpgFogVisionMask').forEach(x=>x.remove());const incomingGrid=holder.querySelector(gridSelector);if(incomingGrid&&grid){grid.style.cssText=incomingGrid.style.cssText;grid.className=incomingGrid.className;grid.dataset.overlay=incomingGrid.dataset.overlay||'0';incomingGrid.replaceWith(grid)}else if(grid&&!incomingGrid){holder.insertBefore(grid,holder.firstChild)}map.innerHTML=holder.innerHTML;const renderedGrid=map.querySelector(gridSelector);if(renderedGrid&&renderedGrid!==grid)renderedGrid.replaceWith(grid);persistentLayers.forEach(layer=>{if(!map.contains(layer))map.appendChild(layer)});try{window.rpgForgeUpdateWeatherBounds?.();window.rpgForgeUpdateFogVision?.()}catch(_){}map.querySelectorAll('.token[id]').forEach(t=>{t.style.transition='none'});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:map.innerHTML};window.dispatchEvent(new Event('lumathhu-map-rebuilt'));lastSent=JSON.stringify(serializable());}catch(err){console.warn('LUMATHHU: falha ao sincronizar mapa',err)}finally{setTimeout(()=>{applying=false},80)}}
+ const obs=new MutationObserver(m=>{if(m.some(x=>x.type==='childList'||x.type==='attributes'))queue()});obs.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['class','src','data-locked','data-item','data-obj','data-hidden-items']});
  document.addEventListener('input',e=>{if(e.target.closest?.('#map'))queue()});document.addEventListener('change',e=>{if(e.target.closest?.('#map'))queue()});
  window.addEventListener('lumathhu-map-sync',receive);window.addEventListener('lumathhu-page-changed',e=>{if(e.detail?.pageId)pageId=e.detail.pageId;});
- function ready(e){const d=e.detail||{};roomCode=d.roomCode||roomCode;pageId=d.currentPageId||pageId;const s=window.rpgForgeSocket;if(s&&!s.__lumathhuMapSyncListener){s.__lumathhuMapSyncListener=true;s.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){pageId=d.pageId;queue()}})}if(s&&s.connected)setTimeout(()=>{if(roomCode)send()},900)}
+ function ready(e){const d=e.detail||{};roomCode=d.roomCode||roomCode;pageId=d.currentPageId||pageId;const s=window.rpgForgeSocket;bindMoveListener();if(s&&!s.__lumathhuMapSyncListener){s.__lumathhuMapSyncListener=true;s.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){pageId=d.pageId;queue()}})}if(s&&s.connected)setTimeout(()=>{if(roomCode)send()},900)}
  window.addEventListener('lumathhu-room-ready',ready);window.addEventListener('rpgforge-room-ready',ready);
  window.addEventListener('lumathhu-room-left',()=>{roomCode='';lastSent=''});
  const origEmit=window.rpgForgeSocket?.emit;
