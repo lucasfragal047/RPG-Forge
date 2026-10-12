@@ -1,7 +1,20 @@
-RPG Forge · LUMATHHU — Correção da grade
+# RPG Forge · LUMATHHU — reprodução sincronizada do YouTube
 
-Correção do botão de grade e da opção “Grade sobrepor”. A visibilidade e o modo de sobreposição agora são sincronizados pela sala. Ao ativar a sobreposição, a grade volta a ficar visível, com linhas transparentes sobre tokens/objetos e abaixo da névoa.
+Esta versão ajusta o fluxo de reprodução sincronizada do som compartilhado.
 
-Atualize os arquivos do projeto no GitHub e aguarde o deploy do Render. Depois recarregue a mesa em todos os dispositivos e teste “Grade: ligada” e “Grade sobrepor: ligada”.
+## Alteração
+- O Mestre continua enviando o comando de reprodução para a sala imediatamente.
+- Nos dispositivos dos jogadores, a reprodução tenta iniciar silenciada para contornar políticas de autoplay do navegador e libera o som quando o player confirma que começou a tocar.
+- Um bloqueio de autoplay com áudio não desativa imediatamente a sincronização da sala.
+- Mantém o restante dos arquivos e recursos da versão de origem.
 
-A sintaxe dos scripts foi validada; a confirmação visual final depende do teste na sala publicada.
+## Limitação importante
+Navegadores podem exigir uma interação do usuário para permitir áudio automático. Nenhum site consegue garantir que todo navegador/dispositivo reproduza som audível sem essa autorização. Se o navegador bloquear até a reprodução silenciada ou exigir ativação inicial, o jogador pode precisar liberar o áudio uma vez; não deve precisar apertar Play a cada faixa quando a autorização e o player estiverem funcionando.
+
+## Publicação
+1. Faça backup da versão atual.
+2. Substitua os arquivos do projeto pelos arquivos deste ZIP, mantendo a estrutura de pastas.
+3. Envie as alterações ao GitHub e aguarde o deploy do Render.
+4. Recarregue a mesa em todos os dispositivos e teste com uma faixa curta.
+
+A sintaxe do servidor e dos scripts inline foi verificada. A reprodução real entre dispositivos ainda precisa ser testada na sala publicada.

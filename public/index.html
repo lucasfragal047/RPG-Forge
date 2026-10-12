@@ -1039,7 +1039,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
     }
     function playerContainer(panel){return panel?.querySelector('.ytPlayerHost')||null}
     function getYoutubePlayerVars(){
-      const vars={autoplay:1,controls:1,rel:0,playsinline:1,enablejsapi:1};
+      const vars={autoplay:0,controls:1,rel:0,playsinline:1,enablejsapi:1};
       if(/^https?:$/.test(location.protocol))vars.origin=location.origin;
       return vars;
     }
@@ -1070,11 +1070,39 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
               events:{
                 onReady:()=>{playerReady=true;finish(true);if(autoplay)startCurrentVideo()},
                 onAutoplayBlocked:()=>{
-                  // O navegador pode bloquear áudio automático em iframes remotos.
-                  // Mantém o vídeo em reprodução silenciosa e pede uma única interação para liberar o som.
-                  syncEnabled=false;localStorage.setItem(syncKey,'0');
-                  try{if(player){player.mute();player.setVolume(0);player.playVideo()}}catch(_){}
-                  updateSyncStatus(panel,'blocked');
+                  // O autoplay com áudio pode ser bloqueado. Mantemos a sincronização habilitada
+                  // e tentamos a reprodução silenciada; não exigimos que o jogador aperte Play.
+                  if(syncEnabled&&latestSyncEvent?.action==='play'&&latestSyncEvent?.item){
+                    const vid=youtubeId(latestSyncEvent.item.url);
+                    try{if(vid){player.mute();pendingSyncedUnmute=true;player.loadVideoById({videoId:vid,startSeconds:Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000)})}}catch(_){}
+                  }else updateSyncStatus(panel,'blocked');
+                },
+                onStateChange:(ev)=>{
+                  const state=ev?.data;
+                  // Se o Mestre usar os controles nativos do próprio YouTube, espelhar Play/Pause
+                  // para a sala. Ignora mudanças geradas pelo comando do botão da mesa para não reiniciar a faixa.
+                  if(roleIsMaster() && (state===YT.PlayerState.PLAYING || state===YT.PlayerState.PAUSED) && state!==masterLastPlayerState){
+                    const previous=masterLastPlayerState;masterLastPlayerState=state;
+                    const recentAppCommand=(Date.now()-masterLastUiCommandAt)<2200;
+                    if(!recentAppCommand && previous!==-1 && latestSyncEvent?.item){
+                      const nativeAction=state===YT.PlayerState.PLAYING?'play':'pause';
+                      const now=Date.now();
+                      const positionSeconds=state===YT.PlayerState.PLAYING?Math.max(0,Number(player?.getCurrentTime?.())||0):undefined;
+                      const commandId='native-'+now+'-'+Math.random().toString(36).slice(2,7);
+                      if(nativeAction==='play'){
+                        latestSyncEvent={...latestSyncEvent,action:'play',commandId,sourceClientId:clientId,startedAt:now,positionSeconds};
+                        lastLocalCommandId=commandId;
+                        sendRoomSoundCommand({action:'play',item:{id:latestSyncEvent.item.id,name:latestSyncEvent.item.name,url:latestSyncEvent.item.url},commandId,sourceClientId:clientId,startedAt:now,positionSeconds});
+                      }else{
+                        latestSyncEvent={...latestSyncEvent,action:'pause',commandId,sourceClientId:clientId,startedAt:now};
+                        sendRoomSoundCommand({action:'pause',commandId,sourceClientId:clientId,startedAt:now});
+                      }
+                    }
+                  }
+                  if(state===YT.PlayerState.PLAYING&&pendingSyncedUnmute&&syncEnabled){
+                    pendingSyncedUnmute=false;
+                    try{player.setVolume(100);player.unMute()}catch(_){}
+                  }
                 },
                 onError:(ev)=>{const code=String(ev?.data??'sem código');updateSyncStatus(panel,'error',code);finish(false,new Error('O YouTube recusou o vídeo/player (código '+code+').'))}
               }
@@ -1099,7 +1127,33 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       const id=youtubeId(latestSyncEvent.item.url);if(!id)return;
       try{player.unMute();player.setVolume(100);player.loadVideoById(id)}catch(e){}
     }
-    function stopPlayback(){try{player?.stopVideo()}catch(e){}}
+    // Inicia a faixa sincronizada com autoplay compatível: nos dispositivos dos jogadores,
+    // começa silenciado (permitido por mais navegadores) e libera o som assim que o vídeo
+    // realmente entra em reprodução. O Mestre continua iniciando com áudio pelo próprio clique.
+    let pendingSyncedUnmute=false;
+    let masterLastUiCommandAt=0;
+    let masterLastPlayerState=-1;
+    function playSyncedVideo(panel,videoId,startedAt,fromMaster=false){
+      if(!player||!playerReady||!videoId)return false;
+      const elapsed=Math.max(0,(Date.now()-(Number(startedAt)||Date.now()))/1000);
+      try{
+        player.setVolume(100);
+        if(fromMaster){
+          player.unMute();
+          player.loadVideoById({videoId,startSeconds:elapsed});
+          pendingSyncedUnmute=false;
+        }else{
+          // Não tentar iniciar com áudio antes do play: isso costuma ser bloqueado pelo navegador.
+          player.mute();
+          pendingSyncedUnmute=true;
+          player.loadVideoById({videoId,startSeconds:elapsed});
+        }
+        return true;
+      }catch(e){
+        console.warn('[LUMATHHU áudio] Falha ao iniciar reprodução sincronizada:',e);
+        return false;
+      }
+    }
     function destroyPlayer(){try{player?.destroy()}catch(e){}player=null;playerReady=false;playerReadyPromise=null;}
     function showSyncStatus(panel,kind,msg){
       const box=panel?.querySelector('.ytSyncStatus');if(!box)return;
@@ -1111,14 +1165,14 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           syncEnabled=true;localStorage.setItem(syncKey,'1');
           const item=latestSyncEvent?.item,id=item?youtubeId(item.url):null;
           if(playerReady&&player){
-            try{player.unMute();player.setVolume(100);if(id){const elapsed=Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:id,startSeconds:elapsed})}updateSyncStatus(panel);return}catch(e){}
+            try{if(id){const pos=Math.max(0,Number(latestSyncEvent.positionSeconds)||0);playSyncedVideo(panel,id,(Number(latestSyncEvent.startedAt)||Date.now())-pos*1000,false)}updateSyncStatus(panel);return}catch(e){}
           }
           b.disabled=true;b.textContent='Preparando áudio…';
           ensurePlayer(panel,id,false).then(ok=>{
             if(!ok){syncEnabled=false;localStorage.setItem(syncKey,'0');showSyncStatus(panel,'error','O player do YouTube não carregou. Confira a conexão ou bloqueador de anúncios e tente novamente.');return}
             if(latestSyncEvent?.action==='play'){
-              try{player.unMute();player.setVolume(100);const vid=youtubeId(latestSyncEvent.item?.url);if(vid){const elapsed=Math.max(0,(Date.now()-(Number(latestSyncEvent.startedAt)||Date.now()))/1000);player.loadVideoById({videoId:vid,startSeconds:elapsed})}}
-              catch(e){showSyncStatus(panel,'blocked','O player foi preparado, mas o navegador bloqueou a reprodução. Clique novamente em ativar áudio.')}
+              try{const vid=youtubeId(latestSyncEvent.item?.url);const pos=Math.max(0,Number(latestSyncEvent.positionSeconds)||0);if(vid&&!playSyncedVideo(panel,vid,(Number(latestSyncEvent.startedAt)||Date.now())-pos*1000,false))showSyncStatus(panel,'blocked','O navegador bloqueou a reprodução automática. A mesa continuará sincronizando os comandos do Mestre.')}
+              catch(e){showSyncStatus(panel,'blocked','O navegador bloqueou a reprodução automática. A mesa continuará sincronizando os comandos do Mestre.')}
             }
             updateSyncStatus(panel);
           }).catch(()=>{syncEnabled=false;localStorage.setItem(syncKey,'0');showSyncStatus(panel,'error','Falha ao iniciar o áudio. Tente novamente.')});
@@ -1146,6 +1200,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
           const play=document.createElement('button');play.className='btn';play.textContent='▶ Tocar';
           play.onclick=()=>{
             const startedAt=Date.now();
+            masterLastUiCommandAt=startedAt;
             const cmd='cmd-'+startedAt+'-'+Math.random().toString(36).slice(2,7);lastLocalCommandId=cmd;
             latestSyncEvent={action:'play',item,commandId:cmd,sourceClientId:clientId,startedAt};
             if(activeSoundPanel)updateNowPlaying(activeSoundPanel,item,'Reproduzindo para todos…');
@@ -1153,11 +1208,11 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
             const sent=sendRoomSoundCommand({action:'play',item:{id:item.id,name:item.name,url:item.url},commandId:cmd,sourceClientId:clientId,startedAt});
             // Se o player já está pronto, iniciar dentro do próprio clique preserva a ativação do navegador.
             if(playerReady&&player){
-              try{player.unMute();player.setVolume(100);player.loadVideoById(youtubeId(item.url))}catch(e){console.warn('[LUMATHHU áudio] Não foi possível iniciar a faixa:',e)}
+              try{playSyncedVideo(activeSoundPanel,youtubeId(item.url),startedAt,true)}catch(e){console.warn('[LUMATHHU áudio] Não foi possível iniciar a faixa:',e)}
             }else{
               ensurePlayer(activeSoundPanel,youtubeId(item.url),false).then(ok=>{
                 if(!ok){showSyncStatus(activeSoundPanel,'error','O player ainda não está pronto. Tente novamente; o comando já foi enviado para a sala.');return}
-                try{player.unMute();player.setVolume(100);player.loadVideoById(youtubeId(item.url))}catch(e){console.warn('[LUMATHHU áudio] Falha ao iniciar após carregar:',e)}
+                try{playSyncedVideo(activeSoundPanel,youtubeId(item.url),startedAt,true)}catch(e){console.warn('[LUMATHHU áudio] Falha ao iniciar após carregar:',e)}
               });
             }
             if(!sent)showSyncStatus(activeSoundPanel,'error','Conexão da sala indisponível. Reconecte à mesa e tente novamente.');
@@ -1226,7 +1281,7 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
         };
         panel.querySelector('.ytAdd').onclick=add;panel.querySelector('.ytUrl').onkeydown=e=>{if(e.key==='Enter')add()};
       }
-      if(!syncEnabled&&syncConnected)showSyncStatus(panel,'activate','Cada jogador precisa clicar uma vez em “Ativar áudio neste dispositivo”. Depois disso, quando o Mestre tocar, o som poderá iniciar neste navegador.');
+      if(!syncEnabled&&syncConnected)showSyncStatus(panel,'activate','Cada jogador pode precisar liberar o áudio uma vez neste navegador. Depois disso, o Mestre controla Play/Pause para a sala; a reprodução tenta iniciar sem exigir que cada jogador aperte Play.');
       // No dispositivo do Mestre, inicializa o iframe ao abrir o painel, não depois de clicar em Tocar.
       // Assim o clique em uma faixa não fica preso a um await que pode perder a permissão de autoplay.
       if(roleIsMaster()){
@@ -1242,24 +1297,24 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       if((Number(data.seq)||0)<=lastSyncSeq)return;
       lastSyncSeq=Number(data.seq)||lastSyncSeq;latestSyncEvent=data;
       if(data.action==='stop'){stopPlayback();if(activeSoundPanel){const wrap=activeSoundPanel.querySelector('.ytPlayerWrap');wrap.style.display='none';updateSyncStatus(activeSoundPanel)}return}
+      if(data.action==='pause'){try{player?.pauseVideo()}catch(e){};return}
       if(data.action==='play'&&data.item){
         if(data.sourceClientId===clientId&&data.commandId===lastLocalCommandId){lastLocalCommandId=null;return}
         const p=activeSoundPanel||openSoundPanel();
         if(!p)return;
         updateNowPlaying(p,data.item,'Som sincronizado pelo Mestre.');
-        const id=youtubeId(data.item.url);
-        if(!syncEnabled)showSyncStatus(p,'activate','O Mestre iniciou a faixa. Se o navegador bloquear o som automático, o vídeo tocará sem áudio até você liberar o som uma vez neste dispositivo.');
-        // Não usar cueVideoById no evento remoto: ele deixa a miniatura pausada. Carrega e toca diretamente.
-        ensurePlayer(p,null,false).then(ok=>{
-          if(!ok||!id)return;
-          const target=Math.max(0,(Date.now()-(Number(data.startedAt)||Date.now()))/1000);
-          try{
-            if(syncEnabled){player.unMute();player.setVolume(100)}
-            else{player.mute();player.setVolume(0)}
-            player.loadVideoById({videoId:id,startSeconds:target});
-            player.playVideo();
-          }catch(e){updateSyncStatus(p,'blocked')}
-        }).catch(()=>showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a conexão e tente novamente.'));
+        if(!syncEnabled){
+          showSyncStatus(p,'activate','O som está pronto. Se este navegador bloquear a primeira reprodução, clique uma vez em “Ativar áudio neste dispositivo”; depois o Mestre controla as faixas.');
+          // Prepara o iframe antes do clique do jogador, para que o clique possa iniciar o áudio diretamente.
+          const activateButton=p.querySelector('.ytEnableSync');
+          if(activateButton){activateButton.disabled=true;activateButton.textContent='Preparando áudio…'}
+          ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{
+            if(!ok){showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a mensagem técnica exibida no painel e tente novamente.');return}
+            const readyButton=p.querySelector('.ytEnableSync');if(readyButton){readyButton.disabled=false;readyButton.textContent='🔊 Ativar áudio neste dispositivo'}
+          }).catch(()=>showSyncStatus(p,'error','Falha ao inicializar o YouTube neste dispositivo. Confira a mensagem técnica exibida no painel e tente novamente.'));
+          return;
+        }
+        ensurePlayer(p,youtubeId(data.item.url),false).then(ok=>{const id=youtubeId(data.item.url);if(!ok||!id)return;const basePosition=Math.max(0,Number(data.positionSeconds)||0);const adjustedStartedAt=(Number(data.startedAt)||Date.now())-basePosition*1000;if(!playSyncedVideo(p,id,adjustedStartedAt,false))updateSyncStatus(p,'blocked')});
       }
     }
     function bindRoomSoundSocket(){

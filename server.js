@@ -76,9 +76,9 @@ io.on('connection',socket=>{
    const code=String(payload.sala||socket.data.room||'').toUpperCase(),room=rooms.get(code),me=room?.players.get(socket.id);
    if(!room||!me||socket.data.room!==code)return;
    if(me.role!=='gm')return socket.emit('sala-erro','Apenas o Mestre pode controlar o som compartilhado.');
-   const action=payload.action==='stop'?'stop':payload.action==='play'?'play':null;if(!action)return;
+   const action=payload.action==='stop'?'stop':payload.action==='pause'?'pause':payload.action==='play'?'play':null;if(!action)return;
    const event={action,seq:++soundSeq,commandId:String(payload.commandId||('sound-'+Date.now())).slice(0,160),sourceClientId:me.clientId,startedAt:Number(payload.startedAt)||Date.now()};
-   if(action==='play'){
+   if(action==='play'){event.positionSeconds=Math.max(0,Math.min(86400,Number(payload.positionSeconds)||0));
      const item=payload.item||{},url=String(item.url||'').slice(0,1000);
      if(!url)return;
      event.item={id:String(item.id||'').slice(0,160),name:String(item.name||'Som do YouTube').slice(0,120),url};
