@@ -1291,7 +1291,7 @@ window.tool = window.tool || 'select';
     overlayBtn.textContent='Grade sobrepor: '+(on?'ligada':'desligada');
     overlayBtn.classList.toggle('active',on);
   }
-  overlayBtn.onclick=()=>{grid.dataset.overlay=grid.dataset.overlay==='1'?'0':'1';updateGridOverlay()};
+  overlayBtn.onclick=()=>{grid.dataset.overlay=grid.dataset.overlay==='1'?'0':'1';updateGridOverlay();window.dispatchEvent(new CustomEvent('lumathhu-grid-overlay-changed',{detail:{overlay:grid.dataset.overlay==='1'}}));window.rpgForgeSyncMapNow?.()};
   updateGridOverlay();
   const toolsWrap=$('#mapToolsWrap'),toolsPanel=$('#mapToolsPanel'),toolsToggle=$('#mapToolsToggle');
   toolsToggle.onclick=e=>{e.stopPropagation();toolsWrap.classList.toggle('open');toolsToggle.title=toolsWrap.classList.contains('open')?'Fechar ferramentas do mapa':'Abrir ferramentas do mapa'};
@@ -1667,7 +1667,7 @@ window.tool = window.tool || 'select';
     el.onpointerdown=e=>{
       e.stopPropagation();
       if(tool!=='select')return;
-      dragging=true;
+      dragging=true;el.dataset.localDragging='1';
       const p=pos(e);
       off=[p[0]-(parseFloat(el.style.left)||0),p[1]-(parseFloat(el.style.top)||0)];
       el.classList.add('selected');
@@ -1678,9 +1678,10 @@ window.tool = window.tool || 'select';
       const p=pos(e);
       el.style.left=(p[0]-off[0])+'px';
       el.style.top=(p[1]-off[1])+'px';
-      window.rpgForgeSaveCurrentPage?.();
+      window.rpgForgeSendObjectMove?.(el);
     };
-    el.onpointerup=e=>{dragging=false;try{el.releasePointerCapture?.(e.pointerId)}catch(_){};window.rpgForgeSaveCurrentPage?.()};
+    el.onpointerup=e=>{dragging=false;delete el.dataset.localDragging;try{el.releasePointerCapture?.(e.pointerId)}catch(_){};window.rpgForgeSendObjectMove?.(el);window.rpgForgeSaveCurrentPage?.()};
+    el.onpointercancel=el.onpointerup;
     el.onclick=e=>{
       if(dragging)return;
       e.stopPropagation();
@@ -1745,6 +1746,8 @@ window.tool = window.tool || 'select';
   function makeObj(def,x=700,y=400){
     const el=document.createElement('div');
     el.className='forgeObj';
+    el.id='forge-object-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);
+    el.dataset.objectInstanceId=el.id;
     el.dataset.obj=def[0];
     el.dataset.name=def[2];
     el.innerHTML=objectIcon(def[0]);
@@ -2215,7 +2218,7 @@ window.tool = window.tool || 'select';
   }
 
   mapEl.querySelectorAll('.token').forEach(prepareToken);
-  window.addEventListener('lumathhu-map-rebuilt',()=>mapEl.querySelectorAll('.token').forEach(t=>{t.dataset.tokenEnhanced='';prepareToken(t)}));
+  window.addEventListener('lumathhu-map-rebuilt',()=>{mapEl.querySelectorAll('.token').forEach(t=>{t.dataset.tokenEnhanced='';prepareToken(t)});window.rpgForgeRebindObjects?.()});
 
   document.querySelectorAll('.tokenItem[data-kind]').forEach(item=>{
     item.draggable=true;
@@ -3038,18 +3041,21 @@ window.tool = window.tool || 'select';
  const map=document.getElementById('map');if(!map)return;
  let roomCode='',pageId='page-1',timer=0,applying=false,lastSent='';
  window.rpgForgeSendTokenMove=function(t){const s=window.rpgForgeSocket;if(!t||!s||!s.connected||!roomCode)return;s.volatile.emit('rpg-token-move',{sala:roomCode,pageId,tokenId:t.id,left:parseFloat(t.style.left)||0,top:parseFloat(t.style.top)||0})};
+ window.rpgForgeSendObjectMove=function(o){const s=window.rpgForgeSocket;if(!o||!s||!s.connected||!roomCode)return;s.volatile.emit('rpg-object-move',{sala:roomCode,pageId,objectId:o.dataset.objectInstanceId||o.dataset.instanceId||o.id,objKey:o.dataset.obj||'',left:parseFloat(o.style.left)||0,top:parseFloat(o.style.top)||0})};
  function bindMoveListener(){const s=window.rpgForgeSocket;if(!s||s.__lumathhuTokenMoveListener)return;s.__lumathhuTokenMoveListener=true;s.on('rpg-token-move',d=>{if(!d||d.pageId!==pageId||!d.tokenId)return;const t=[...map.querySelectorAll('.token')].find(x=>x.id===d.tokenId);if(!t||t.dataset.localDragging==='1')return;t.style.left=d.left+'px';t.style.top=d.top+'px';try{window.rpgForgeUpdateFogVision?.();window.rpgForgeUpdateWeatherBounds?.()}catch(_){}});}
- bindMoveListener();
+ function bindObjectMoveListener(){const s=window.rpgForgeSocket;if(!s||s.__lumathhuObjectMoveListener)return;s.__lumathhuObjectMoveListener=true;s.on('rpg-object-move',d=>{if(!d||d.pageId!==pageId)return;const all=[...map.querySelectorAll('.forgeObj')];const o=all.find(x=>(x.dataset.objectInstanceId||x.dataset.instanceId||x.id)===d.objectId);if(!o||o.dataset.localDragging==='1')return;o.style.left=d.left+'px';o.style.top=d.top+'px'});}
+ bindMoveListener();bindObjectMoveListener();
  const gridSelector='.grid';
  function getLocalGrid(){const g=map.querySelector(gridSelector);return g?g.cloneNode(true):null}
  function serializable(){const clone=map.cloneNode(true);clone.querySelectorAll('#weatherOverlay,.rpgFogVisionMask,#rpgFogLayer').forEach(x=>x.remove());clone.querySelectorAll('.spellResizeHandle').forEach(x=>x.remove());clone.querySelectorAll('.spellArea').forEach(x=>x.classList.remove('spellEditing','spellMoving'));const grid=clone.querySelector(gridSelector);if(grid){grid.dataset.overlay=grid.dataset.overlay==='1'?'1':'0';}return {html:clone.innerHTML}}
  function send(){if(applying)return;const s=window.rpgForgeSocket;if(!s||!s.connected||!roomCode)return;const st=serializable();const raw=JSON.stringify(st);if(raw===lastSent)return;lastSent=raw;s.emit('lumathhu-map-sync',{sala:roomCode,pageId,state:st})}
  function queue(){if(applying)return;clearTimeout(timer);timer=setTimeout(send,45)}
- function receive(e){const d=e.detail||{};if(!d.state||typeof d.state.html!=='string'||(d.pageId&&pageId&&d.pageId!==pageId))return;applying=true;try{const oldPositions=new Map();map.querySelectorAll('.token[id]').forEach(t=>oldPositions.set(t.id,{left:t.style.left,top:t.style.top}));const persistentLayers=[...map.querySelectorAll('#weatherOverlay,#rpgFogLayer')];const grid=getLocalGrid();const holder=document.createElement('div');holder.innerHTML=d.state.html;holder.querySelectorAll('#weatherOverlay,#rpgFogLayer,.rpgFogVisionMask').forEach(x=>x.remove());const incomingGrid=holder.querySelector(gridSelector);if(incomingGrid&&grid){grid.style.cssText=incomingGrid.style.cssText;grid.className=incomingGrid.className;grid.dataset.overlay=incomingGrid.dataset.overlay||'0';incomingGrid.replaceWith(grid)}else if(grid&&!incomingGrid){holder.insertBefore(grid,holder.firstChild)}map.innerHTML=holder.innerHTML;const renderedGrid=map.querySelector(gridSelector);if(renderedGrid&&renderedGrid!==grid)renderedGrid.replaceWith(grid);persistentLayers.forEach(layer=>{if(!map.contains(layer))map.appendChild(layer)});try{window.rpgForgeUpdateWeatherBounds?.();window.rpgForgeUpdateFogVision?.()}catch(_){}map.querySelectorAll('.token[id]').forEach(t=>{t.style.transition='none'});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:map.innerHTML};window.dispatchEvent(new Event('lumathhu-map-rebuilt'));lastSent=JSON.stringify(serializable());}catch(err){console.warn('LUMATHHU: falha ao sincronizar mapa',err)}finally{setTimeout(()=>{applying=false},80)}}
- const obs=new MutationObserver(m=>{if(m.some(x=>x.type==='childList'||x.type==='attributes'))queue()});obs.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['class','src','data-locked','data-item','data-obj','data-hidden-items']});
+ window.rpgForgeSyncMapNow=function(){if(applying)return;clearTimeout(timer);send()};
+ function receive(e){const d=e.detail||{};if(!d.state||typeof d.state.html!=='string'||(d.pageId&&pageId&&d.pageId!==pageId))return;applying=true;try{const oldPositions=new Map();map.querySelectorAll('.token[id]').forEach(t=>oldPositions.set(t.id,{left:t.style.left,top:t.style.top}));const persistentLayers=[...map.querySelectorAll('#weatherOverlay,#rpgFogLayer')];const grid=getLocalGrid();const holder=document.createElement('div');holder.innerHTML=d.state.html;holder.querySelectorAll('#weatherOverlay,#rpgFogLayer,.rpgFogVisionMask').forEach(x=>x.remove());const incomingGrid=holder.querySelector(gridSelector);if(incomingGrid&&grid){grid.style.cssText=incomingGrid.style.cssText;grid.className=incomingGrid.className;grid.dataset.overlay=incomingGrid.dataset.overlay||'0';grid.style.zIndex=grid.dataset.overlay==='1'?'4':'0';grid.style.pointerEvents='none';grid.style.backgroundColor=grid.dataset.overlay==='1'?'transparent':'';incomingGrid.replaceWith(grid)}else if(grid&&!incomingGrid){holder.insertBefore(grid,holder.firstChild)}map.innerHTML=holder.innerHTML;const renderedGrid=map.querySelector(gridSelector);if(renderedGrid&&renderedGrid!==grid)renderedGrid.replaceWith(grid);persistentLayers.forEach(layer=>{if(!map.contains(layer))map.appendChild(layer)});try{window.rpgForgeUpdateWeatherBounds?.();window.rpgForgeUpdateFogVision?.()}catch(_){}map.querySelectorAll('.token[id]').forEach(t=>{t.style.transition='none'});window.rpgForgePageSnapshot={...(window.rpgForgePageSnapshot||{}),html:map.innerHTML};window.dispatchEvent(new Event('lumathhu-map-rebuilt'));try{document.getElementById('gridOverlayToggle')?.classList.toggle('active',grid?.dataset.overlay==='1');const b=document.getElementById('gridOverlayToggle');if(b)b.textContent='Grade sobrepor: '+(grid?.dataset.overlay==='1'?'ligada':'desligada')}catch(_){}lastSent=JSON.stringify(serializable());}catch(err){console.warn('LUMATHHU: falha ao sincronizar mapa',err)}finally{setTimeout(()=>{applying=false},80)}}
+ const obs=new MutationObserver(m=>{if(m.some(x=>x.type==='childList'||x.type==='attributes'))queue()});obs.observe(map,{subtree:true,childList:true,attributes:true,attributeFilter:['class','src','style','data-overlay','data-locked','data-item','data-obj','data-hidden-items']});
  document.addEventListener('input',e=>{if(e.target.closest?.('#map'))queue()});document.addEventListener('change',e=>{if(e.target.closest?.('#map'))queue()});
  window.addEventListener('lumathhu-map-sync',receive);window.addEventListener('lumathhu-page-changed',e=>{if(e.detail?.pageId)pageId=e.detail.pageId;});
- function ready(e){const d=e.detail||{};roomCode=d.roomCode||roomCode;pageId=d.currentPageId||pageId;const s=window.rpgForgeSocket;bindMoveListener();if(s&&!s.__lumathhuMapSyncListener){s.__lumathhuMapSyncListener=true;s.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){pageId=d.pageId;queue()}})}if(s&&s.connected)setTimeout(()=>{if(roomCode)send()},900)}
+ function ready(e){const d=e.detail||{};roomCode=d.roomCode||roomCode;pageId=d.currentPageId||pageId;const s=window.rpgForgeSocket;bindMoveListener();bindObjectMoveListener();if(s&&!s.__lumathhuMapSyncListener){s.__lumathhuMapSyncListener=true;s.on('pagina-troca-confirmada',d=>{if(d&&d.pageId){pageId=d.pageId;queue()}})}if(s&&s.connected)setTimeout(()=>{if(roomCode)send()},900)}
  window.addEventListener('lumathhu-room-ready',ready);window.addEventListener('rpgforge-room-ready',ready);
  window.addEventListener('lumathhu-room-left',()=>{roomCode='';lastSent=''});
  const origEmit=window.rpgForgeSocket?.emit;
