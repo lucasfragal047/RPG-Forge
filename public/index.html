@@ -581,16 +581,17 @@ function send(){let i=document.querySelector('#chat'),v=i.value.trim();if(!v)ret
       const grid=mapEl.querySelector('.grid');
       const img=el.querySelector('img');
       if(!grid||!img||!img.src){message('Não foi possível anexar esta imagem ao grid.');return;}
-      const gl=parseFloat(grid.style.left)||-400, gt=parseFloat(grid.style.top)||-300;
-      const left=parseFloat(el.style.left)||0, top=parseFloat(el.style.top)||0;
-      const w=parseFloat(el.style.width)||600, h=parseFloat(el.style.height)||400;
+      // A imagem deve cobrir exatamente a área da grade, não manter o tamanho original importado.
+      const gl=parseFloat(grid.style.left)||0, gt=parseFloat(grid.style.top)||0;
+      const w=parseFloat(grid.style.width)||grid.offsetWidth||600, h=parseFloat(grid.style.height)||grid.offsetHeight||400;
       const src=img.src;
-      // A imagem fica numa camada própria ATRÁS das linhas do grid, nunca como parte da grade.
+      // Camada separada atrás das linhas, dimensionada para acompanhar o grid.
       let bg=mapEl.querySelector('.gridMapBackground');
       if(!bg){bg=document.createElement('div');bg.className='gridMapBackground';bg.style.cssText='position:absolute;pointer-events:none;z-index:0;background-repeat:no-repeat;background-size:100% 100%;';mapEl.insertBefore(bg,grid);}
-      bg.style.left=(gl+(left-gl))+'px'; bg.style.top=(gt+(top-gt))+'px';
-      bg.style.width=w+'px'; bg.style.height=h+'px'; bg.style.backgroundImage='url("'+src.replace(/\\/g,'\\\\').replace(/"/g,'%22')+'")';
-      bg.dataset.image=src; bg.dataset.width=String(w); bg.dataset.height=String(h); bg.dataset.left=bg.style.left; bg.dataset.top=bg.style.top;
+      bg.style.left=gl+'px'; bg.style.top=gt+'px';
+      bg.style.width=w+'px'; bg.style.height=h+'px'; bg.style.backgroundSize='100% 100%';
+      bg.style.backgroundImage='url("'+src.replace(/\\/g,'\\\\').replace(/"/g,'%22')+'")';
+      bg.dataset.image=src; bg.dataset.width=String(w); bg.dataset.height=String(h); bg.dataset.left=bg.style.left; bg.dataset.top=bg.style.top; bg.dataset.fitGrid='1';
       grid.dataset.backgroundImage=''; grid.dataset.backgroundWidth=''; grid.dataset.backgroundHeight=''; grid.dataset.backgroundX=''; grid.dataset.backgroundY='';
       const cell=(grid.style.backgroundSize||'50px 50px').split(',').slice(-1)[0].trim()||'50px 50px';
       grid.style.backgroundColor='transparent'; grid.style.backgroundImage='linear-gradient(rgba(170,180,195,.58) 1px,transparent 1px),linear-gradient(90deg,rgba(170,180,195,.58) 1px,transparent 1px)'; grid.style.backgroundSize=cell; grid.style.backgroundPosition='0 0'; grid.style.backgroundRepeat='repeat'; grid.style.zIndex=grid.dataset.overlay==='1'?'999999':'1';
@@ -3210,6 +3211,29 @@ window.tool = window.tool || 'select';
 (function(){
  function order(){const map=document.getElementById('map');if(!map)return;const grid=map.querySelector('.grid');const bg=map.querySelector('.gridMapBackground');if(bg){bg.style.zIndex='0';bg.style.pointerEvents='none'}if(grid){grid.style.backgroundColor=bg?'transparent':(grid.dataset.overlay==='1'?'transparent':'');grid.style.zIndex=grid.dataset.overlay==='1'?'999999':(bg?'1':'0');grid.style.pointerEvents='none';}}
  window.addEventListener('lumathhu-map-rebuilt',order);document.addEventListener('DOMContentLoaded',order);setTimeout(order,500);
+})();
+</script>
+
+<script id="lumathhuBackgroundFitGridSize">
+(function(){
+  function fit(){
+    const map=document.querySelector('#map'); if(!map)return;
+    const grid=map.querySelector('.grid'); const bg=map.querySelector('.gridMapBackground');
+    if(!grid||!bg||bg.dataset.fitGrid!=='1')return;
+    const left=parseFloat(grid.style.left)||0, top=parseFloat(grid.style.top)||0;
+    const width=parseFloat(grid.style.width)||grid.offsetWidth||600;
+    const height=parseFloat(grid.style.height)||grid.offsetHeight||400;
+    bg.style.left=left+'px'; bg.style.top=top+'px';
+    bg.style.width=width+'px'; bg.style.height=height+'px';
+    bg.style.backgroundSize='100% 100%';
+    bg.dataset.width=String(width); bg.dataset.height=String(height);
+    bg.dataset.left=bg.style.left; bg.dataset.top=bg.style.top;
+  }
+  window.addEventListener('lumathhu-map-rebuilt',()=>setTimeout(fit,0));
+  window.addEventListener('lumathhu-grid-cell-size-changed',()=>setTimeout(fit,0));
+  window.addEventListener('resize',fit);
+  document.addEventListener('DOMContentLoaded',fit);
+  setTimeout(fit,500); setTimeout(fit,1500);
 })();
 </script>
 </body></html>
